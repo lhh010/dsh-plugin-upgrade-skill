@@ -43,7 +43,7 @@ Error: dsh: plugin tree failed to load: dsh: 1 entry did not activate
 ```
 
 **翻译成人话**：插件在等新宿主提供一个叫 `apiProxy` 的服务，但 0.1.2 里这个服务
-已经被整个拆掉了（卡片 ALPHA1-01 记录的破坏性变更），插件永远等不到，启动直接失败。
+已经被整个拆掉了（卡片 DSH-0.1.2-A1-01 记录的破坏性变更），插件永远等不到，启动直接失败。
 
 这正是 #5120 痛点 #4「注入服务漂移：入口永远 pending (waiting for service: …)」的
 同款症状——只不过那里等的是 `remote.agentPresets`，这里等的是被删除的 `apiProxy`。
@@ -61,15 +61,15 @@ Error: dsh: plugin tree failed to load: dsh: 1 entry did not activate
 其余四类: miss
 ```
 
-按 skill 流程，命中 #3 就去读卡片 **ALPHA1-01**（APIProxy 移除 + 17 条操作映射表），
-并连带 **ALPHA2-02**（错误流新契约）。卡片在手，开始迁移。
+按 skill 流程，命中 #3 就去读卡片 **DSH-0.1.2-A1-01**（APIProxy 移除 + 17 条操作映射表），
+并连带 **DSH-0.1.2-A2-02**（错误流新契约）。卡片在手，开始迁移。
 
 ### 第三幕：按卡片迁移 —— 改三处，插件复活
 
 | 改动 | 依据 | 旧写法 → 新写法 |
 | --- | --- | --- |
-| 换注入的服务 | ALPHA1-01：APIProxy 整体移除 | `inject: ["apiProxy"]` → `inject: ["llm"]`（见下方「重要发现」） |
-| 换调用方式 | ALPHA1-01 映射表 | `await ctx.apiProxy.llm.providers()` → `ctx.llm.listProviders()` |
+| 换注入的服务 | DSH-0.1.2-A1-01：APIProxy 整体移除 | `inject: ["apiProxy"]` → `inject: ["llm"]`（见下方「重要发现」） |
+| 换调用方式 | DSH-0.1.2-A1-01 映射表 | `await ctx.apiProxy.llm.providers()` → `ctx.llm.listProviders()` |
 | 删掉死依赖 | #5120 痛点 #2：SDK 包已删除 | `dependencies` 移除 `@deepseek-ai/dsh-host-apiproxy` |
 
 ### 第四幕：迁移后上 0.1.2 验证 —— 启动成功，服务调用走通
@@ -84,6 +84,29 @@ Error: dsh: plugin tree failed to load: dsh: 1 entry did not activate
   **调用本身通了**——这恰好也演示了卡片的归因原则：这是 profile 配置问题，
   不是插件或运行时故障）。
 
+### 补充正控：旧插件放回 0.1.1-rc.2 —— 活得好好的
+
+同一个插件、同一台容器，装进 0.1.1-rc.2（npm latest）的 web profile：
+
+```
+[upgrade-demo] apply() 执行 — 旧 API（apiProxy）路径
+dsh web: http://127.0.0.1:3080
+```
+
+插件正常激活、`apiProxy` 服务存在、宿主完整启动（demo 里 `providers()`
+一行的调用参数不足以走完 0.1.1 的 RPC 信封细节而报错，属 demo 自身
+调用形态问题，不影响结论——**服务在不在、入口活不活**才是本验证的重点）。
+
+新旧宿主对照，结论干脆利落：
+
+| 同一个旧插件 | 0.1.1-rc.2 | 0.1.2-alpha.2（不迁移） | 0.1.2-alpha.2（按 skill 迁移后） |
+| --- | --- | --- | --- |
+| 结果 | 激活成功 | **启动直接失败**（等不到 apiProxy 服务） | 激活成功 + 服务调用走通 |
+
+另有一个意外收获作为旁证：0.1.1-rc.2 用 npm 安装**解析依赖超过 15 分钟未完**，
+换 pnpm 才在 4 分钟内装完——亲身体验了 #5120 里"包管理解析成本"的痛点，
+也正好印证卡片 DSH-0.1.2-A2-03（peer dependency 裁剪）的价值。
+
 ## 四、重要发现：卡片需要补一条「平面」说明
 
 迁移过程中踩到一个卡片没写透的点，值得回馈给 skill：
@@ -95,7 +118,7 @@ Error: dsh: plugin tree failed to load: dsh: 1 entry did not activate
   而是**跳过网关门面、直接注入背后的领域服务**（`llm`、`sessionTitle` 等）；
   `remote` 门面留给浏览器插件（需在 package.json 声明 `dsh.client`）。
 
-**对 skill 的改进建议**：给 ALPHA1-01 补一条实战批注——
+**对 skill 的改进建议**：给 DSH-0.1.2-A1-01 补一条实战批注——
 「迁移前先判定插件运行在宿主平面还是客户端平面：宿主平面消费者直接注入领域服务；
 客户端平面消费者走 `ctx.remote.*`（package.json 需声明 `dsh.client`）。
 两代插件的注入名不等价，直接对号换名会踩 `pending (waiting for service)`」。

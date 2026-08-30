@@ -8,6 +8,8 @@
 
 **Complexity**: ⭐⭐⭐
 
+**Plane**: primarily Web Client (type imports / snapshot reads / slot registration / packaging declarations); no host API migration — only a note on how host-half changes take effect (see Error 6)
+
 **Sources**: Community migration practice (migration completed 2026-08-28, verified by real boot + unit-test regression) — [deepseek-harness discussion #5120](https://github.com/deepseek-ai/deepseek-harness/discussions/5120#discussioncomment-18208001); the six plugin repositories are listed at the bottom.
 
 ---

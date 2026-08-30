@@ -8,6 +8,8 @@
 
 **复杂度**: ⭐⭐⭐
 
+**运行平面**: Web Client 为主（类型导入 / 快照读取 / slot 注册 / 打包声明）；无 host API 迁移，仅附 host 半段生效方式的说明（见常见错误 6）
+
 **素材来源**: 社区迁移实践（2026-08-28 完成迁移，实机 boot 验证 + 单测回归）——[deepseek-harness discussion #5120](https://github.com/deepseek-ai/deepseek-harness/discussions/5120#discussioncomment-18208001)，六个插件仓库见文末。
 
 ---

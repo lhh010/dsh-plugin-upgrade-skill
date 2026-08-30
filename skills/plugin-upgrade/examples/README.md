@@ -11,6 +11,7 @@
 | `03-dual-cohort-plugin.md`（待补充） | 跨 cohort 兼容插件（双版本支持） | ⭐⭐⭐ |
 | `04-preview-cohort-upgrade.md`（待补充） | 未发布 preview cohort 升级（完整流程） | ⭐⭐⭐⭐ |
 | `05-third-party-plugin-patch.md`（待补充） | 第三方预构建插件 pnpm patch | ⭐⭐⭐ |
+| [06-real-world-batch-migration.md](06-real-world-batch-migration.md) | 真实批量迁移实录（6 个插件，三种形态，含踩坑清单） | ⭐⭐⭐ |
 
 ## 如何使用
 

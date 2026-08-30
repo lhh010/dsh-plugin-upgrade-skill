@@ -1,5 +1,7 @@
 # 示例 06：六个真实插件的批量迁移实录（0.1.1-rc.1 → 0.1.2-alpha.1）
 
+**简体中文** | [English](06-real-world-batch-migration.en.md)
+
 **场景**: 6 个已发布的 Web UI 插件（像素宠物 / 进度条 / 输入历史 / 小游戏合集 / 粘贴输入 / 文件追踪）从 `dsh-v0.1.1-rc.1` 批量迁移到 `dsh-v0.1.2-alpha.1`。三种典型形态都覆盖到了：读快照 + 注册 slot 的重灾型、自包含 DOM 的零成本型、仅需清理声明的微小型。
 
 **影响触点**: #3 客户端导入（`dsh-client-runtime` 移除）、快照读取（`ConversationSnapshot` → views）、slot 注册（`ctx.slots.inject`）、`package.json` 的 `dsh.client.inject` 声明

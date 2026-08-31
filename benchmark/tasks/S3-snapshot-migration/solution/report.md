@@ -2,7 +2,7 @@
 
 ## 会坏的面与迁移写法
 
-1. **类型导入（src/client/index.ts:8, Pet.tsx:5）**：`@deepseek-ai/dsh-client-runtime/client`
+1. **类型导入（src/client/index.ts:6, Pet.tsx:8）**：`@deepseek-ai/dsh-client-runtime/client`
    包在 alpha 已移除。`ClientContext`/`ConversationSnapshot` 类型改从
    `@deepseek-ai/cordis` 导入；`package.json` `client.inject` 里的
    `dsh-client-runtime` 声明同步删除（残留会启动报服务缺失）。

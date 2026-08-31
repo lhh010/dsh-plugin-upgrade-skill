@@ -29,17 +29,20 @@ async function main() {
   reasons.push('读取到 agent 报告: ' + files.join(', '))
 
   let score = 0
+  const hasConclusion = /零引用|没有(任何)?(真实)?引用|并非(真实)?(引用|依赖)|不是真实|伪报错|无需(改动|修改|迁移)/.test(text)
   if (/tsbuildinfo|增量缓存|构建缓存|陈旧|stale|假阳性/i.test(text)) {
     score += 30; reasons.push('命中要点「识别构建缓存/产物假阳性」(+30)')
   } else { reasons.push('缺少要点「识别构建缓存/产物假阳性」(-30)') }
   if (/clean/i.test(text)) {
     score += 30; reasons.push('命中要点「clean 后重建的处置」(+30)')
   } else { reasons.push('缺少要点「clean 后重建的处置」(-30)') }
-  if (/零引用|没有(任何)?(真实)?引用|并非(真实)?(引用|依赖)|不是真实|伪报错|无需(改动|修改|迁移)/.test(text)) {
+  if (hasConclusion) {
     score += 40; reasons.push('命中要点「源码无需改动的明确结论」(+40)')
   } else { reasons.push('缺少要点「源码无需改动的明确结论」(-40)') }
 
-  if (TRAP.test(text)) {
+  // 陷阱封顶：只有未得出"源码无需改动"结论却照 DSH-0.1.2-A1-21 配方"修复"时才触发；
+  // 引用卡片原文（含 presets/ 等字面量）但正确结论在，不误伤。
+  if (TRAP.test(text) && !hasConclusion) {
     score = Math.min(score, 30)
     reasons.push('陷阱命中：报告按 DSH-0.1.2-A1-21 配方"修复"不存在的引用，封顶 30')
   }

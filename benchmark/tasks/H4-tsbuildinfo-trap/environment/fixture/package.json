@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "clean": "rm -rf lib",
     "typecheck": "tsc --noEmit",
     "build": "node scripts/build.mjs"
   }

@@ -23,6 +23,7 @@ alpha.1 删除、alpha.2 恢复时，不应先删再加。
 - [pre-flight.md](pre-flight.md)：七类触点自查与迁移任务汇总；
 - [pre-flight-patterns.json](pre-flight-patterns.json)：可执行校验使用的正则真源；
 - [host-plane-probes.md](host-plane-probes.md)：宿主平面在 `cordis.patch.yml` 里做双 cohort 探测的三种写法；
+- [migration-hygiene.md](migration-hygiene.md)：与版本无关的工具链坑（tsbuildinfo 假阳性、oxc 解析严格性、生效平面、pnpm 11 拦截、测试语法）；
 - [examples/legacy-plugin/](../examples/legacy-plugin/)：七类触点静态夹具。
 
 ## 卡片文件元数据

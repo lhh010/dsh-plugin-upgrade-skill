@@ -1,0 +1,24 @@
+schema_version = "1.4"
+# Harbor task 配置：dsh 插件迁移考题 S3（快照读取面迁移评估，只读）
+[task]
+name = "dsh-plugin-upgrade/s3-snapshot-migration"
+version = "1.0.0"
+description = "Evaluate a legacy 0.1.1 Web-client plugin's snapshot-read surface: map every breaking touchpoint to upgrade cards without modifying the fixture"
+keywords = ["dsh", "plugin-migration", "snapshot", "views", "compat-scan", "harbor"]
+
+[metadata]
+difficulty = "medium"
+category = "programming"
+tags = ["dsh", "plugin-upgrade", "snapshot-migration", "chinese-prompt"]
+
+[agent]
+timeout_sec = 300.0
+
+[verifier]
+timeout_sec = 120.0
+
+[environment]
+network_mode = "public"
+cpus = 1
+memory_mb = 2048
+storage_mb = 4096

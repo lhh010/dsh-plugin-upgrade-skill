@@ -1,6 +1,6 @@
 # 评分细则与考点对照
 
-总分 600（6 题 × 100，harbor reward 为 0~1，由 score/100 归一化）。
+总分 800（8 题 × 100，harbor reward 为 0~1，由 score/100 归一化）。
 所有 judge：exit 0，stdout 末行
 `{"score": 0-100, "max": 100, "reasons": [...]}`；`tests/test.sh` 解析末行 JSON，
 把 score/100 写入 `/logs/verifier/reward.txt`。
@@ -11,6 +11,8 @@
 |---|---|---|
 | S1-static-scan | 七类触点自查（pre-flight.md）；**走廊折叠**：DSH-0.1.2-A1-02 ↔ DSH-0.1.2-A2-01；DSH-0.1.2-A1-01 / A1-03 / A1-04 / A1-08 | 期望卡集 {A1-01, A1-02, A1-03, A1-04, A1-08, A2-01} 每卡 100/6 ≈ 16.7；fixture 被改动直接 0（只读纪律） |
 | S2-negative-scan | pre-flight.md 负面清单「扫描不是兼容性证明」；DSH-0.1.2-A1-01 | 命中类映射 A1-01（40）+ 交代零命中类（20）+ 零命中≠兼容（20）+ 声明必须验证（20）；fixture 被改动直接 0 |
+| S3-snapshot-migration | DSH-0.1.2-A1-03 会话视图拆分（legacy 投影两步走 / useSession 座 / cordis 类型导入 / slots.inject） | 五要点各 20：legacy 投影、useSession、@deepseek-ai/cordis、slots.inject、卡片 A1-03 引用；fixture 被改动直接 0 |
+| H4-tsbuildinfo-trap | migration-hygiene §1（构建缓存假阳性）；DSH-0.1.2-A1-21 实战批注（陷阱反面） | 识别缓存假阳性（30）+ clean 处置（30）+ 源码无需改动结论（40）；src 被改动直接 0（陷阱）；报告含 A1-21 配方式修改（presets/、resolveRecordedPreset）封顶 30 |
 | M1-host-migration | DSH-0.1.2-A1-01 宿主平面迁法（inject `llm` + `ctx.llm.listProviders()`）；死依赖清理（#5120 痛点 #2） | 容器冷启动激活 100；改了但仍有 pending / plugin tree failed 40；`dsh plugin add` 失败 30；fixture 未改 0 |
 | H1-plane-trap | DSH-0.1.2-A1-01 实战批注「先判平面再选注入名」；验证报告第四节（误换 remote → `pending (waiting for service: remote)`） | 同 M1 分档；另加静态门槛：inject 含 remote 不含 llm → 封顶 20（注释陷阱） |
 | H2-baseline-trap | rollup R-06 迁移前 baseline 归因 | 报告含 baseline/预存/豁免归因且与迁移切割（60）+ 容器激活（40）− 偷修预存测试文件（30，保底 0）；fixture 未改 0 |

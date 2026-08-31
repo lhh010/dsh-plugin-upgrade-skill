@@ -1,0 +1,3 @@
+- insert:
+    - id: bench-catalog
+      name: '@demo/dsh-bench-catalog'

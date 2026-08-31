@@ -67,7 +67,7 @@ harbor run -p benchmark/tasks/S1-static-scan -a oracle
 # 单题评测某个 agent
 harbor run -p benchmark/tasks/M1-host-migration -a claude-code -m anthropic/claude-opus-4-1
 
-# 全部 6 题：-p 指向 tasks/ 目录即按 dataset 批量跑
+# 全部 8 题：-p 指向 tasks/ 目录即按 dataset 批量跑
 harbor run -p benchmark/tasks -a claude-code -m anthropic/claude-opus-4-1
 ```
 
@@ -121,7 +121,7 @@ harbor run -p benchmark/tasks -a claude-code -m anthropic/claude-opus-4-1
   它的 README 也注明了"只是考题素材，不许发布"。**新增题目时保持这两条**，
   目的是防止有人不小心把这些假插件发到 npm 上——它们运行不了，发出去只会
   污染环境。
-- 新增题目用 `harbor task init` 起骨架，再对照现有 6 题的布局补齐
+- 新增题目用 `harbor task init` 起骨架，再对照现有 8 题的布局补齐
   judge / solve.sh，并用 `harbor run -p <题> -a oracle` 验证标准答案得 1.0。
 - 在 benchmark 的 Markdown 里引用升级卡时，要写完整编号（如
   `DSH-0.1.2-A1-01`，不能简写成"A1-01"）。仓库自检会查两件事：这个编号

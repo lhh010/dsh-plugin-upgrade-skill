@@ -12,7 +12,7 @@ English | [简体中文](06-real-world-batch-migration.md)
 
 **Sources**: Community migration practice (migration completed 2026-08-28, verified by real boot + unit-test regression) — [deepseek-harness discussion #5120](https://github.com/deepseek-ai/deepseek-harness/discussions/5120#discussioncomment-18208001); the six plugin repositories are listed at the bottom.
 
-> Corridor coverage note: the existing corridor cards cover `dsh-v0.1.1-rc.2 → dsh-v0.1.2-alpha.1` (see the from/to in [v0.1.2-alpha.1.md](../references/v0.1.2-alpha.1.md)), while this example starts from `0.1.1-rc.1` — the rc.1 → rc.2 segment has no cards yet. The technical claims in this example (client-runtime removal, `ctx.slots.inject`, `views.get('chat')?.legacy`, etc.) are first-hand sources for that segment, pending cards; the closest existing card is DSH-0.1.2-A1-03 · 会话视图工程大幅拆分 (session-view engineering split).
+> Corridor coverage note: the corridor now covers `dsh-v0.1.1-rc.1 → dsh-v0.1.2-alpha.2` (when this example was written the rc.1 → rc.2 segment had no cards; it was later filled by [v0.1.1-rc.2.md](../references/v0.1.1-rc.2.md), 3 cards, `DSH-0.1.1-R2` prefix). The technical claims in this example (client-runtime removal, `ctx.slots.inject`, `views.get('chat')?.legacy`, etc.) were first-hand sources at the time of writing; the closest existing card is DSH-0.1.2-A1-03 · 会话视图工程大幅拆分 (session-view engineering split).
 
 ---
 

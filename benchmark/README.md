@@ -41,3 +41,159 @@ honestly instead of quietly fixing it and pretending nothing happened).
 | M4-peer-prerelease-range | Hands-on | A peer lower bound written as ^0.1.0-rc.8 does not match 0.1.2-alpha.2 under npm semver's prerelease rule: does it rewrite the bound to the target cohort instead of widening it into a meaningless range |
 | H7-locale-trap | Hands-on | A web plugin anchors host UI by display text, which breaks silently once the host copy is localized: does it switch to a stable data-slot anchor and assert the injection actually rendered |
 
+## Task format (Harbor task layout)
+
+Each task directory `tasks/<task-id>/` is a self-contained Harbor task:
+
+```
+tasks/<task-id>/
+├── instruction.md        # the prompt given to the agent (was task.md)
+├── task.toml             # Harbor config: name, timeout, resources, network
+├── environment/
+│   ├── Dockerfile        # task environment: node:24-bookworm + git baseline commit;
+│   │                     # hands-on tasks (M/H prefix) also install dsh 0.1.2-alpha.2 globally
+│   └── fixture/          # the plugin code under test (private:true — cannot run, must not be published)
+├── tests/
+│   ├── test.sh           # harbor verifier entry point: runs the judge and normalizes
+│   │                     # the 0-100 score to 0~1 in /logs/verifier/reward.txt
+│   ├── judge.mjs         # grading logic (checkpoints, score bands, signal detection — all here)
+│   └── judge-utils.mjs   # shared grading library (profile lifecycle, cold-boot signals)
+├── solution/
+│   ├── solve.sh          # oracle solution (static tasks write a report; hands-on tasks copy the answer into the fixture)
+│   └── ...               # reference answer + what this task tests (SOLUTION.md)
+└── README.md             # task description
+```
+
+The repo also has [`docs/execution-contract.md`](docs/execution-contract.md), which
+defines the unattended-authorization contract, and
+`scripts/validate-execution-contract.mjs`, which checks that every task prompt and
+piece of metadata uses the same version.
+
+**Self-contained**: no external containers needed. The agent works directly inside the
+task environment (a container) — the fixture lives at `/app/fixture/`, and static-task
+reports are written to `/app/agent-output/<task-id>/`; the verifier shares the same
+container as the agent, and for hands-on tasks the judge really creates an isolated
+profile inside the container, installs the plugin, and cold-boots it to tell whether
+it is alive.
+
+## Prerequisites
+
+- Docker (Harbor runs environments on your local Docker by default; you can also
+  switch to a cloud sandbox such as Daytona with `--env`).
+- Harbor CLI: `uv tool install harbor` or `pip install harbor`.
+- A model API key for the agent (e.g. `ANTHROPIC_API_KEY`, depending on the agent you use).
+
+## How to run
+
+```sh
+# oracle self-check (no API cost): the reference answer must score a perfect 1.0
+harbor run -p benchmark/tasks/S1-static-scan -a oracle
+
+# evaluate a single task with an agent
+harbor run -p benchmark/tasks/M1-host-migration -a claude-code -m anthropic/claude-opus-4-1
+
+# all 21 tasks: pointing -p at the tasks/ directory runs them as a dataset batch
+harbor run -p benchmark/tasks -a claude-code -m anthropic/claude-opus-4-1
+```
+
+Each task's results land in Harbor's trial output directory:
+`/logs/verifier/reward.txt` holds the 0–1 score (mapped from the judge's 0–100), and
+the judge's per-item reasons are in the verifier log.
+
+## How to use with an agent (evaluation protocol)
+
+### Unattended authorization
+
+All 21 `instruction.md` files carry the `BENCHMARK-AUTH-v1` marker: the task prompt
+itself is the user's confirmation of the plan and the execution within the stated
+scope. The agent should complete the necessary analysis/planning and then proceed — it
+must not stop just because Harbor will not send a second round of "confirmation". The
+authorization does not change the task boundaries: the fixtures for S1/S2/S3 still
+require zero changes, H4 keeps `src/` unchanged and only permits cleaning the `lib/`
+build artifacts, and M1/H1/H2/H3/H5/M2/M3/M4/H7/M5/H8 may only modify the fixture, write the specified
+reports, and create one-off local verification assets; publishing, pushing, external
+services, and modifying the skill/judge/reference answers are all outside the
+authorized scope. See [`docs/execution-contract.md`](docs/execution-contract.md) for
+the full semantics and maintenance rules.
+
+First check that the contract is intact:
+
+```sh
+node benchmark/scripts/validate-execution-contract.mjs
+```
+
+1. **Input for the agent**: `instruction.md` is exactly what the user says to the
+   agent — feed it as-is; the working directory (`/app` inside the container) is
+   already stated in the prompt.
+2. **Where the agent writes** (also stated in the prompts):
+   - Static scan tasks (S1/S2/S3): the agent only reads the fixture and writes its
+     report under `/app/agent-output/<task-id>/` (any filename; .md/.txt/.json all fine);
+   - Build-cache diagnosis task (H4): the agent keeps `src/` unchanged, may only clean
+     the `lib/` build artifacts, and writes its report to
+     `/app/agent-output/H4-tsbuildinfo-trap/`;
+   - Hands-on tasks (M1/H1/H2/H3/H5/M2/M3/M4/H7/M5/H8): the agent edits files under `/app/fixture/`
+     directly; H2 additionally requires writing the migration report to
+     `/app/agent-output/H2-baseline-trap/`.
+3. **Grading**: after the agent finishes, Harbor automatically runs `tests/test.sh`;
+   each task's judge prints a single JSON line
+   `{"score": 0-100, "max": 100, "reasons": [...]}`, and test.sh aggregates it into a
+   0–1 reward. See [docs/scoring.md](docs/scoring.md) for the scoring details and
+   checkpoint mapping.
+
+### with-skill vs without-skill comparison (isolating the skill's effect)
+
+Run two rounds with the same agents and the same tasks:
+
+- **with-skill round**: attach this repo's `skills/plugin-upgrade/` to the agent as a
+  skill (prompts unchanged);
+- **without-skill round**: a bare agent, given only the prompts.
+
+The score difference between the two rounds is the skill's net effect. We recommend
+running each round 3 times and taking the median (hands-on tasks have environmental
+noise). Every Harbor trial is a fresh container, so no manual fixture restoration is
+needed between rounds. `BENCHMARK-AUTH-v1` is identical in both rounds: it only
+removes the false zeros caused by the missing confirmation round in an unattended
+environment, and it does not leak migration answers to either round.
+
+## Grading design notes
+
+- **Real activation counts**: for hands-on tasks the judge installs the agent's
+  modified fixture into an isolated profile inside the container (`bench-<task-id>`),
+  cold-boots it, and treats `pending (waiting for service: …)` /
+  `plugin tree failed` / startup reaching the application layer as the liveness
+  signals; the judge cleans up its own assets when done.
+- **No dependence on fixed output text**: the agent's plugin log wording is free; the
+  criteria are host-side signals (e.g. headless must print `MISSING_CREDENTIAL` when
+  there is no key, proving that the plugin tree activated as a whole).
+- **Error tolerance**: missing reports, dsh errors, etc. all count as 0 and are
+  explained in the reasons; the judge itself always exits 0, and if test.sh cannot
+  parse the JSON it falls back to a 0 score.
+
+## Historical documents
+
+- `validation-report-2026-08-30.md`: the skill-effectiveness validation report (v1
+  era). The manual `dsh-verify` container reproduction in its section 6 has been
+  replaced by the self-contained environment — each task image is now built with the
+  same steps as that section (node:24-bookworm + globally installed pnpm/dsh
+  0.1.2-alpha.2).
+- The v1 in-house harness of this directory (`run.mjs` + external container) has been
+  removed; see git history.
+
+## Notes for maintainers (skip if you are not changing tasks)
+
+- Every fake plugin in a task's `environment/fixture/` has `"private": true` in its
+  package.json, and its README states it is "exam material only, do not publish".
+  **Keep both when adding tasks** — the point is to stop anyone from accidentally
+  publishing these fake plugins to npm: they cannot run, and publishing them would
+  only pollute the ecosystem.
+- When adding a task, scaffold it with `harbor task init`, then fill in
+  judge / solve.sh following the layout of the existing 21 tasks, and verify the
+  reference answer scores 1.0 with `harbor run -p <task> -a oracle`.
+- After adding or modifying prompts, run
+  `node benchmark/scripts/validate-execution-contract.mjs` to make sure the
+  authorization marker, the read-only/hands-on boundaries, and the `task.toml`
+  metadata are consistent.
+- When referencing upgrade cards in benchmark Markdown, use the full ID (e.g.
+  `DSH-0.1.2-A1-01`, never the shorthand "A1-01"). The repo self-check verifies two
+  things: that the ID really exists and that its link resolves; if you get it wrong,
+  `node scripts/validate.mjs` fails outright.

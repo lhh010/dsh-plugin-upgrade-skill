@@ -41,6 +41,7 @@ description: 一句话说明做什么、何时触发，以及重要的只读/写
 | [plugin-write](plugin-write/) | 编写 DSH 插件，按目标 Harness 版本选择扩展形态，并区分官方单仓与外部插件规则 | [@omdsh-dev](https://github.com/omdsh-dev) |
 | [plugin-test](plugin-test/) | 为 DSH 插件变更选择测试层级，并覆盖真实组合、发布产物与目标版本产品入口 | [@omdsh-dev](https://github.com/omdsh-dev) |
 | [plugin-release](plugin-release/) | 打包、发布与分发 DSH 插件：发布轨选择、未发布 cohort 安装、CI 门禁与回滚 | [@omdsh-dev](https://github.com/omdsh-dev) |
+| [plugin-runtime-debug](plugin-runtime-debug/) | 依据 DSH 源码契约排查 Web 插件运行时故障（粘贴/附件/输入机、版本 chip 等），方法级不讲答案 | [@lhh010](https://github.com/lhh010) |
 
 ## 版本兼容审计（独立条目）
 

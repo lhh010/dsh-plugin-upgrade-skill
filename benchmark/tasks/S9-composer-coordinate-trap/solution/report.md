@@ -6,7 +6,7 @@ The host input machine maintains **two projections of the same composer document
 (`host-input-contract.ts`):
 
 - the **clipboard projection** — `InputState.draft` and every `Occurrence.offset/length`:
-  a chip is expanded to its whole `clipboardText` (here `[attachment: screenshot.png]`, 26 chars);
+  a chip is expanded to its whole `clipboardText` (here `[attachment: screenshot.png]`, 28 chars);
 - the **detect projection** — `EditorProjection.detectText`: a chip is exactly **one U+FFFC
   character**.
 

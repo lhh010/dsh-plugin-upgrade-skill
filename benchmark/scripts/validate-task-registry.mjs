@@ -88,6 +88,26 @@ function splitRow(line) {
   return line.split('|').slice(1, -1).map((cell) => cell.trim())
 }
 
+/** Row-shape guard for the README task table: each data row must have exactly
+ *  id | Type | description (a row truncated or merged by a bad edit is caught
+ *  here, not just a missing/duplicate id). */
+function checkTaskTableShape(text) {
+  const rows = extractMarkdownTable(text)
+  if (rows === null) return []
+  const failures = []
+  rows.forEach((cells, index) => {
+    if (cells.length !== 3) {
+      failures.push(FAILURE_PREFIX + ' README task table row ' + (index + 1) + ' has ' + cells.length + ' cells (expected 3; a row looks split or merged): ' + cells.join(' | ').slice(0, 100))
+      return
+    }
+    if (cells[0] === '') failures.push(FAILURE_PREFIX + ' README task table row ' + (index + 1) + ' has an empty task id')
+    if (/^(Static|Hands-on)$/.test(cells[1]) === false) {
+      failures.push(FAILURE_PREFIX + ' README task table row ' + (index + 1) + ' has unexpected Type "' + cells[1] + '" (expected Static | Hands-on)')
+    }
+  })
+  return failures
+}
+
 function tableTaskIds(text) {
   const rows = extractMarkdownTable(text)
   if (rows === null) return null
@@ -150,6 +170,9 @@ export function validateRegistry(root) {
     failures.push(`${FAILURE_PREFIX} benchmark/README.md has no task table (header cell "Task" not found)`)
   } else {
     failures.push(...tableConsistency(readmeIds, ids, 'benchmark/README.md'))
+    // Row-shape guard: a table can be consistent (right ids/rows) yet still
+    // be structurally broken by a truncated/merged row (see the S8/S9 break).
+    failures.push(...checkTaskTableShape(readme))
   }
 
   // C. README top count

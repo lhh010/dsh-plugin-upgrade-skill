@@ -46,4 +46,6 @@ a user running v0.2.10 hard-refreshed and the green chip said "already the lates
 
 What is tested: choosing the authoritative conflict source over a fragile cache, scoping a
 behavior change to one acquisition path, and not trusting a cached remote value as ground
-truth next to a locally-known running version.
+truth next to a locally-known running version. Report items 1, 3, 4, 5 are scored; item 2
+(the exact extension/MIME fallback and what the dock chip and upload path each show) is
+guidance for completeness and is not scored.

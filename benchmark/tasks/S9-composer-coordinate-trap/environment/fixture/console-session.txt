@@ -5,8 +5,8 @@
 [12:39:41]   dock chip rendered: [screenshot.png · 48.2 KiB · ×]
 [12:39:41]   composer chip inserted after the draft text
 [12:39:41]   input.state.getSnapshot() after insert:
-              draft = "[attachment: screenshot.png] "   (length 27)
-              occurrences = [{ offset: 0, length: 26, label: "screenshot.png", clipboardText: "[attachment: screenshot.png]" }]
+              draft = "[attachment: screenshot.png] "   (length 29)
+              occurrences = [{ offset: 0, length: 28, label: "screenshot.png", clipboardText: "[attachment: screenshot.png]" }]
 [12:39:41]   → OK
 
 [12:40:05] paste #2: clipboard file "screenshot.png" (51.7 KiB)

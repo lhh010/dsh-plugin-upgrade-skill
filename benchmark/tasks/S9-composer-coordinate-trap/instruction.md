@@ -41,4 +41,6 @@ excerpt, a captured browser session log, and the two host source files my code c
 
 What is tested: tying both symptoms to one underlying contract misread (not two unrelated
 bugs), deriving the correction rule from the host source rather than trial and error, and a
-regression plan that covers the repeat-interaction and removal sequences.
+regression plan that covers the repeat-interaction and removal sequences. Report items 1–4 are
+scored; item 5 (the maintainer's routine source-reading discipline) is guidance for
+completeness and is not scored.

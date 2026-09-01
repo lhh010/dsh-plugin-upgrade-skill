@@ -1,0 +1,25 @@
+schema_version = "1.4"
+# Harbor task config: dsh plugin post-release follow-ups task S10 (static, read-only)
+[task]
+name = "dsh-plugin-upgrade/s10-paste-rename-and-version-chip"
+version = "1.1.0"
+description = "Design unified paste-file renaming with sequence numbering from the authoritative live-chip set, and fix a version chip that reports a CDN-stale fetched tag as the latest"
+keywords = ["dsh", "plugin-runtime", "rename", "version-check", "harbor"]
+
+[metadata]
+difficulty = "medium"
+category = "programming"
+tags = ["dsh", "plugin-release", "client-api-contract", "english-prompt"]
+execution_contract = "BENCHMARK-AUTH-v1"
+
+[agent]
+timeout_sec = 300.0
+
+[verifier]
+timeout_sec = 120.0
+
+[environment]
+network_mode = "public"
+cpus = 1
+memory_mb = 2048
+storage_mb = 4096

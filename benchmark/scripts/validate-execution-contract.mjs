@@ -28,6 +28,7 @@ const expectedModes = new Map([
   ['S7-unpublished-cohort', 'readonly'],
   ['S8-release-routing-trap', 'readonly'],
   ['S9-composer-coordinate-trap', 'readonly'],
+  ['S10-paste-rename-and-version-chip', 'readonly'],
   ['M2-optional-dep-trap', 'mutable'],
   ['M3-session-projection', 'mutable'],
   ['M4-peer-prerelease-range', 'mutable'],

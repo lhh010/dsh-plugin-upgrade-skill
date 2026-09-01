@@ -1,6 +1,6 @@
 # Scoring rules and checkpoint mapping
 
-Total 2400 (24 tasks × 100; the Harbor reward is 0–1, normalized as score/100).
+Total 2500 (25 tasks × 100; the Harbor reward is 0–1, normalized as score/100).
 Every judge: exit 0, with the last stdout line
 `{"score": 0-100, "max": 100, "reasons": [...]}`; `tests/test.sh` parses that last
 line as JSON and writes score/100 to `/logs/verifier/reward.txt`.
@@ -34,6 +34,7 @@ line as JSON and writes score/100 to `/logs/verifier/reward.txt`.
 | H7-locale-trap | rollup R-13 (display-text anchoring breaks silently after localization) | fixture changed (else 0) + static gates (data-slot anchor without the display-text regex: 30; explicit render assertion — throw/assert, a silent `return` does not count: 10) + `dsh plugin add` (10) + host half no pending (10) + `__DSH_BOOT__.entries` contains the plugin (40); a display-text regex (even multi-language) caps at 40. Boundary (same as H3): no browser in the container, client.js runtime behavior is not graded |
 | S8-release-routing-trap | profile-dependency-management.md §8 version routing + §9 tag sync (real 2026-08-31 incident) | Five diagnosis aspects × 20, exactly as the judge scores them: attempt-1 tag-missing attribution (v0.9.5), attempt-2 forward-incompatibility symptom (useConversation), version direction identified (alpha.x build on rc.x runtime), rc-compatible remedy (v0.9.3 — valid only once the missing tag is pushed to the mirror), maintainer tag-sync fix (push --tags to every mirror); fixture modified → flat 0 |
 | S9-composer-coordinate-trap | skills/plugin-runtime-debug (read-the-verb's-contract method; real 2026-09-01 dsh-paste-input v0.1.10 incident) | Five diagnosis aspects × 20: the two projections named (clipboard vs detect/U+FFFC), first-works-then-fails signature, unavailable traced to the declined verb + early bookkeeping delete, conversion rule at both call sites, repeat-interaction + removal regression plan; fixture modified → flat 0 (read-only discipline) |
+| S10-paste-rename-and-version-chip | skills/plugin-runtime-debug (authoritative-state + cached-remote-value families; same 2026-09-01 session's v0.1.10 rename feature and v0.1.11 chip fix) | Five design/diagnosis aspects × 20: rename scheme + numbering, authoritative conflict source (live chips; fragile records cache), paste-only scope, CDN-lagged fetched tag vs running version (show the newer), regression + lib-only release hygiene; fixture modified → flat 0 (read-only discipline) |
 
 ## Liveness signals (shared convention for container tasks)
 

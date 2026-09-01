@@ -1,8 +1,8 @@
 # dsh plugin upgrade tasks (benchmark v2.4 · Harbor format)
 
 The 27 plugin-upgrade tasks measure one thing: **once an AI has our upgrade skill
-installed, will it actually upgrade the plugin**. The first 12 are written exams (read
-the code, produce the answer); the last 15 are hands-on (actually install dsh and run
+installed, will it actually upgrade the plugin**. The first 14 are written exams (read
+the code, produce the answer); the last 14 are hands-on (actually install dsh and run
 the plugin — whether it is alive is obvious at a glance). Every task ships with
 auto-grading, so no human marking is involved.
 
@@ -42,6 +42,7 @@ honestly instead of quietly fixing it and pretending nothing happened).
 | S8-release-routing-trap | Static | A consumer install fails twice: the README-pinned tag is missing from the mirror, then the newest tag crashes on their older runtime — can it diagnose both root causes (tag sync + version routing) and give a working install command |
 | S9-composer-coordinate-trap | Static | A community attachment plugin works on the first paste then fails every later one, and the dock × leaves an `unavailable` chip — can it tie both symptoms to one coordinate-projection misread and derive the conversion from host source |
 | S10-paste-rename-and-version-chip | Static | Post-release follow-ups: pasted files need unified `paste_image(N)` renaming driven by the authoritative live-chip set (drops/picker untouched), and the version chip reported a CDN-stale fetched tag as latest — can it design both correctly |
+| S11-mermaid-lazyload-trap | Static | A lazy-loaded mermaid chunk rollout fails three ways: split-chunk sibling imports 404, a Windows-only 403 from a case-sensitive containment guard, and a Ctrl+scroll double-fire under the zoom modal — can it derive each mechanism from the evidence |
 | M2-optional-dep-trap | Hands-on | The plugin declares an optional dependency but imports it unconditionally at top level (the comment says optional is harmless): does it fix the dependency contract instead of wrapping the import, and prove it with a cold boot |
 | M3-session-projection | Hands-on | A self-assembled profile mounts dsh-tool-todo without the sessionProjections service: does it fix the composition (never edit shipped packages) so the tree activates while the todo tool survives in the final composition |
 | M4-peer-prerelease-range | Hands-on | A peer lower bound written as ^0.1.0-rc.8 does not match 0.1.2-alpha.2 under npm semver's prerelease rule: does it rewrite the bound to the target cohort instead of widening it into a meaningless range |

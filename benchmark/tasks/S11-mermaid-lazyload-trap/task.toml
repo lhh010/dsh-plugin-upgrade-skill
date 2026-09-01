@@ -1,0 +1,25 @@
+schema_version = "1.4"
+# Harbor task config: dsh plugin heavy-dependency lazy-load diagnosis task S11 (static, read-only)
+[task]
+name = "dsh-plugin-upgrade/s11-mermaid-lazyload-trap"
+version = "1.1.0"
+description = "Diagnose a three-incident mermaid lazy-chunk rollout: split-chunk sibling imports 404, a Windows-only 403 from a case-sensitive containment guard, and a Ctrl+wheel double-fire under a zoom modal"
+keywords = ["dsh", "plugin-runtime", "lazy-chunk", "host-route", "harbor"]
+
+[metadata]
+difficulty = "medium"
+category = "programming"
+tags = ["dsh", "plugin-runtime", "client-api-contract", "english-prompt"]
+execution_contract = "BENCHMARK-AUTH-v1"
+
+[agent]
+timeout_sec = 300.0
+
+[verifier]
+timeout_sec = 120.0
+
+[environment]
+network_mode = "public"
+cpus = 1
+memory_mb = 2048
+storage_mb = 4096

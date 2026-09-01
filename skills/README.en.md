@@ -42,6 +42,7 @@ Requirements:
 | [plugin-test](plugin-test/) | Choose the test level for DSH plugin changes, covering real combinations, release artifacts, and target-version product entry points | [@omdsh-dev](https://github.com/omdsh-dev) |
 | [plugin-release](plugin-release/) | Package, publish, and distribute DSH plugins: release track selection, unpublished-cohort installation, CI gates, and rollback | [@omdsh-dev](https://github.com/omdsh-dev) |
 | [plugin-runtime-debug](plugin-runtime-debug/) | Diagnose DSH Web plugin runtime failures against host source contracts (paste/attachment/input machine, version chips, etc.) — method-level, no answers | [@lhh010](https://github.com/lhh010) |
+| [plugin-heavy-dep](plugin-heavy-dep/) | Integrate heavy dependencies (mermaid etc.) into lightweight DSH Web plugins: lazy single-file chunks, host routes with robust containment, SVG whitelist sanitization, event ownership | [@lhh010](https://github.com/lhh010) |
 
 ## Version compatibility audit (separate entry)
 

@@ -35,6 +35,8 @@ const expectedModes = new Map([
   ['S8-release-routing-trap', 'readonly'],
   ['S9-composer-coordinate-trap', 'readonly'],
   ['S10-paste-rename-and-version-chip', 'readonly'],
+  ['S11-mermaid-lazyload-trap', 'readonly'],
+  ['S11-mermaid-lazyload-trap', 'readonly'],
   ['M2-optional-dep-trap', 'mutable'],
   ['M3-session-projection', 'mutable'],
   ['M4-peer-prerelease-range', 'mutable'],

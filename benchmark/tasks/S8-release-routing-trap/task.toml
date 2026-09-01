@@ -1,0 +1,25 @@
+schema_version = "1.4"
+# Harbor task config: dsh plugin release-engineering diagnosis task S8 (static, read-only)
+[task]
+name = "dsh-plugin-upgrade/s8-release-routing-trap"
+version = "1.1.0"
+description = "Diagnose a two-stage community install failure: a README-pinned tag missing from the public mirror, then a forward-incompatible plugin version crashing on the consumer's DSH"
+keywords = ["dsh", "plugin-release", "tag-sync", "version-routing", "harbor"]
+
+[metadata]
+difficulty = "medium"
+category = "programming"
+tags = ["dsh", "plugin-release", "release-engineering", "english-prompt"]
+execution_contract = "BENCHMARK-AUTH-v1"
+
+[agent]
+timeout_sec = 300.0
+
+[verifier]
+timeout_sec = 120.0
+
+[environment]
+network_mode = "public"
+cpus = 1
+memory_mb = 2048
+storage_mb = 4096

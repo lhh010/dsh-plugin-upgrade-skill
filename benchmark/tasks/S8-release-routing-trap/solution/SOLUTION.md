@@ -4,7 +4,8 @@
 
 发布工程双陷阱的归因：**tag 分发缺失**（文档引用的 tag 从未被同步到镜像 → "Could not resolve"）
 与**版本路由缺失**（面向 alpha.x 构建的插件装上 rc.x 运行时 → `useConversation is not a function` 崩溃）；
-正确处置 = 消费者装 rc 兼容旧版（v0.9.3）+ 维护者补 tag 同步与 README 版本路由。
+正确处置 = 维护者先把缺失的 v0.9.3 tag 同步到镜像、消费者再装 rc 兼容旧版（v0.9.3）
++ 维护者补 tag 同步与 README 版本路由。
 
 ## 参考报告
 

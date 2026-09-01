@@ -16,4 +16,4 @@ for (let i = lines.length - 1; i >= 0; i -= 1) {
 }
 const reward = Math.max(0, Math.min(1, score / 100));
 fs.writeFileSync("/logs/verifier/reward.txt", String(reward) + "\n")
-' 
+'

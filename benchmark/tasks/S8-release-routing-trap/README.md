@@ -14,7 +14,7 @@ production-freeze constraint, and the maintainer-side fix. 题面见
 - **Oracle**: `harbor run -p benchmark/tasks/S8-release-routing-trap -a oracle`, expected reward 1.0.
 
 ```
-environment/fixture/   # evidence pack: mirror tags, crash log, dsh version, compat table, sync script
+environment/fixture/   # evidence pack: mirror tags, dsh version, compat table, sync script (crash symptom is quoted in instruction.md)
 tests/                 # judge.mjs + judge-utils.mjs + test.sh
 solution/              # reference report + solve.sh
 ```

@@ -20,16 +20,26 @@ The crash is the version-routing failure, not a plugin bug.
 
 ## Remedy for the consumer right now
 
-The consumer's runtime cannot be upgraded (production freeze), so install the
-**rc-compatible version**:
+The consumer's runtime cannot be upgraded (production freeze), so the working target is the
+**rc-compatible version v0.9.3** — the last release verified against 0.1.1-rc.1 (rc.2 adds
+only image preprocessing, so rc.1-verified plugins work).
 
-```
-dsh plugin --profile web add '@org/dsh-ui-progress@github:public-org/dsh-ui-progress#v0.9.3'
-```
+The mirror's tag listing shows **v0.9.3 is not on the public mirror either** — the same
+tag-distribution defect as v0.9.5 — so the install only works once the tag is distributed.
+The working sequence is:
 
-v0.9.3 is the last release verified against 0.1.1-rc.1 (rc.2 adds only image preprocessing,
-so rc.1-verified plugins work). As with any plain-dependency install, the plugin still needs
-its `insert` row in the profile's `cordis.patch.yml` to activate.
+1. Maintainer: push the missing tag to the public mirror —
+   `git push public v0.9.3` (or `git push public --tags` to catch every missed release);
+2. Consumer: then install the rc-compatible tag:
+
+   ```
+   dsh plugin --profile web add '@org/dsh-ui-progress@github:public-org/dsh-ui-progress#v0.9.3'
+   ```
+
+If the consumer cannot wait for the tag push, the immediate unblock is to pin the full
+commit SHA of v0.9.3 (`...#<sha>`), which resolves even without tags. As with any
+plain-dependency install, the plugin still needs its `insert` row in the profile's
+`cordis.patch.yml` to activate.
 
 ## Maintainer-side fix (so both defects cannot recur)
 

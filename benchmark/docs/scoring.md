@@ -1,6 +1,6 @@
 # Scoring rules and checkpoint mapping
 
-Total 2700 (27 tasks × 100; the Harbor reward is 0–1, normalized as score/100).
+Total 2800 (28 tasks × 100; the Harbor reward is 0–1, normalized as score/100).
 Every judge: exit 0, with the last stdout line
 `{"score": 0-100, "max": 100, "reasons": [...]}`; `tests/test.sh` parses that last
 line as JSON and writes score/100 to `/logs/verifier/reward.txt`.

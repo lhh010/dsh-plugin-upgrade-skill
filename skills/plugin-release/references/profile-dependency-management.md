@@ -137,3 +137,30 @@ mirrors, so the version pinned in the docs cannot be resolved.
 `repos/<org>/<repo>/git/refs/tags/<tag>` per tag and re-push any that are missing. This is the same
 class of check as "lockfile commit equals expected HEAD" (Section 2): if the docs say it installs,
 it must actually install.
+
+## 10. The in-plugin update prompt must carry its own routing and rescue notes
+
+**Symptom**: a consumer clicks the plugin's "new version available" chip, pastes the copied update
+prompt, and the agent runs it verbatim — against a DSH version the tag was never built for, or with
+no idea where to look when the install fails. The README's version matrix (Section 8) never enters
+the picture: **the prompt is the only guidance the user sees at that moment.**
+
+**Root cause**: the update prompt is generated inside the plugin with a single pinned tag and only
+the mechanical install steps. Version routing lived one browser tab away, and troubleshooting
+pointers lived only in the README — so the most common failure paths (wrong DSH version, pnpm 11
+build-script block, install errors) hit the user with zero context.
+
+**Fix** — the prompt a chip copies must be self-sufficient:
+
+1. **Step 0, before any command**: run `dsh --version` and check it against the README
+   compatibility table; if the prompt's tag does not match the consumer's DSH version, install the
+   table's matching tag instead (a wrong pick crashes — Section 8's symptom applies unchanged).
+2. **The install command** with the pinned tag, plus the pnpm 11 `approve-builds` escape hatch.
+3. **The hard-refresh reminder** after the install.
+4. **A final troubleshooting step**: on install failure / version mismatch / startup errors, consult
+   the README's compatibility and known-limitations sections first.
+
+Keep one prompt template across a plugin family (only the package spec and repo URL differ), so a
+fix to the routing wording ships once and every plugin's next release carries it. This is a
+documentation-in-code contract: treat prompt wording changes like behavior changes — bump, release,
+and let the chip distribute them.

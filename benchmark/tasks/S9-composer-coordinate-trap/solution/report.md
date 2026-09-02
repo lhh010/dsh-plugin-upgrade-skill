@@ -16,7 +16,7 @@ splices the detect text. My plugin computes the insertion point as
 `snapshot.draft.length` — a **clipboard-projection** length.
 
 On paste #1 the composer is empty: both projections are length 0, the coordinates coincide,
-and the insert applies. After the first chip exists, `draft.length` is 27 while the detect
+and the insert applies. After the first chip exists, `draft.length` is 29 while the detect
 text is only 1 char long; the insertion point falls **past the end of the detect text**, the
 splice cannot apply, `insertReference` returns `false`, and my code translates that into
 "The DSH composer changed before the attachment could be inserted". Nothing about the
@@ -27,7 +27,7 @@ least one opaque chip occupies the document.
 ## 2. Why × shows `unavailable` instead of removing the chip
 
 The removal path has the **same mismatch in the opposite direction**: I pass
-`occurrence.offset .. offset+length` — clipboard coordinates (0..26) — into
+`occurrence.offset .. offset+length` — clipboard coordinates (0..28) — into
 `consumeToken`'s span guard, which compares against the detect text (1 char). The splice
 silently fails; `consumeToken` returns `false`, and my code never inspects it. The next
 line deletes the record anyway (`records.delete(occurrence.ref)`), and the dock renders

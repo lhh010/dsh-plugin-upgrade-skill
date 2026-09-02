@@ -20,7 +20,7 @@ const TASK = 'S10-paste-rename-and-version-chip'
 
 const ASPECTS = [
   { key: 'rename scheme + sequence numbering (paste_image(2) / paste_file)', pattern: /paste[_ ](image|file|attachment)[\s\S]{0,400}(\(2\)|\(n\)|sequence|numbering|increment|suffix)/i, points: 20 },
-  { key: 'authoritative conflict source = live chips/occurrences, cache alone is fragile', pattern: /(live|composer|occurrenc|chip)[\s\S]{0,200}(authoritative|source of truth|conflict|taken|occupied)|(records? (map|cache|cache))[\s\S]{0,220}(retire|momentary|empty|flicker|lost|stale)/i, points: 20 },
+  { key: 'authoritative conflict source = live chips/occurrences, cache alone is fragile', pattern: /(live|composer|occurrenc|chip)[\s\S]{0,200}(authoritative|source of truth|conflict|taken|occupied)|(records? (map|cache))[\s\S]{0,220}(retire|momentary|empty|flicker|lost|stale)/i, points: 20 },
   { key: 'paste-only scope: drops and picker keep real names', pattern: /(paste|clipboard)[\s\S]{0,220}(only|just)[\s\S]{0,260}(drop|drag|picker|select)|(drop|drag|picker)[\s\S]{0,200}(keep|preserve|untouched|real name)/i, points: 20 },
   { key: 'version chip: CDN-cached fetched tag shown as truth; compare with running version, show newer', pattern: /(cache|CDN)[\s\S]{0,240}(tag|version|fetch)|(fetched|remote|stale)[\s\S]{0,200}(running|local|PLUGIN_VERSION|ground truth)/i, points: 20 },
   { key: 'regression + release hygiene (same-name pastes coexist, version sync, hard refresh)', pattern: /(same[- ]name|two consecutive|second paste|repeated)[\s\S]{0,300}(coexist|assert|test|\(2\))|(PLUGIN_VERSION|hand-inlined|version constant)[\s\S]{0,240}(sync|package.json|in sync)/i, points: 20 },

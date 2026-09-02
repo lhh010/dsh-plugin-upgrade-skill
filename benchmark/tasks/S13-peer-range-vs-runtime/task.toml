@@ -1,0 +1,25 @@
+schema_version = "1.4"
+# Harbor task config: peer range vs runtime compatibility (static, read-only)
+[task]
+name = "dsh-plugin-upgrade/s13-peer-range-vs-runtime"
+version = "1.1.0"
+description = "A TUI plugin's peerDependencies claim ^0.1.2-alpha.2 compatibility (npm installs without warnings) but crashes at runtime because dsh alpha.4 removed Session.events — diagnose why peer satisfaction is not runtime compatibility"
+keywords = ["dsh", "plugin-runtime", "peer-dependencies", "semver", "harbor"]
+
+[metadata]
+difficulty = "medium"
+category = "programming"
+tags = ["dsh", "plugin-runtime", "peer-dependencies", "english-prompt"]
+execution_contract = "BENCHMARK-AUTH-v1"
+
+[agent]
+timeout_sec = 300.0
+
+[verifier]
+timeout_sec = 120.0
+
+[environment]
+network_mode = "public"
+cpus = 1
+memory_mb = 2048
+storage_mb = 4096

@@ -1,0 +1,25 @@
+schema_version = "1.4"
+# Harbor task config: dsh plugin global-upgrade operational traps (static, read-only)
+[task]
+name = "dsh-plugin-upgrade/s12-global-upgrade-ebusy-trap"
+version = "1.1.0"
+description = "Diagnose two failed dsh upgrades: EBUSY on koffi.node (running process holds a native-module lock) and a silent downgrade to rc.2 (unpinned npm install -g resolves to latest, not the desired alpha)"
+keywords = ["dsh", "plugin-release", "npm", "upgrade", "harbor"]
+
+[metadata]
+difficulty = "medium"
+category = "programming"
+tags = ["dsh", "plugin-release", "upgrade-safety", "english-prompt"]
+execution_contract = "BENCHMARK-AUTH-v1"
+
+[agent]
+timeout_sec = 300.0
+
+[verifier]
+timeout_sec = 120.0
+
+[environment]
+network_mode = "public"
+cpus = 1
+memory_mb = 2048
+storage_mb = 4096

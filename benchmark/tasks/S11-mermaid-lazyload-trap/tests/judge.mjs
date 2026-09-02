@@ -24,7 +24,7 @@ const TASK = 'S11-mermaid-lazyload-trap'
 const ASPECTS = [
   { key: 'split-chunk siblings resolve relative to the chunk URL; bundle one file', pattern: /(relative|against|resolve[sd]?)[\s\S]{0,120}(chunk|module)[\s\S]{0,160}(url|404)|(single|one)[\s\S]{0,60}(file|self-contained)[\s\S]{0,120}(bundle|chunk)/i, points: 20 },
   { key: 'Windows 403: realpath drive-letter case vs case-sensitive startsWith', pattern: /(realpath|drive)[\s\S]{0,160}(case|lower|upper|e\\:|E\\:)|startsWith[\s\S]{0,140}(case|sensitive)|403[\s\S]{0,200}(case|guard|startsWith)/i, points: 20 },
-  { key: 'fix: path.relative containment (+ js MIME for dynamic import)', pattern: /(path\.relative|relative\()[\s\S]{0,160}(contain|escape|\Q..\E|absolute)|containment[\s\S]{0,120}(relative)/i, points: 20 },
+  { key: 'fix: path.relative containment (+ js MIME for dynamic import)', pattern: /(path\.relative|relative\()[\s\S]{0,160}(contain|escape|\.\.|absolute)|containment[\s\S]{0,120}(relative)/i, points: 20 },
   { key: 'modal owns all wheel events; pane Ctrl+wheel stands down while open', pattern: /(modal|overlay)[\s\S]{0,200}(own|stand down|skip|inert|yield|not fire)|ctrl[\s\S]{0,80}wheel[\s\S]{0,160}(modal|both|double|conflict)/i, points: 20 },
   { key: 'regression: import-failure fallback + containment case test + modal inertness', pattern: /(fallback|fall back)[\s\S]{0,200}(import|chunk)|(regression|test)[\s\S]{0,160}(contain|403|case)/i, points: 20 },
 ]

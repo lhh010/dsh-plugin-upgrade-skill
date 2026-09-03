@@ -2,7 +2,7 @@ schema_version = "1.4"
 # Harbor task config: dsh plugin link-install file-lock trap task S14 (static, read-only)
 [task]
 name = "dsh-plugin-upgrade/s14-link-install-lock-trap"
-version = "1.0.0"
+version = "1.1.0"
 description = "Diagnose why repo edits to a link-installed plugin never reach the GUI, why copying into the profile hits EBUSY, and derive the correct activation procedure"
 keywords = ["dsh", "plugin-runtime", "link-install", "file-lock", "harbor"]
 

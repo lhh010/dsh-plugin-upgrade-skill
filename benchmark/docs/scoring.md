@@ -1,6 +1,6 @@
 # Scoring rules and checkpoint mapping
 
-Total 5100 (51 tasks × 100; the Harbor reward is 0–1, normalized as score/100).
+Total 5200 (52 tasks × 100; the Harbor reward is 0–1, normalized as score/100).
 Every judge: exit 0, with the last stdout line
 `{"score": 0-100, "max": 100, "reasons": [...]}`; `tests/test.sh` parses that last
 line as JSON and writes score/100 to `/logs/verifier/reward.txt`.
@@ -43,6 +43,7 @@ line as JSON and writes score/100 to `/logs/verifier/reward.txt`.
 | S13-peer-range-vs-runtime | real 2026-09-02 dsh-tui crash | Five × 20: Session.events→snapshotEvents / peer=static not API / pass-peer-crash categories / author feature detect / user changelog check |
 | S14-link-install-lock-trap | skills/plugin-runtime-debug (link-install activation family; real 2026-09-03 dsh-paste-input v0.1.17 session) | Five × 20: junction semantics (repo tree IS the install) / lock owners (running host + browser cache) / rename-aside same-directory recovery / ordered activation (stop host → restart → hard refresh) / pre-flight install-mode check |
 | S15-slot-error-boundary-crash | skills/plugin-runtime-debug (silent slot-unmount family; same 2026-09-03 session's dangling-busy crash) | Five × 20: free identifier + || short-circuit + chip-present latency / error-boundary whole-entry unmount (console-only) / attribution vs the newest diff (rollback or minimal render mount) / fix + hardening (?? [], closest?.()) / data-present render smoke + no-undef |
+| S16-self-host-upgrade-trap | skills/plugin-upgrade (global host-upgrade agent discipline; real 2026-09-03 dsh alpha.5→rc.1 incident) | Five × 20: self-upgrade structural root cause (session IS the host, npm replaces the live tree, call never returns) / interrupted-install signature (shims missing, content ≠ working install) / external pinned re-install repair / protocol: refuse + hand off, host stopped BEFORE npm so nothing crashes mid-install / prevention guard + post-upgrade checklist |
 | M6-sleep-tool | DSH-0.1.2-A2-03 peer hygiene (bare cordis contract, ContentBlock → dsh-llm); real @huanlin/dsh-plugin-sleep e25a4a9 | Static 50 (bare cordis gone 12 + @deepseek-ai/cordis 10 + dsh-tools floor 12 + dsh-llm peer 10 + meta optional 6) + headless activation 25 + diagnose 15 (exists 5, names 5, A2-03 3, R-01 2) + release 10; memo bait (keep bare cordis) caps at 60, changed-but-unfixed caps at 40 (M4 precedent) |
 | M7-d399-overlay | DSH-0.1.2-A1-25 client-runtime removal; DSH-0.1.2-A1-19 roster anchor | Static 50 (runtimeGone 10 + inject recomposed 10 + ISessions annotation 10 + cohort 12 + scoped cordis 8) + deploy 25 + diagnose 15 (exists 5, names 5, A1-25 3, R-01 2) + release 10; runtime retained caps at 20 |
 | M8-brand-text | DSH-0.1.2-A1-25 (store engine → dsh-client-store); rollup R-06 baseline attribution (H2 precedent) | Static 50 (runtimeGone + storeTypeSource + inject recomposed + cordis ^4.0.1 without -rc + cohort, 10 each) + deploy 25 + diagnose 15 incl. pre-existing-red-test honesty item + release 10; runtime retained caps at 20, store-bait retained caps at 60 |

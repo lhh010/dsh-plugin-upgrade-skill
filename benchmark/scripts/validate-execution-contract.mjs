@@ -41,6 +41,7 @@ const expectedModes = new Map([
   ['S13-peer-range-vs-runtime', 'readonly'],
   ['S14-link-install-lock-trap', 'readonly'],
   ['S15-slot-error-boundary-crash', 'readonly'],
+  ['S16-self-host-upgrade-trap', 'readonly'],
   ['H12-remote-result-boundary-trap', 'readonly'],
   ['M2-optional-dep-trap', 'mutable'],
   ['M3-session-projection', 'mutable'],

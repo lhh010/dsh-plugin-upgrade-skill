@@ -21,6 +21,28 @@ Note: the version cards and reference docs under `references/` are in English; c
 
 This skill does not handle "upgrade DSH core only and leave the plugins alone," and it must not modify DSH core to conceal plugin incompatibility.
 
+## Global DSH host upgrades (agent discipline)
+
+Upgrading the dsh host itself (`npm install -g @deepseek-ai/dsh@…`) is not Mode B/C plugin
+work — and when the requesting agent runs INSIDE a dsh session it is structurally fatal:
+the session IS the host process, npm removes/replaces the very package tree it executes
+from, the host dies mid-install (the tool call never returns), and the interrupted install
+leaves package content present WITHOUT regenerated shims — the `dsh` command itself is
+gone until an external pinned re-install repairs it. Never execute the global host
+upgrade from inside a session on that host; hand the user the external procedure:
+
+1. fully stop every dsh process (a running host holds native-module file locks → EBUSY;
+   a browser refresh is not a host stop);
+2. from an EXTERNAL terminal, run the pinned install
+   `npm install -g @deepseek-ai/dsh@<exact-version>` (a bare package name resolves to the
+   `latest` dist-tag and can silently downgrade to an older line);
+3. restart `dsh web`, hard-refresh the browser, verify version markers and plugins.
+
+Because the host is fully stopped before npm runs, nothing crashes mid-install — a crash
+during the upgrade is a signature of doing it wrong, not a risk to tolerate. If an install
+was already interrupted: repair from an external shell by re-running the pinned formal
+install (never hand-copy package directories or hand-write shims).
+
 ## Shared read-only preparation
 
 1. Read the target repository's rules such as `AGENTS.md` / `CLAUDE.md`; check branch, HEAD, working tree, and submodules. Stop and report unfamiliar changes or untracked files; never auto-stash, reset, clean, or checkout.

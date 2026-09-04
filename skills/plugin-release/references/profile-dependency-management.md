@@ -164,3 +164,38 @@ Keep one prompt template across a plugin family (only the package spec and repo 
 fix to the routing wording ships once and every plugin's next release carries it. This is a
 documentation-in-code contract: treat prompt wording changes like behavior changes — bump, release,
 and let the chip distribute them.
+
+## 11. Version constants baked at build time: rebuild before tagging, or the tag lies about itself
+
+**Symptom**: right after publishing `vX.Y.Z+1`, a consumer on the *latest* install clicks the
+plugin's update chip, installs the new tag, and the chip **still** offers an update to
+`vX.Y.Z+1`. The README matrix, the git tag, and `package.json` all say the new version; only the
+running plugin disagrees. (Real case: dsh-file-trace v0.3.1, 2026-09-04 — the update chip kept
+prompting immediately after the release was pushed.)
+
+**Root cause**: the plugin reads its version via `import pkg from '../../package.json'` in
+**source**, but what ships is the **built bundle** (`lib/client.js`): the bundler replaces the
+import at build time and bakes the then-current version string into the artifact. Bumping
+`package.json` and tagging **without rebuilding** publishes a tag whose manifest says
+`X.Y.Z+1` while its artifact still carries `X.Y.Z` — a self-inconsistent tag. Every
+version-comparison surface that reads the artifact (update chip, about panel, diagnostics) now
+compares old-against-new and reports an update forever. This bites hardest for repos that commit
+build outputs (`lib/` tracked in git) precisely because "just bump the manifest" *looks* like a
+complete doc-only release.
+
+**Fix** — make the artifact part of the release, not an afterthought:
+
+1. **Bump → rebuild → commit together**: change `package.json`, run the full build, and commit
+   manifest + rebuilt artifacts in the same commit before tagging. For a doc-only release the
+   rebuilt bundle is the *only* functional change — it is the release.
+2. **Gate**: grep the built artifact for the new version string before tagging
+   (`grep -o 'X\.Y\.Z' lib/client.js` or equivalent). No match → no tag.
+3. **Recovery for an already-pushed inconsistent tag**: rebuild, amend the release commit (or add
+   a fix commit), re-point the tag, and force-push **branch and tag with an explicit lease**
+   (`--force-with-lease=refs/heads/<branch>:<old-sha>`, `git push -f <remote> vX.Y.Z`) to every
+   mirror, then verify each mirror's tag target SHA. Acceptable only while the tag is fresh enough
+   that consumers pinning it are known; otherwise cut `X.Y.Z+2`.
+
+Related: Section 9 (the re-pointed tag must land on **every** mirror) and Section 10 (the update
+chip is the surface where this bug becomes user-visible — a chip that never clears is this section's
+signature symptom, not a prompt-wording problem).

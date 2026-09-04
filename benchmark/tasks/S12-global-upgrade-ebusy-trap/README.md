@@ -1,6 +1,6 @@
 # S12-global-upgrade-ebusy-trap · Global upgrade EBUSY + downgrade trap (read-only)
 
-A user tries to upgrade dsh from alpha.5 to alpha.6 and fails twice: first EBUSY on
+A user tries to upgrade dsh from alpha.4 to alpha.5 and fails twice: first EBUSY on
 koffi.node (the running dsh host process holds an OS file lock on the native addon that a
 page refresh cannot release), then after stopping dsh, a combined install command from a
 plugin README silently downgrades dsh to rc.2 (unpinned npm install -g resolves to the

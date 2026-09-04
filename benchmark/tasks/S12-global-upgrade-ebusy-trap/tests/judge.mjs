@@ -6,12 +6,12 @@
 //      stays alive and the lock persists.
 //   2. Downgrade root cause: npm install -g without a version pin resolves to the
 //      `latest` dist-tag (0.1.1-rc.2), NOT the currently-installed or newest version.
-//      The combined command unseated the pinned alpha.5 install.
+//      The combined command unseated the pinned alpha.4 install.
 //   3. Safe sequence: fully stop dsh (not just refresh) -> npm install -g
-//      @deepseek-ai/dsh@0.1.2-alpha.6 (PINNED) -> npm install -g @deepseek-harness-tui/dsh-tui
+//      @deepseek-ai/dsh@0.1.2-alpha.5 (PINNED) -> npm install -g @deepseek-harness-tui/dsh-tui
 //      -> restart dsh.
 //   4. Prevention: plugin README install commands must always pin the version
-//      (e.g. @deepseek-ai/dsh@0.1.2-alpha.6), never a bare @deepseek-ai/dsh.
+//      (e.g. @deepseek-ai/dsh@0.1.2-alpha.5), never a bare @deepseek-ai/dsh.
 //   5. The skill's lesson: a running process holds OS-level file locks on native
 //      modules that outlast page navigation; and npm dist-tags (latest vs alpha)
 //      are the real resolution target of unpinned installs.

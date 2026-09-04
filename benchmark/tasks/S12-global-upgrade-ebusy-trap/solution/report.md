@@ -23,9 +23,9 @@ The combined command `npm install -g @deepseek-ai/dsh @deepseek-harness-tui/dsh-
 NOT preserve the currently-installed version of `@deepseek-ai/dsh`. Without a version
 specifier, npm resolves the package to its **`latest` dist-tag** — which, per the evidence
 (`npm-dist-tags.txt`), points to `0.1.1-rc.2` (the stable release channel), NOT to
-`0.1.2-alpha.6` (which is on the `alpha` dist-tag).
+`0.1.2-alpha.5` (which is on the `alpha` dist-tag).
 
-So the user's pinned alpha.5 install was silently replaced by the older rc.2 — a **downgrade**
+So the user's pinned alpha.4 install was silently replaced by the older rc.2 — a **downgrade**
 disguised as an install.
 
 ## 3. Safe upgrade commands
@@ -33,11 +33,11 @@ disguised as an install.
 ```sh
 # 1. Stop dsh completely (host process, not just the browser tab)
 # 2. Upgrade dsh with the EXACT version pinned
-npm install -g @deepseek-ai/dsh@0.1.2-alpha.6
+npm install -g @deepseek-ai/dsh@0.1.2-alpha.5
 # 3. Install the TUI plugin (separate command, dsh already handled)
 npm install -g @deepseek-harness-tui/dsh-tui
 # 4. Verify
-dsh --version    # should print 0.1.2-alpha.6
+dsh --version    # should print 0.1.2-alpha.5
 # 5. Restart
 dsh web
 ```
@@ -53,7 +53,7 @@ README install commands should ALWAYS pin the version:
 npm install -g @deepseek-ai/dsh @deepseek-harness-tui/dsh-tui
 
 # GOOD (pins the version the plugin was tested against):
-npm install -g @deepseek-ai/dsh@0.1.2-alpha.6 @deepseek-harness-tui/dsh-tui
+npm install -g @deepseek-ai/dsh@0.1.2-alpha.5 @deepseek-harness-tui/dsh-tui
 ```
 
 The rule: **an install command that can change what the user already has must specify

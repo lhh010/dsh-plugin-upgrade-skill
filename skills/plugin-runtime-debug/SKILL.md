@@ -59,6 +59,34 @@ cover most incidents:
   a fetched remote value as ground truth when it can be older than the
   running build; decide "current vs update" against the running version and
   display the newer of the two.
+- **A whole slot's UI silently vanishes after a release** — a throwing
+  expression inside a slot component (classically a dangling identifier:
+  another component's state variable referenced out of scope) is caught by
+  the framework's slot-level error boundary, which unmounts the entire
+  entry; the error is console-only, so users just report "the chips/panel
+  are gone". Two latency mechanisms hide it from the author: an `||`
+  short-circuit keeps the expression unevaluated until the left operand is
+  false, and components that early-return on the empty state never evaluate
+  it until real data renders. Do not blame the newest diff by default —
+  bisect by rollback or a minimal render mount with data present, check
+  whether the throwing line shipped earlier, and fix by removing the
+  reference (scope any such state locally). Cheap hardening for slot
+  components: defensive reads (`x?.items ?? []`) and optional-chained DOM
+  access (`target.closest?.()`) — inside an error boundary any throw costs
+  the whole slot.
+- **Repo edits never reach the GUI / EBUSY under the profile's node_modules** —
+  first determine the install mode: `Get-Item <profile>/node_modules/<pkg> |
+  Select LinkType, Target` (or the `link:<path>` marker in cordis.patch.yml).
+  A Junction/link install means the repo working tree IS the installed copy —
+  no copy step exists or is needed, and Copy-Item into node_modules is a
+  no-op at best. The EBUSY holder is the running dsh host process (closing
+  the browser does not release it), and the browser can still serve a cached
+  client bundle after the host restarts. Activation for a link-installed
+  lib-only plugin: fully stop the host, restart `dsh web`, hard-refresh,
+  then verify the loaded version marker. Never rename-aside files under an
+  unresolved path: through a junction "two" directories are one, and the
+  rename moves the only copy.
+
 
 ## Workflow
 

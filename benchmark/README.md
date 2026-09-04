@@ -1,7 +1,7 @@
 # dsh plugin upgrade tasks (benchmark v2.4 · Harbor format)
 
-The 49 plugin-upgrade tasks measure one thing: **once an AI has our upgrade skill
-installed, will it actually upgrade the plugin**. The first 16 are written exams (read
+The 51 plugin-upgrade tasks measure one thing: **once an AI has our upgrade skill
+installed, will it actually upgrade the plugin**. The first 18 are written exams (read
 the code, produce the answer); the last 33 are hands-on (actually install dsh and run
 the plugin — whether it is alive is obvious at a glance). Every task ships with
 auto-grading, so no human marking is involved.
@@ -46,6 +46,8 @@ honestly instead of quietly fixing it and pretending nothing happened).
 | S11-mermaid-lazyload-trap | Static | A lazy-loaded mermaid chunk rollout fails three ways: split-chunk sibling imports 404, a Windows-only 403 from a case-sensitive containment guard, and a Ctrl+scroll double-fire under the zoom modal — can it derive each mechanism from the evidence |
 | S12-global-upgrade-ebusy-trap | Static | A user upgrades dsh and fails twice: EBUSY on koffi.node (running process holds a native-module lock) then a silent downgrade to rc.2 (unpinned npm install follows the latest dist-tag) — can it diagnose both and give the safe upgrade sequence |
 | S13-peer-range-vs-runtime | Static | A TUI plugin's peerDependencies claim ^0.1.2-alpha.2 (npm installs without warnings) but it crashes on dsh alpha.5 because alpha.4 removed Session.events — can it distinguish peer range satisfaction from runtime API compatibility |
+| S14-link-install-lock-trap | Static | Repo edits to a link-installed plugin never reach the GUI, Copy-Item into the profile hits EBUSY, and a rename-aside recovery leaves both "directories" with no entry files — can it recognize the junction install (repo tree IS the installed copy), attribute the two locks (running host + browser cache), and derive the activation procedure |
+| S15-slot-error-boundary-crash | Static | After a feature release the pending-attachment dock vanishes entirely: a dangling `busy` identifier (another component's state) throws only when a chip renders and the phase guard short-circuits open — can it find the pre-existing line behind the misleading new diff and design a data-present render regression |
 | M2-optional-dep-trap | Hands-on | The plugin declares an optional dependency but imports it unconditionally at top level (the comment says optional is harmless): does it fix the dependency contract instead of wrapping the import, and prove it with a cold boot |
 | M3-session-projection | Hands-on | A self-assembled profile mounts dsh-tool-todo without the sessionProjections service: does it fix the composition (never edit shipped packages) so the tree activates while the todo tool survives in the final composition |
 | M4-peer-prerelease-range | Hands-on | A peer lower bound written as ^0.1.0-rc.8 does not match 0.1.2-alpha.2 under npm semver's prerelease rule: does it rewrite the bound to the target cohort instead of widening it into a meaningless range |
@@ -233,7 +235,7 @@ harbor run -p benchmark/tasks/S1-static-scan -a oracle
 # evaluate a single task with an agent
 harbor run -p benchmark/tasks/M1-host-migration -a claude-code -m anthropic/claude-opus-4-1
 
-# all 49 tasks: pointing -p at the tasks/ directory runs them as a dataset batch
+# all 51 tasks: pointing -p at the tasks/ directory runs them as a dataset batch
 harbor run -p benchmark/tasks -a claude-code -m anthropic/claude-opus-4-1
 ```
 
@@ -245,7 +247,7 @@ the judge's per-item reasons are in the verifier log.
 
 ### Unattended authorization
 
-All 49 `instruction.md` files carry the `BENCHMARK-AUTH-v1` marker: the task prompt
+All 51 `instruction.md` files carry the `BENCHMARK-AUTH-v1` marker: the task prompt
 itself is the user's confirmation of the plan and the execution within the stated
 scope. The agent should complete the necessary analysis/planning and then proceed — it
 must not stop just because Harbor will not send a second round of "confirmation". The
@@ -422,7 +424,7 @@ numbers cannot be compared across models or against later runs.
   adding ordinary fixture tasks** — the point is to stop anyone from accidentally
   publishing fake plugins to npm.
 - When adding a task, scaffold it with `harbor task init`, then fill in
-  judge / solve.sh following the layout of the existing 49 tasks, and verify the
+  judge / solve.sh following the layout of the existing 51 tasks, and verify the
   reference answer scores 1.0 with `harbor run -p <task> -a oracle`.
 - After adding or modifying prompts, run
   `node benchmark/scripts/validate-execution-contract.mjs` to make sure the

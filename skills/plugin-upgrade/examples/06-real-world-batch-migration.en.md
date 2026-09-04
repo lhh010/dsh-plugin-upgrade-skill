@@ -12,7 +12,7 @@ English | [简体中文](06-real-world-batch-migration.md)
 
 **Sources**: Community migration practice (migration completed 2026-08-28, verified by real boot + unit-test regression) — [deepseek-harness discussion #5120](https://github.com/deepseek-ai/deepseek-harness/discussions/5120#discussioncomment-18208001); the six plugin repositories are listed at the bottom.
 
-> Corridor coverage note: the corridor now covers `dsh-v0.1.1-rc.1 → dsh-v0.1.2-alpha.2` (when this example was written the rc.1 → rc.2 segment had no cards; it was later filled by [v0.1.1-rc.2.md](../references/v0.1.1-rc.2.md), 3 cards, `DSH-0.1.1-R2` prefix). The technical claims in this example (client-runtime removal, `ctx.slots.inject`, `views.get('chat')?.legacy`, etc.) were first-hand sources at the time of writing; the closest existing card is DSH-0.1.2-A1-03 · 会话视图工程大幅拆分 (session-view engineering split).
+> Corridor coverage note: the corridor now covers `dsh-v0.1.1-rc.1 → dsh-v0.1.2-alpha.2` (when this example was written the rc.1 → rc.2 segment had no cards; it was later filled by [v0.1.1-rc.2.md](../references/v0.1.1-rc.2.md), 3 cards, `DSH-0.1.1-R2` prefix). The technical claims in this example (client-runtime removal, `ctx.slots.inject`, `views.get('chat')?.legacy`, etc.) were first-hand sources at the time of writing; the same fleet's later zero-code ride of the 0.1.2 train up to rc.1 is recorded in the "Follow-up" section at the end; the closest existing card is DSH-0.1.2-A1-03 · 会话视图工程大幅拆分 (session-view engineering split).
 
 ---
 
@@ -183,6 +183,35 @@ Verification records from this migration: all six plugins passed same-day live b
 
 Wrap the client `apply` in a compatibility self-check (probe key capabilities like `ctx.slots.inject` / `ctx.locale.register`; render a remediation banner instead of throwing). DSH/plugin version mismatches are frequent during alphas — this turns "black-screen crash" into "one readable upgrade hint". All six plugins here ship it.
 
+## Follow-up: riding the 0.1.2 train to rc.1 (2026-09-04)
+
+After the alpha.1 landing, DSH shipped alpha.2 / alpha.3 / alpha.4 / alpha.5 / rc.1 in succession, and the same six plugins followed edge by edge until all of them declare compatibility with `dsh-v0.1.2-alpha.1`–`alpha.5`, `rc.1`. This follow-through is the complement of the migration storm at the top of this example: migration is about deciding *what to change*; riding the train is about **confirming nothing needs changing — and still verifying and releasing by the book**.
+
+### Outcome: every edge after alpha.1 was zero-code
+
+| DSH edge | Plugin source changes | Release action |
+|---|---|---|
+| alpha.2 / alpha.3 | None (the alpha.2 peer cleanup (A2-03) and other cards never touch this pure client-UI fleet; alpha.3 was a zero-card edge) | Compatibility range extended straight to `~alpha.3`, shipped with feature releases |
+| alpha.4 | None (the A4 breaking cards sit on the host/SDK plane: `send_message`, `Session.events` → `seq`, …) | One "declare support" patch release each, after typecheck/build/tests went green |
+| alpha.5 | None (pure bug fixes, no API change) | Same |
+| rc.1 | None (252 files, all version bumps — see [v0.1.2-rc.1.md](../references/v0.1.2-rc.1.md)) | Same + real-host rc.1 boot verification (Windows) |
+
+Final plugin states (visible in each README compatibility matrix): whale v0.3.13 / progress v0.9.12 / input-history v0.1.8 / minigames v0.3.14 / paste-input v0.1.18 / file-trace v0.3.1.
+
+### The per-edge "declare support" routine
+
+1. Read that edge's corridor cards and confirm none touches this plugin's shape (client-UI plugins focus on the client / renderer / inject surfaces).
+2. `pnpm run build && pnpm run typecheck && pnpm run test` (add `clean` on edges that touch the host half — see common error 1).
+3. Real-host verification: switch the harness source checkout to the new tag, rebuild, restart the host + hard-refresh the browser (the client/host effective-mode split is common error 6).
+4. **Append a row** to the README compatibility matrix (keep old rows, note the DSH version range); update the tag routing in the install prompt (see plugin-release references §8 version routing and §10 self-sufficient update prompts).
+5. bump patch → commit → tag → push to every mirror → **verify the remote SHA and tag target on each mirror** (§9: every tag the docs reference must exist on every mirror).
+
+### New pitfalls hit while riding the train (not in the original example)
+
+- **Version constants are baked at build time**: a plugin's `import pkg from '../../package.json'` version gets **baked into `lib/client.js`** at bundling. Tagging after bumping `package.json` alone ships a self-inconsistent tag — the in-plugin update chip compares the *artifact's* old version against the new remote tag and offers an update forever, even on the latest install. Grep the built artifact for the new version before tagging (symptom, fix, and recovery: the baked-version entry in plugin-release references).
+- **dist-tag drift**: while riding the train, the umbrella package's npm `latest` drifted from `0.1.1-rc.2` to `0.1.2-rc.1` (measured 2026-09-04), so an unpinned `npm i -g @deepseek-ai/dsh` installs different content over time — verification environments must **pin the exact version** (the rc.1 corridor card's npm-channels note has the per-tag measurements).
+- **Zero-diff edges still get full verification**: a pure version-stamp edge like rc.1 invites skipping straight to the declaration — still run build/typecheck/test + a real-host boot: "upstream says zero diff" and "zero diff on this machine" are two different propositions (this fleet verified on dsh-v0.1.2-rc.1 + Windows).
+
 ## Plugin Repositories
 
 - https://github.com/lhh010/dsh-ui-whale (migrated at v0.3.5)
@@ -191,3 +220,5 @@ Wrap the client `apply` in a compatibility self-check (probe key capabilities li
 - https://github.com/lhh010/dsh-minigames (v0.3.7)
 - https://github.com/lhh010/dsh-paste-input (v0.1.6)
 - https://github.com/lhh010/dsh-file-trace (written on 0.1.2-alpha.1)
+
+As of 2026-09-04 all six plugins declare compatibility with `dsh-v0.1.2-rc.1` (final versions in the "Follow-up" section).

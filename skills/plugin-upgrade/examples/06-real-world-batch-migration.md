@@ -12,7 +12,7 @@
 
 **素材来源**: 社区迁移实践（2026-08-28 完成迁移，实机 boot 验证 + 单测回归）——[deepseek-harness discussion #5120](https://github.com/deepseek-ai/deepseek-harness/discussions/5120#discussioncomment-18208001)，六个插件仓库见文末。
 
-> 走廊覆盖说明: 走廊现已覆盖 `dsh-v0.1.1-rc.1 → dsh-v0.1.2-alpha.2`（本示例写作时 rc.1 → rc.2 段尚无卡片，后由 [v0.1.1-rc.2.md](../references/v0.1.1-rc.2.md) 补齐，3 张卡，`DSH-0.1.1-R2` 前缀）。文中 client-runtime 移除、`ctx.slots.inject`、`views.get('chat')?.legacy` 等技术声明写作时为本示例一手来源；主题最接近的现有卡片为 DSH-0.1.2-A1-03 · 会话视图工程大幅拆分。
+> 走廊覆盖说明: 走廊现已覆盖 `dsh-v0.1.1-rc.1 → dsh-v0.1.2-alpha.2`（本示例写作时 rc.1 → rc.2 段尚无卡片，后由 [v0.1.1-rc.2.md](../references/v0.1.1-rc.2.md) 补齐，3 张卡，`DSH-0.1.1-R2` 前缀）。文中 client-runtime 移除、`ctx.slots.inject`、`views.get('chat')?.legacy` 等技术声明写作时为本示例一手来源；同一批插件后续跟随 0.1.2 列车至 rc.1 的零代码追车记录见文末「后续」一节；主题最接近的现有卡片为 DSH-0.1.2-A1-03 · 会话视图工程大幅拆分。
 
 ---
 
@@ -183,6 +183,35 @@ pnpm run clean && pnpm run build && pnpm run typecheck && pnpm run test
 
 给 client `apply` 包一层兼容自诊断（检查 `ctx.slots.inject` / `ctx.locale.register` 等关键能力，缺失时渲染修复指引横幅而非抛异常）。alpha 阶段 DSH 与插件版本错配频繁，这层兜底能把「黑屏崩溃」变成「一条可读的升级提示」，本次 6 个插件全部内置。
 
+## 后续：跟随 0.1.2 列车到 rc.1（2026-09-04）
+
+alpha.1 落地后，DSH 又相继发布 alpha.2 / alpha.3 / alpha.4 / alpha.5 / rc.1，同一批六个插件逐边跟进，最终全部声明兼容 `dsh-v0.1.2-alpha.1`~`alpha.5`、`rc.1`。这段「追列车」的经历与本例开头的迁移风暴正好互补：迁移的核心是判断改什么，追车的核心是**确认什么都不用改之后仍然按流程验证发布**。
+
+### 结果：alpha.1 之后全是零代码边
+
+| DSH 边 | 插件侧源码改动 | 发布动作 |
+|---|---|---|
+| alpha.2 / alpha.3 | 无（alpha.2 的 peer 清理（A2-03）等卡片不触达本批纯 client UI 插件；alpha.3 为零卡片边） | 兼容区间直接扩到 `~alpha.3`，随功能版本一起发 |
+| alpha.4 | 无（A4 破坏性卡片集中在 host/SDK 面：`send_message`、`Session.events`→`seq` 等） | typecheck/build/单测全绿后各发一个「声明支持」patch 版 |
+| alpha.5 | 无（纯 bug 修复，无 API 变更） | 同上 |
+| rc.1 | 无（252 文件全是版本号提交，见 [v0.1.2-rc.1.md](../references/v0.1.2-rc.1.md)） | 同上 + 实机 rc.1 boot 验证（Windows） |
+
+各插件终态（README 兼容矩阵可查）：whale v0.3.13 / progress v0.9.12 / input-history v0.1.8 / minigames v0.3.14 / paste-input v0.1.18 / file-trace v0.3.1。
+
+### 每条边的「声明支持」例行流程
+
+1. 读该边走廊卡，确认没有触达本插件形态的卡片（client UI 插件重点看 client / renderer / inject 面）。
+2. `pnpm run build && pnpm run typecheck && pnpm run test`（涉及 host 半段的边加 `clean`，见常见错误 1）。
+3. 实机验证：宿主源码 checkout 切到新 tag 重构建，重启宿主 + 浏览器硬刷新（client/host 半段生效方式区别见常见错误 6）。
+4. README 兼容矩阵**追加一行**（旧行保留、标注对应 DSH 版本区间）；安装提示词里的 tag 路由同步更新（见 plugin-release references 的 §8 版本路由与 §10 更新提示词自足性）。
+5. bump patch → 提交 → 打 tag → 推全部镜像 → **逐镜像核验远端 SHA 与 tag 指向**（§9：文档引用的每个 tag 必须存在于每个镜像）。
+
+### 追列车新踩的坑（本例原文未覆盖）
+
+- **版本常量在构建期烧录**：插件源码里 `import pkg from '../../package.json'` 取到的版本号会随打包**烧进 `lib/client.js`**。只 bump `package.json` 而不重新构建就发 tag，tag 内容自相矛盾——内置更新提示拿产物里的旧版本号对比远端新 tag，装了最新版也永远提示「可更新」。发 tag 前在构建产物里 grep 新版本号确认已烧入（症状、修复与恢复手法见 plugin-release references 的 baked-version 条目）。
+- **dist-tag 漂移**：追车期间 umbrella 包 npm `latest` 从 `0.1.1-rc.2` 漂到 `0.1.2-rc.1`（2026-09-04 实测），不带版本的 `npm i -g @deepseek-ai/dsh` 装到的内容随时间变化——验证环境必须**钉精确版本**（rc.1 走廊卡的 npm channels 小节有逐 tag 实测记录）。
+- **纯版本号边不能跳过验证**：rc.1 这类上游零差异边最容易直接声明兼容——仍然要跑完整 build/typecheck/test + 实机 boot：「上游说零差异」与「本机环境零差异」是两个命题（本批实机验证在 dsh-v0.1.2-rc.1 + Windows 通过）。
+
 ## 插件仓库
 
 - https://github.com/lhh010/dsh-ui-whale （v0.3.5 完成迁移）
@@ -191,3 +220,5 @@ pnpm run clean && pnpm run build && pnpm run typecheck && pnpm run test
 - https://github.com/lhh010/dsh-minigames （v0.3.7）
 - https://github.com/lhh010/dsh-paste-input （v0.1.6）
 - https://github.com/lhh010/dsh-file-trace （基于 0.1.2-alpha.1 新写）
+
+截至 2026-09-04，六插件均已声明兼容 `dsh-v0.1.2-rc.1`（终态版本见「后续」一节）。

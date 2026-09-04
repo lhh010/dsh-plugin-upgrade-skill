@@ -85,7 +85,24 @@ cover most incidents:
   lib-only plugin: fully stop the host, restart `dsh web`, hard-refresh,
   then verify the loaded version marker. Never rename-aside files under an
   unresolved path: through a junction "two" directories are one, and the
-  rename moves the only copy.
+  rename moves the only copy. A source-launched host (`pnpm dsh web` in the
+  harness checkout) adds two constraints: the client bundle combo is
+  assembled once at boot (no HMR rebuilds it — every plugin edit needs a
+  full host restart), and on Windows the listener port stays bound by the
+  dying tree unless you stop the whole process tree
+  (`taskkill /PID <pid> /T /F`), or the next boot dies on EADDRINUSE.
+- **One plugin with raw ESM in its client bundle takes every plugin down,
+  and the error names an innocent entry** — the host concatenates all client
+  bundles into one classic `<script>` combo; a single top-level `import`
+  anywhere makes the whole multi-megabyte combo fail to compile, zero
+  plugins register, and the browser surfaces `failed to import loader
+  entry <first-entry>` — the first awaited entry (often
+  `dsh-typert-registry`, itself perfectly fine), not the culprit. Do not
+  chase the named entry: bisect the profile's `insert` rows (or point the
+  suspect bundle through `node --check`) until the combo loads again. The
+  client half is not a bare ESM module — it must register through
+  `window.__ModuleLoader__.load({ id, factory })`, pull react inside the
+  factory via `require("react")`, and export `inject`/`apply`.
 
 
 ## Workflow

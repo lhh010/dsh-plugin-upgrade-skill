@@ -188,13 +188,27 @@ complete doc-only release.
 1. **Bump → rebuild → commit together**: change `package.json`, run the full build, and commit
    manifest + rebuilt artifacts in the same commit before tagging. For a doc-only release the
    rebuilt bundle is the *only* functional change — it is the release.
-2. **Gate**: grep the built artifact for the new version string before tagging
-   (`grep -o 'X\.Y\.Z' lib/client.js` or equivalent). No match → no tag.
-3. **Recovery for an already-pushed inconsistent tag**: rebuild, amend the release commit (or add
-   a fix commit), re-point the tag, and force-push **branch and tag with an explicit lease**
-   (`--force-with-lease=refs/heads/<branch>:<old-sha>`, `git push -f <remote> vX.Y.Z`) to every
-   mirror, then verify each mirror's tag target SHA. Acceptable only while the tag is fresh enough
-   that consumers pinning it are known; otherwise cut `X.Y.Z+2`.
+2. **Gate**: extract the version constant actually consumed by the update check from the built
+   artifact (or read it by executing the bundle in an isolated test harness), and require exact
+   string equality with `package.json.version`, including prerelease and build metadata. A missing,
+   ambiguous, or mismatched value blocks tagging. A whole-bundle grep is insufficient: `0.3.1`
+   also matches `0.3.1-rc.1`, and a dependency's version does not identify the plugin's version.
+3. **Recovery for an already-pushed inconsistent tag**: record each mirror's current branch and
+   tag ref OIDs before the repair. Rebuild, amend the release commit (or add a fix commit), and
+   re-point the tag. Push the intended branch and tag together with **separate explicit leases**:
+
+   ```sh
+   git push --atomic \
+     --force-with-lease=refs/heads/<branch>:<old-branch-oid> \
+     --force-with-lease=refs/tags/<tag>:<old-tag-oid> \
+     <remote> refs/heads/<branch>:refs/heads/<branch> refs/tags/<tag>:refs/tags/<tag>
+   ```
+
+   Use the OIDs recorded for that mirror; for an annotated tag, the lease needs the tag object's
+   OID, not its peeled commit SHA. If a lease fails, stop and inspect the concurrent change; do
+   not retry with `-f`. Repeat for every mirror, then verify each mirror's branch and tag target
+   SHAs. Acceptable only while the tag is fresh enough that consumers pinning it are known;
+   otherwise cut `X.Y.Z+2`.
 
 Related: Section 9 (the re-pointed tag must land on **every** mirror) and Section 10 (the update
 chip is the surface where this bug becomes user-visible — a chip that never clears is this section's

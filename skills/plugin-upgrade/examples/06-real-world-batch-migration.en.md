@@ -187,30 +187,31 @@ Wrap the client `apply` in a compatibility self-check (probe key capabilities li
 
 After the alpha.1 landing, DSH shipped alpha.2 / alpha.3 / alpha.4 / alpha.5 / rc.1 in succession, and the same six plugins followed edge by edge until all of them declare compatibility with `dsh-v0.1.2-alpha.1`–`alpha.5`, `rc.1`. This follow-through is the complement of the migration storm at the top of this example: migration is about deciding *what to change*; riding the train is about **confirming nothing needs changing — and still verifying and releasing by the book**.
 
-### Outcome: every edge after alpha.1 was zero-code
+### Outcome: no compatibility source changes for this fleet after alpha.1
 
 | DSH edge | Plugin source changes | Release action |
 |---|---|---|
-| alpha.2 / alpha.3 | None (the alpha.2 peer cleanup (A2-03) and other cards never touch this pure client-UI fleet; alpha.3 was a zero-card edge) | Compatibility range extended straight to `~alpha.3`, shipped with feature releases |
-| alpha.4 | None (the A4 breaking cards sit on the host/SDK plane: `send_message`, `Session.events` → `seq`, …) | One "declare support" patch release each, after typecheck/build/tests went green |
-| alpha.5 | None (pure bug fixes, no API change) | Same |
+| alpha.2 / alpha.3 | None (the alpha.2 peer cleanup (A2-03) and other cards require no migration for this fleet; alpha.3 has the optional [A3-01 settings-card capability](../references/v0.1.2-alpha.3.md), which this fleet does not need to adopt) | Compatibility range extended straight to `~alpha.3`, shipped with feature releases |
+| alpha.4 | None (the A4 breaking cards sit on the host/SDK plane: `send_message`, `Session.events` → `seq`, …) | One "declare support" patch release each, after verification appropriate to each plugin's shape (see the routine below) |
+| alpha.5 | None (a host bug fix plus the [A5-01 / A5-02 storage-domain capabilities](../references/v0.1.2-alpha.5.md), including `compatibleVersions` and `invalidRecords`; none requires this fleet to migrate) | Same |
 | rc.1 | None (252 files, all version bumps — see [v0.1.2-rc.1.md](../references/v0.1.2-rc.1.md)) | Same + real-host rc.1 boot verification (Windows) |
 
 Final plugin states (visible in each README compatibility matrix): whale v0.3.13 / progress v0.9.12 / input-history v0.1.8 / minigames v0.3.14 / paste-input v0.1.18 / file-trace v0.3.1.
 
 ### The per-edge "declare support" routine
 
-1. Read that edge's corridor cards and confirm none touches this plugin's shape (client-UI plugins focus on the client / renderer / inject surfaces).
-2. `pnpm run build && pnpm run typecheck && pnpm run test` (add `clean` on edges that touch the host half — see common error 1).
-3. Real-host verification: switch the harness source checkout to the new tag, rebuild, restart the host + hard-refresh the browser (the client/host effective-mode split is common error 6).
-4. **Append a row** to the README compatibility matrix (keep old rows, note the DSH version range); update the tag routing in the install prompt (see plugin-release references §8 version routing and §10 self-sufficient update prompts).
-5. bump patch → commit → tag → push to every mirror → **verify the remote SHA and tag target on each mirror** (§9: every tag the docs reference must exist on every mirror).
+1. Read that edge's corridor cards and confirm no touchpoint requires this fleet to migrate (client-UI plugins focus on the client / renderer / inject surfaces; decide separately whether to adopt optional capabilities).
+2. Switch the harness source checkout to the target tag, install dependencies, and rebuild; confirm the plugin's source dependency links also point to that target before building and checking the plugin.
+3. Bump the patch version; **append a row** to the README compatibility matrix (keep old rows, note the DSH version range, and leave verification results pending until complete); update the tag routing in the install prompt (see plugin-release references §8 version routing and §10 self-sufficient update prompts).
+4. Run final checks appropriate to the plugin's shape: for plugins with source build scripts, run `pnpm run build && pnpm run typecheck && pnpm run test` after updating the version and prompt (clear incremental caches using the project's cleanup procedure — see common error 1); paste-input maintains `lib/` directly and has none of those scripts, so run `node --check lib/index.js && node --check lib/client.js` and inspect the artifact's version constants and update prompt instead.
+5. Verify that the final `lib/client.js` version constant and prompt tag match the intended release; restart the target host + hard-refresh the browser and verify these final artifacts on the real host (the client/host effective-mode split is common error 6). Fill in the matrix's actual results after verification passes.
+6. Commit the version, prompt, final artifacts, and docs → tag → push to every mirror → **verify the remote SHA and tag target on each mirror** (§9: every tag the docs reference must exist on every mirror).
 
 ### New pitfalls hit while riding the train (not in the original example)
 
-- **Version constants are baked at build time**: a plugin's `import pkg from '../../package.json'` version gets **baked into `lib/client.js`** at bundling. Tagging after bumping `package.json` alone ships a self-inconsistent tag — the in-plugin update chip compares the *artifact's* old version against the new remote tag and offers an update forever, even on the latest install. Grep the built artifact for the new version before tagging (symptom, fix, and recovery: the baked-version entry in plugin-release references).
+- **Version constants are baked at build time**: a plugin's `import pkg from '../../package.json'` version gets **baked into `lib/client.js`** at bundling. Tagging after bumping `package.json` alone ships a self-inconsistent tag — the in-plugin update chip compares the *artifact's* old version against the new remote tag and offers an update forever, even on the latest install. Update the version and prompt before rebuilding; verify the artifact's version constant and prompt tag before tagging, and commit the final artifacts together with the changes.
 - **dist-tag drift**: while riding the train, the umbrella package's npm `latest` drifted from `0.1.1-rc.2` to `0.1.2-rc.1` (measured 2026-09-04), so an unpinned `npm i -g @deepseek-ai/dsh` installs different content over time — verification environments must **pin the exact version** (the rc.1 corridor card's npm-channels note has the per-tag measurements).
-- **Zero-diff edges still get full verification**: a pure version-stamp edge like rc.1 invites skipping straight to the declaration — still run build/typecheck/test + a real-host boot: "upstream says zero diff" and "zero diff on this machine" are two different propositions (this fleet verified on dsh-v0.1.2-rc.1 + Windows).
+- **Zero-diff edges still get full verification**: a pure version-stamp edge like rc.1 invites skipping straight to the declaration — still complete the checks appropriate to each plugin: build/typecheck/test for source plugins, artifact syntax and content checks for plugins maintaining lib directly, and a real-host boot for both (this fleet verified on dsh-v0.1.2-rc.1 + Windows).
 
 ## Plugin Repositories
 

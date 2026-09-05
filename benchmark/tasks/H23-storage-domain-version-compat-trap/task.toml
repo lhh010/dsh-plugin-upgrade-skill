@@ -1,0 +1,26 @@
+schema_version = "1.4"
+# Harbor task: a storage-domain version-stamp compatibility migration on the
+# alpha.4 -> alpha.5 edge (DSH-0.1.2-A5-01 compatibleVersions).
+[task]
+name = "dsh-plugin-upgrade/h23-storage-domain-version-compat-trap"
+version = "1.1.0"
+description = "After the alpha.4 -> alpha.5 upgrade and a domain version bump, the plugin boots green but its older per-record storage silently disappears: repair the version-stamp compatibility declaration so v4 records load without losing the version bump"
+keywords = ["dsh", "plugin-migration", "storage-domain", "compatible-versions", "alpha5", "harbor"]
+
+[metadata]
+difficulty = "hard"
+category = "programming"
+tags = ["dsh", "plugin-upgrade", "storage-domain", "version-compat", "english-prompt"]
+execution_contract = "BENCHMARK-AUTH-v1"
+
+[agent]
+timeout_sec = 900.0
+
+[verifier]
+timeout_sec = 600.0
+
+[environment]
+network_mode = "public"
+cpus = 1
+memory_mb = 2048
+storage_mb = 4096

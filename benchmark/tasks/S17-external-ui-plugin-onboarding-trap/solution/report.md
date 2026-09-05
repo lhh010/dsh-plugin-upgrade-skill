@@ -22,9 +22,12 @@ Do not chase the named entry. The cheap discriminating steps:
 
 - Bisect the profile's `cordis.patch.yml` insert rows: comment out the new plugin's row,
   reboot — if the combo loads again, the new bundle is the culprit.
-- Static-check the suspect bundle directly: `node --check lib/client.js` — a top-level
-  `import` outside a wrapper is flagged immediately (the file is being parsed as a
-  classic script).
+- Static-check the suspect bundle directly with a CLASSIC-script parse, NOT
+  `node --check`: on Node ≥22 `node --check` auto-detects module syntax and
+  returns 0 even for a raw-ESM bundle, so it flags nothing. The reliable probe
+  is `node -e "new (require('vm')).Script(require('fs').readFileSync('lib/client.js','utf8'))"` —
+  a top-level `import` throws `Cannot use import statement outside a module`
+  immediately (classic scripts have no module system).
 
 The client bundle an external plugin ships is NOT a bare ES module. It must register
 through the host's module loader:
@@ -85,6 +88,7 @@ slot via ctx.slots.inject".
 
 Authoring side: an external-plugin client-bundle template (ModuleLoader wrapper +
 require-based React + inject/apply exports) and a checklist — no top-level imports;
-syntax-check with `node --check`; wrap cross-entry registrations in
-`ctx.slots.inject`; every iteration ends with a full host restart (tree-kill on
-Windows) plus a hard refresh before re-testing.
+syntax-check every bundle with a classic-script parse (`vm.Script`; NOT
+`node --check`, which passes raw-ESM bundles on Node ≥22); wrap cross-entry
+registrations in `ctx.slots.inject`; every iteration ends with a full host restart
+(tree-kill on Windows) plus a hard refresh before re-testing.

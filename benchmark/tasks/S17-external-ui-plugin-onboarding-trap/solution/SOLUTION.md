@@ -5,7 +5,7 @@
 **外部 UI 插件接入的三层陷阱**：客户端 bundle 含裸 ESM 时，宿主把全部插件的 bundle
 拼成一条经典 `<script>`——一个 import 令整个 combo 编译失败、**零插件注册**，而浏览器
 错误只点名第一个被 await 的 entry（无辜的 `dsh-typert-registry`），诊断纪律是二分
-insert 行并做静态语法检查、按 `window.__ModuleLoader__.load({id, factory})` +
+insert 行并做**经典脚本解析检查**（`vm.Script`——Node ≥22 的 `node --check` 会自动按模块语法解析、对裸 ESM 返回 0，检不出来）、按 `window.__ModuleLoader__.load({id, factory})` +
 factory 内 `require("react")` + 导出 `inject`/`apply` 的封装形态重打包；第二个坑是
 向其他 entry 声明的 slot 裸 `ctx.slots.register` 会与声明到达顺序竞态，必须以
 `ctx.slots.inject(name, () => ctx.slots.register(...))` 包裹且 registrant 只传
@@ -19,7 +19,7 @@ Windows 下要树杀进程（`taskkill /PID <pid> /T /F`）否则下次启动 EA
 ## 判分要点
 
 只读门禁 + 五要点各 20：combo 全灭根因（一条 ESM 令经典脚本整体编译失败、零注册、
-被点名 entry 只是无辜的第一个 await）、诊断纪律（二分 insert / node --check / 正确
+被点名 entry 只是无辜的第一个 await）、诊断纪律（二分 insert / 经典脚本解析检查 vm.Script / 正确
 封装形态三要素）、slot 声明竞态（inject 包裹 + registrant 字段白名单）、开发环纪律
 （boot 组装一次、整体重启、Windows 树杀 EADDRINUSE）、预防（宿主启动静态扫描点名肇事
 插件、combo 失败归因、外部插件作者模板与检查单）。

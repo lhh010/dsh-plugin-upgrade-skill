@@ -54,11 +54,28 @@ new SKILL.md `784c29a224d64457a6858ef37a28d8ff56da2f069c5da200633bbc9a5879c793`.
 | Skill mount | `--skill <tree>/skills/plugin-upgrade` (old vs new tree — the only difference) |
 | Freshness | every slot: fresh Harbor trial, fresh container, fresh agent context |
 
-Measurement instrument: `benchmark/scripts/audit-skill-activation.mjs` at
-commit `539243e02168eec5f0ba0b163548aa28bd0fe9a4` (PR #132). Its 44 unit
-tests were green before the first run, and a re-audit of the six historical
-calibration trials reproduced the known result (with-skill 3/3 supplied,
-0/3 opened), confirming instrument stability.
+Measurement instrument: `benchmark/scripts/audit-skill-activation.mjs`
+(PR #132). The measurements in this report were produced at experiment time
+by the instrument code at commit
+`539243e02168eec5f0ba0b163548aa28bd0fe9a4` (the #132 head at experiment
+time); that file is **byte-identical** to the final merged auditor at
+`2077648b93535da22dd3a9eda80b36197bb3910b` (the #132 merge commit; blob
+`890e99ce9a6558c79c02a5e72294772bb12cada4` at both commits, verified by git
+blob equality — the same holds for the auditor's test suite). The merged
+auditor's 44 unit tests pass on current main. Its 44 unit tests were green
+before the first run, and a re-audit of the six historical calibration
+trials at experiment time reproduced the known result (with-skill 3/3
+supplied, 0/3 opened), confirming instrument stability.
+
+Publication provenance (2026-09-04): the experiment's raw trajectory
+archive (six trial session logs, auditor JSON outputs, tree manifests) was
+held in a local temporary directory that the host's temporary-directory
+cleanup removed after the experiment, so a literal post-merge re-audit pass
+could not be re-run. The byte-identity verification above is the equivalent
+consistency guarantee for the instrument: identical code run on identical
+trajectories produces identical measurements, and the reported per-slot
+values are the recorded outputs of exactly that code. No measurement in this
+report was re-derived, re-weighted, or adjusted after the experiment ended.
 
 ## Pre-registered run order
 
@@ -191,13 +208,18 @@ Two secondary observations are worth keeping for design of later work:
    equality + blob identity before any run.
 3. Six Harbor runs, order `old, new, new, old, old, new`, concurrency 1,
    config as in the table above; `--skill` points at the condition tree.
-4. Audit every trial with `audit-skill-activation.mjs` at commit
-   `539243e…` (`--target-name plugin-upgrade --condition <cond>`); rewards
-   from `verifier/reward.txt`.
+4. Audit every trial with `audit-skill-activation.mjs` (`--target-name
+   plugin-upgrade --condition <cond>`); the instrument file at experiment
+   commit `539243e…` is byte-identical to the merged auditor at `2077648b…`
+   (see the measurement-instrument section); rewards from
+   `verifier/reward.txt`.
 
 ## Artifact / privacy note
 
-Raw trajectories, Harbor result files, and full audit outputs are kept in a
-local experiment archive and are not committed. This report contains only
-trial basenames, aggregate counts, and the grader rewards; no prompts,
-command outputs, credentials, tokens, or machine paths appear here.
+The raw trajectories, Harbor result files, and full audit outputs were
+retained in a local archive during the experiment and are not committed;
+that archive was later removed by host temporary-directory cleanup, so the
+raw artifacts are no longer available (see the publication-provenance note
+above). This report contains only trial basenames, aggregate counts, and the
+grader rewards; no prompts, command outputs, credentials, tokens, or
+machine paths appear here.

@@ -2,7 +2,17 @@
 // Declarations and schemas are checked by value/behavior, not source spelling.
 import { isDeepStrictEqual } from 'node:util'
 
-/** Scan the fixture package.json dependency VALUES for the alpha.4 pin (prose mentioning alpha.4 never flags). */
+// The fixed closure installed by the fixture lockfile, not whatever happens to
+// remain in node_modules after a candidate edits its manifest.
+export const REQUIRED_DEPENDENCIES = Object.freeze({
+  '@deepseek-ai/cordis': '4.0.2',
+  '@deepseek-ai/dsh-storage': '0.1.2-alpha.5',
+  '@deepseek-ai/dsh-storage-domain': '0.1.2-alpha.5',
+  '@deepseek-ai/dsh-storage-json': '0.1.2-alpha.5',
+  zod: '4.4.3',
+})
+
+/** Check required runtime pins and scan dependency VALUES for alpha.4 (not prose). */
 export function scanPackageJson(packageJson) {
   let parsed = null
   try {
@@ -20,7 +30,10 @@ export function scanPackageJson(packageJson) {
       }
     }
   }
-  return { pinsAlpha4 }
+  const dependencyErrors = Object.entries(REQUIRED_DEPENDENCIES)
+    .filter(([name, version]) => parsed?.dependencies?.[name] !== version)
+    .map(([name, version]) => `${name} must remain in dependencies at ${version}`)
+  return { pinsAlpha4, dependencyErrors }
 }
 
 /** Validate the evaluated declaration, including constants and expressions. */
@@ -82,7 +95,7 @@ export function scoreMigration(spec, schemaHonest) {
 
 /** Migration hygiene (max 10). */
 export function scoreHygiene(packageScan) {
-  return packageScan.pinsAlpha4 ? 7 : 10
+  return packageScan.pinsAlpha4 ? 7 : packageScan.dependencyErrors.length > 0 ? 0 : 10
 }
 
 /** Smallest triggered hard cap, or null. */
@@ -91,6 +104,7 @@ export function capFor({ spec, schemaHonest, packageScan }) {
   if (spec === null || compatEntriesInvalid(spec)) caps.push(30)
   if (spec !== null && typeof spec.version === 'number' && spec.version < 5) caps.push(20)
   if (packageScan.pinsAlpha4) caps.push(20)
+  if (packageScan.dependencyErrors.length > 0) caps.push(20)
   const compatHas4 = spec !== null && Array.isArray(spec.compatibleVersions) && spec.compatibleVersions.includes(4)
   if (spec?.invalidRecords === 'backup-and-skip' && !compatHas4) caps.push(50)
   if (!schemaHonest) caps.push(70)
@@ -114,6 +128,7 @@ export function assembleScore({ behavioral, spec, packageJson }) {
   if (compatEntriesInvalid(spec)) reasons.push('invalid compatibleVersions declaration — cap 30')
   if (spec !== null && typeof spec.version === 'number' && spec.version < 5) reasons.push(`domain version downgraded to ${spec.version} — cap 20`)
   if (packageScan.pinsAlpha4) reasons.push('alpha.4 dependency pin — cap 20')
+  if (packageScan.dependencyErrors.length > 0) reasons.push(`required runtime dependencies missing or changed — cap 20: ${packageScan.dependencyErrors.join('; ')}`)
   if (spec?.invalidRecords === 'backup-and-skip' && !(spec !== null && Array.isArray(spec.compatibleVersions) && spec.compatibleVersions.includes(4))) {
     reasons.push('backup-and-skip used instead of version compatibility — cap 50')
   }

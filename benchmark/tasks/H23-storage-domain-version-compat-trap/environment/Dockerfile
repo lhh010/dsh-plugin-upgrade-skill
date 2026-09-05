@@ -14,6 +14,9 @@ RUN cd /app/fixture && npm ci --no-audit --no-fund
 
 # Baseline commit + pinned HEAD: the judge rejects any tracked modification
 # outside fixture/src/ (and fixture/package.json, whose dependency edits are
-# scanned instead of trusted) and any history rewrite.
+# scanned instead of trusted) and any history rewrite. Keep the anchor outside
+# the agent workspace; a missing or altered verifier anchor is a hard failure.
 RUN git init -q && git add -A && git -c user.email=bench@local -c user.name=bench commit -q -m "baseline" \
-    && git rev-parse HEAD > /app/baseline.sha
+    && mkdir -p /opt/h23-verifier \
+    && git rev-parse HEAD > /opt/h23-verifier/baseline.sha \
+    && chmod 444 /opt/h23-verifier/baseline.sha

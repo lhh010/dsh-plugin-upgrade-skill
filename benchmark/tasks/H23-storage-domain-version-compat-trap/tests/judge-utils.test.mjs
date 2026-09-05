@@ -2,11 +2,11 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { z } from '../environment/fixture/node_modules/zod/index.js'
 import {
-  assembleScore, capFor, compatEntriesInvalid, scanPackageJson, schemaContractHolds, scoreHygiene, scoreMigration,
+  assembleScore, capFor, compatEntriesInvalid, REQUIRED_DEPENDENCIES, scanPackageJson, schemaContractHolds, scoreHygiene, scoreMigration,
 } from './judge-utils.mjs'
 
-const CLEAN_PACKAGE = JSON.stringify({ dependencies: { '@deepseek-ai/dsh-storage': '0.1.2-alpha.5' } })
-const PINNED_PACKAGE = JSON.stringify({ dependencies: { '@deepseek-ai/dsh-storage': '0.1.2-alpha.4' } })
+const CLEAN_PACKAGE = JSON.stringify({ dependencies: REQUIRED_DEPENDENCIES })
+const PINNED_PACKAGE = JSON.stringify({ dependencies: { ...REQUIRED_DEPENDENCIES, '@deepseek-ai/dsh-storage': '0.1.2-alpha.4' } })
 const honestSchema = z.object({ id: z.string(), title: z.string(), pinned: z.boolean().optional() })
 const withSchema = (schema) => ({ version: 5, compatibleVersions: [4], tables: { summaries: { valueSchema: schema } } })
 const oracle = withSchema(honestSchema)
@@ -33,6 +33,19 @@ test('compatibility validation uses actual values and the declared current versi
   assert.equal(compatEntriesInvalid({ version: 4, compatibleVersions: [4] }), true)
   assert.equal(compatEntriesInvalid({ version: 5 }), false)
   assert.equal(compatEntriesInvalid(null), false)
+})
+
+test('runtime dependency contract fails closed for incomplete or invalid manifests', () => {
+  assert.deepEqual(scanPackageJson(CLEAN_PACKAGE).dependencyErrors, [])
+  for (const manifest of ['{not json', 'null', '{}', '{"dependencies":null}', '{"dependencies":[]}']) {
+    assert.equal(scanPackageJson(manifest).dependencyErrors.length, 5)
+    assert.equal(score(oracle, 65, manifest).score, 20)
+  }
+  for (const name of Object.keys(REQUIRED_DEPENDENCIES)) {
+    const dependencies = { ...REQUIRED_DEPENDENCIES }
+    delete dependencies[name]
+    assert.equal(scanPackageJson(JSON.stringify({ dependencies })).dependencyErrors.length, 1)
+  }
 })
 
 test('honest schema preserves valid records with optional pinned', () => {
@@ -87,9 +100,9 @@ test('backup-and-skip cap uses the evaluated policy and compatibility declaratio
 })
 
 test('capFor picks the smallest cap; clean runtime contracts have no cap', () => {
-  assert.equal(capFor({ spec: oracle, schemaHonest: true, packageScan: { pinsAlpha4: false } }), null)
-  assert.equal(capFor({ spec: { ...oracle, version: 4 }, schemaHonest: false, packageScan: { pinsAlpha4: true } }), 20)
-  assert.equal(capFor({ spec: null, schemaHonest: false, packageScan: { pinsAlpha4: false } }), 30)
+  assert.equal(capFor({ spec: oracle, schemaHonest: true, packageScan: scanPackageJson(CLEAN_PACKAGE) }), null)
+  assert.equal(capFor({ spec: { ...oracle, version: 4 }, schemaHonest: false, packageScan: scanPackageJson(PINNED_PACKAGE) }), 20)
+  assert.equal(capFor({ spec: null, schemaHonest: false, packageScan: scanPackageJson(CLEAN_PACKAGE) }), 30)
 })
 
 test('hygiene and score reasons are deterministic', () => {

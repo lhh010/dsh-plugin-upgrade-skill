@@ -67,7 +67,11 @@ packages before the task shipped (see the judge's behavioral checks).
 record intact 10 / unlisted v3 foreign 10 / read-modify-write preserves
 fields and re-stamps 5 10 / reopen retains complete records 10) + 25 migration
 (evaluated declaration [4] 15, version stays 5 5, schema behavior probes 5)
-+ 10 hygiene. Hard caps: invalid declaration → 30; version downgrade → 20;
-alpha.4 pin → 20; backup-and-skip instead of compatibility → 50; schema
++ 10 hygiene (all required runtime dependencies keep their exact pins).
+Hard caps: invalid declaration → 30; version downgrade → 20;
+alpha.4 pin or missing/changed required runtime dependency → 20;
+backup-and-skip instead of compatibility → 50; schema
 bypass (including aliased/imported `any` or `unknown`) → 70. Flat 0: untouched fixture, sealed files modified, or baseline
-rewritten. Full model in [tests/judge.mjs](../tests/judge.mjs).
+missing/rewritten. Integrity checks also run after candidate import, initial
+reads, and final schema probes; only the judge's own A write is allowed.
+Full model in [tests/judge.mjs](../tests/judge.mjs).

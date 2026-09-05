@@ -16,15 +16,21 @@ the unlisted ancient stamp must stay foreign.
   `zod@4.4.3`; committed lockfile, `npm ci` at build time; the agent phase
   needs no network). The fixture, data, and `node_modules` are committed as
   a git baseline — the judge seals everything except `fixture/src/**` and
-  `fixture/package.json` (dependency edits are scanned, not trusted).
+  `fixture/package.json` (all five required runtime dependencies must retain
+  their exact pins). The build writes the trusted baseline SHA outside the
+  workspace, at `/opt/h23-verifier/baseline.sha`; missing or altered anchors
+  fail closed.
 - **Verifier**: deterministic. 65 behavioral against the real published
   alpha.5 packages (v4/v5 records preserved in full, unlisted v3
   foreign, read-modify-write preserves fields and re-stamps 5, close+reopen retains full records) + 25 migration (runtime
   `compatibleVersions === [4]`, version stays 5, schema preserves valid records and rejects invalid fields) + 10 hygiene.
   Hard caps: invalid declaration → 30; version downgrade → 20; alpha.4 pin
-  → 20; backup-and-skip instead of compatibility → 50; schema bypass → 70.
+  → 20; missing/changed required runtime dependencies → 20;
+  backup-and-skip instead of compatibility → 50; schema bypass → 70.
   Flat 0: fixture untouched, persisted data / tests / node_modules modified,
-  or the baseline rewritten.
+  or the baseline missing/rewritten. Integrity is rechecked after import,
+  initial reads, and final schema probes. Only the judge's own A write may
+  change persisted data; its bytes must stay unchanged through reopen.
 - **Oracle**: `harbor run -p benchmark/tasks/H23-storage-domain-version-compat-trap -a oracle`, expected reward 1.0.
 
 ```
@@ -52,8 +58,11 @@ and reject missing or wrongly typed fields. Full-record comparisons also
 cover initial reads, read-modify-write, and close/reopen.
 
 Current regression controls: untouched/sealed edits 0; oracle and equivalent
-declarations 100; downgrade/alpha.4 pin 20; invalid declarations 10;
+declarations 100; downgrade/alpha.4 pin/missing or changed runtime dependency
+20; invalid declarations 10;
 comment-only and backup-and-skip without compatibility 40; direct, aliased,
 or imported schema bypasses at most 70. A spec that fails to load earns no
-schema-validation points. These local runtime tests do not replace a Harbor
-container run.
+schema-validation points. Import-time re-stamping/deletion, schema callbacks
+that modify data, installed-package edits, missing/forged baseline anchors,
+and manifest mutation during verification are covered by flat-zero controls.
+These local runtime tests do not replace a Harbor container run.

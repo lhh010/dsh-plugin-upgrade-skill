@@ -12,28 +12,35 @@ const judgeUrl = new URL('./judge.mjs', import.meta.url).href
 const oracle = readFileSync(join(task, 'solution/src/domain-spec.mjs'), 'utf8')
 const fixture = readFileSync(join(task, 'environment/fixture/src/domain-spec.mjs'), 'utf8')
 let app
+let root
+let baseline
+let baselineFile
 const git = (...args) => execFileSync('git', ['-C', app, ...args], { encoding: 'utf8' })
+const commit = (message) => git('-c', 'user.name=benchmark', '-c', 'user.email=benchmark@local', '-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', 'commit', '-qm', message)
 
 before(() => {
-  app = mkdtempSync(join(tmpdir(), 'h23-judge-'))
+  root = mkdtempSync(join(tmpdir(), 'h23-judge-'))
+  app = join(root, 'app')
+  baselineFile = join(root, 'verifier-baseline.sha')
   cpSync(join(task, 'environment/fixture'), join(app, 'fixture'), { recursive: true })
   git('init', '-q')
   git('add', '-f', 'fixture')
-  git('-c', 'user.name=benchmark', '-c', 'user.email=benchmark@local', '-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', 'commit', '-qm', 'baseline')
-  writeFileSync(join(app, 'baseline.sha'), git('rev-parse', 'HEAD'))
+  commit('baseline')
+  baseline = git('rev-parse', 'HEAD').trim()
 })
 
 beforeEach(() => {
-  git('reset', '--hard', '-q', 'HEAD')
-  git('clean', '-fdq', '-e', 'baseline.sha')
+  git('reset', '--hard', '-q', baseline)
+  git('clean', '-fdq')
+  writeFileSync(baselineFile, baseline)
 })
-after(() => { if (app) rmSync(app, { recursive: true, force: true }) })
+after(() => { if (root) rmSync(root, { recursive: true, force: true }) })
 
 function grade(source, prepare = () => {}) {
   if (source !== null) writeFileSync(join(app, 'fixture/src/domain-spec.mjs'), source)
   prepare()
   const output = execFileSync(process.execPath, ['--input-type=module', '-e',
-    `import { grade } from ${JSON.stringify(judgeUrl)}; await grade(${JSON.stringify(app)});`,
+    `import { grade } from ${JSON.stringify(judgeUrl)}; await grade(${JSON.stringify(app)}, ${JSON.stringify(baselineFile)});`,
   ], { encoding: 'utf8', timeout: 30000 })
   return JSON.parse(output.trim().split('\n').at(-1))
 }
@@ -108,4 +115,96 @@ for (const target of ['data/migration_summaries/summaries/A.json', 'node_modules
 
 test('deleting a persisted record remains a flat zero', () => {
   assert.equal(grade(oracle, () => rmSync(join(app, 'fixture/data/migration_summaries/summaries/B.json'))).score, 0)
+})
+
+const fsImport = "import { rmSync, readFileSync, writeFileSync, appendFileSync } from 'node:fs';\n"
+const deleteForeign = "rmSync(new URL('../data/migration_summaries/summaries/D.json', import.meta.url), { force: true });"
+for (const [name, source] of [
+  ['delete a foreign record at import', fsImport + oracle + deleteForeign],
+  ['rewrite old stamps at import instead of declaring compatibility', fsImport + fixture + `
+    for (const key of ['A', 'B']) {
+      const file = new URL('../data/migration_summaries/summaries/' + key + '.json', import.meta.url);
+      const document = JSON.parse(readFileSync(file, 'utf8'));
+      document.version = 5;
+      writeFileSync(file, JSON.stringify(document));
+    }
+  `],
+  ['patch an installed package at import', fsImport + oracle + "appendFileSync(new URL('../node_modules/zod/index.js', import.meta.url), '\\n// patched');"],
+  ['add a persisted record at import', fsImport + oracle + "writeFileSync(new URL('../data/migration_summaries/summaries/E.json', import.meta.url), '{}');"],
+  ['delete during initial schema parsing', fsImport + oracle.replace('\n})', `\n}).transform((record) => { ${deleteForeign} return record; })`)],
+  ['delete then throw during schema parsing', fsImport + oracle.replace('\n})', `\n}).transform(() => { ${deleteForeign} throw new Error('parse failed'); })`)],
+  ['change the judge-written record on reopen', fsImport + oracle.replace('\n})', `\n}).transform((record) => {
+    if (record.title === 'judge-updated') appendFileSync(new URL('../data/migration_summaries/summaries/A.json', import.meta.url), '\\n');
+    return record;
+  })`)],
+  ['delete during final schema probes', fsImport + oracle + `
+    const originalSafeParse = summarySchema.safeParse.bind(summarySchema);
+    summarySchema.safeParse = (...args) => { ${deleteForeign} return originalSafeParse(...args); };
+  `],
+]) {
+  test(`${name} is a flat zero`, () => {
+    const result = grade(source)
+    assert.equal(result.score, 0)
+    assert.ok(result.reasons.some((reason) => reason.includes('sealed files modified')))
+  })
+}
+
+for (const value of [null, '', 'not-a-sha', '0'.repeat(40)]) {
+  test(`unavailable verifier baseline (${String(value)}) fails closed`, () => {
+    const result = grade(oracle, () => {
+      if (value === null) rmSync(baselineFile)
+      else writeFileSync(baselineFile, value)
+      writeFileSync(join(app, 'baseline.sha'), git('rev-parse', 'HEAD'))
+    })
+    assert.equal(result.score, 0)
+    assert.ok(result.reasons.some((reason) => reason.includes('trusted baseline unavailable')))
+  })
+}
+
+for (const forgeWorkspaceAnchor of [false, true]) {
+  test(`committed data deletion cannot reset the baseline (workspace anchor: ${forgeWorkspaceAnchor})`, () => {
+    const result = grade(oracle, () => {
+      rmSync(join(app, 'fixture/data/migration_summaries/summaries/D.json'))
+      git('add', 'fixture/data')
+      commit('delete persisted record')
+      if (forgeWorkspaceAnchor) writeFileSync(join(app, 'baseline.sha'), git('rev-parse', 'HEAD'))
+    })
+    assert.equal(result.score, 0)
+    assert.ok(result.reasons.some((reason) => reason.includes('git history rewritten')))
+  })
+}
+
+const mutatePackage = (mutate) => {
+  const file = join(app, 'fixture/package.json')
+  const pkg = JSON.parse(readFileSync(file, 'utf8'))
+  mutate(pkg)
+  writeFileSync(file, JSON.stringify(pkg, null, 2))
+}
+for (const [name, mutate] of [
+  ['all runtime dependencies deleted', (pkg) => { delete pkg.dependencies }],
+  ['required dependency deleted', (pkg) => { delete pkg.dependencies['@deepseek-ai/cordis'] }],
+  ['required dependency changed', (pkg) => { pkg.dependencies.zod = '3.25.0' }],
+  ['target version loosened', (pkg) => { pkg.dependencies['@deepseek-ai/dsh-storage'] = '^0.1.2-alpha.5' }],
+  ['runtime dependencies moved to devDependencies', (pkg) => { pkg.devDependencies = pkg.dependencies; delete pkg.dependencies }],
+]) {
+  test(`${name} cannot hide behind installed node_modules`, () => {
+    const result = grade(oracle, () => mutatePackage(mutate))
+    assert.equal(result.score, 20)
+    assert.ok(result.reasons.some((reason) => reason.includes('required runtime dependencies missing or changed')))
+  })
+}
+
+test('manifest description edits preserve the full score', () => {
+  assert.equal(grade(oracle, () => mutatePackage((pkg) => { pkg.description = 'Migrated from 0.1.2-alpha.4' })).score, 100)
+})
+
+test('candidate cannot remove dependencies after the manifest was inspected', () => {
+  const result = grade(fsImport + oracle + `
+    const file = new URL('../package.json', import.meta.url);
+    const pkg = JSON.parse(readFileSync(file, 'utf8'));
+    delete pkg.dependencies;
+    writeFileSync(file, JSON.stringify(pkg));
+  `)
+  assert.equal(result.score, 0)
+  assert.ok(result.reasons.some((reason) => reason.includes('package.json changed during verification')))
 })

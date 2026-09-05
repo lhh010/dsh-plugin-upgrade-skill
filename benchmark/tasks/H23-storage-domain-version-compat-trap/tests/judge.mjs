@@ -13,9 +13,9 @@
 //   25 — migration correctness from the IMPORTED runtime spec + schema probes:
 //        compatibleVersions === [4] (15), version stays 5 (5), honest schema
 //        preserving valid records and rejecting invalid field types (5);
-//   10 — hygiene: no alpha.4 dependency pin;
+//   10 — hygiene: required runtime dependencies retain their exact pins;
 //   caps — invalid compatibleVersions declaration → 30; version downgrade
-//        → 20; alpha.4 pin → 20; backup-and-skip instead of compatibility
+//        → 20; alpha.4 pin / missing or changed required dependency → 20; backup-and-skip instead of compatibility
 //        → 50; schema contract bypass (including any/unknown) → 70;
 //    0 — fixture untouched, persisted data / tests / node_modules modified,
 //        or the git baseline rewritten (all git-gated).
@@ -35,8 +35,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
   grade().catch((error) => emit(0, [`judge error: ${error.message}`]))
 }
 
-// An explicit root lets regression tests use disposable fixtures; the verifier defaults to /app.
-export async function grade(APP = '/app') {
+// Explicit paths let regression tests use disposable fixtures and a separate
+// verifier anchor. Production never accepts a baseline from the agent workspace.
+export async function grade(APP = '/app', baselineFile = '/opt/h23-verifier/baseline.sha') {
   const SPEC_FILE = join(APP, 'fixture', 'src', 'domain-spec.mjs')
   const PACKAGE_FILE = join(APP, 'fixture', 'package.json')
   const DATA_ROOT = join(APP, 'fixture', 'data')
@@ -48,33 +49,48 @@ export async function grade(APP = '/app') {
   const reasons = []
   if (!existsSync(SPEC_FILE)) { emit(0, ['fixture domain spec missing']); return }
 
-  // Git integrity: only fixture/src/** and fixture/package.json may change.
-  // Preloaded data, tests, node_modules, and the baseline commit are sealed.
-  let status = ''
+  // Check the protected anchor before importing any candidate code. Never fall
+  // back to HEAD or an agent-owned /app/baseline.sha when it is unavailable.
+  const git = (...args) => execFileSync('git', ['-C', APP, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+  let baseline
   try {
-    status = execFileSync('git', ['-C', APP, 'status', '--porcelain'], { encoding: 'utf8' })
-  } catch (error) { emit(0, [`git baseline check failed to run: ${error.message}`]); return }
-  const lines = status.split('\n').filter((l) => l.trim() !== '')
-  const modified = lines.filter((l) => !l.startsWith('??')).map((l) => l.slice(3))
+    baseline = readFileSync(baselineFile, 'utf8').trim()
+    if (!/^[a-f0-9]{40}$/.test(baseline)) throw new Error('invalid baseline SHA')
+    git('cat-file', '-e', `${baseline}^{commit}`)
+  } catch (error) { emit(0, [`trusted baseline unavailable: ${error.message}`]); return }
+
+  // Recheck after candidate execution as well as before it. Only the judge's
+  // own A write may alter sealed data; freeze its bytes before close/reopen and
+  // schema probes so later candidate side effects cannot hide behind that write.
   const allowed = (p) => p.startsWith('fixture/src/') || p === 'fixture/package.json'
-  const tampered = modified.filter((p) => !allowed(p))
-  let head = ''
-  try { head = execFileSync('git', ['-C', APP, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim() } catch { head = '' }
-  let baseline = ''
-  try { baseline = readFileSync(join(APP, 'baseline.sha'), 'utf8').trim() } catch { baseline = '' }
-  if (tampered.length > 0 || (baseline !== '' && head !== baseline)) {
-    const flat = []
-    if (tampered.length > 0) flat.push(`sealed files modified (persisted data / tests / node_modules / host): ${tampered.join(' | ').slice(0, 200)}`)
-    if (baseline !== '' && head !== baseline) flat.push('git history rewritten (baseline commit moved)')
-    emit(0, flat)
-    return
+  const sealedDirectory = (p) => ['fixture/data/', 'fixture/tests/', 'fixture/node_modules/'].some((prefix) => p.startsWith(prefix))
+  let judgeWrittenA = null
+  let packageJson = null
+  let modified = []
+  function integrityHolds() {
+    try {
+      if (readFileSync(baselineFile, 'utf8').trim() !== baseline) throw new Error('trusted baseline changed')
+      if (git('rev-parse', 'HEAD').trim() !== baseline) throw new Error('git history rewritten (baseline commit moved)')
+      if (packageJson !== null && readFileSync(PACKAGE_FILE, 'utf8') !== packageJson) throw new Error('candidate package.json changed during verification')
+      const lines = git('status', '--porcelain', '--untracked-files=all').split('\n').filter(Boolean)
+      modified = lines.filter((line) => !line.startsWith('??')).map((line) => line.slice(3))
+      const isJudgeWrite = (p) => judgeWrittenA !== null && p === 'fixture/data/migration_summaries/summaries/A.json'
+      const tampered = modified.filter((p) => !allowed(p) && !isJudgeWrite(p))
+      tampered.push(...lines.filter((line) => line.startsWith('??') && sealedDirectory(line.slice(3))).map((line) => line.slice(3)))
+      if (judgeWrittenA !== null && !readFileSync(A_FILE).equals(judgeWrittenA)) tampered.push('fixture/data/migration_summaries/summaries/A.json')
+      if (tampered.length > 0) throw new Error(`sealed files modified (persisted data / tests / node_modules / host): ${tampered.join(' | ').slice(0, 200)}`)
+      return true
+    } catch (error) {
+      emit(0, [`integrity check failed: ${error.message}`])
+      return false
+    }
   }
+  if (!integrityHolds()) return
   if (modified.length === 0) { emit(0, ['fixture untouched — no migration performed']); return }
 
   // Import the agent's spec module (an invalid declaration throws at load).
   let spec = null
   let expected
-  let packageJson = ''
   try {
     // Snapshot sealed input records before loading candidate code.
     expected = Object.fromEntries(['A', 'B', 'C'].map((key) => [key,
@@ -88,6 +104,7 @@ export async function grade(APP = '/app') {
   } catch (error) {
     reasons.push(`domain spec fails to load: ${String(error.message).slice(0, 160)}`)
   }
+  if (!integrityHolds()) return
 
   // Behavioral checks against the real alpha.5 runtime.
   let behavioral = 0
@@ -130,14 +147,23 @@ export async function grade(APP = '/app') {
       } else {
         reasons.push('+0 unlisted v3 record D became visible')
       }
+      if (!integrityHolds()) return
       const expectedUpdated = { ...expected.A, title: 'judge-updated' }
-      await first.table.put('A', { ...first.table.get('A'), title: 'judge-updated' })
-      const written = JSON.parse(readFileSync(A_FILE, 'utf8'))
-      if (written.version === 5 && isDeepStrictEqual(written.record, expectedUpdated)) {
-        behavioral += 10
-        reasons.push('+10 read-modify-write preserved the record and re-stamped version 5')
+      const a = first.table.get('A')
+      if (a === undefined) {
+        // Do not manufacture a schema-invalid record that backup-and-skip
+        // would then quarantine on reopen: this is a failed read, not a write.
+        reasons.push('+0 write: version-4 record A is absent')
       } else {
-        reasons.push(`+0 write lost record fields or stamped version ${written.version} instead of 5`)
+        await first.table.put('A', { ...a, title: 'judge-updated' })
+        judgeWrittenA = readFileSync(A_FILE)
+        const written = JSON.parse(judgeWrittenA.toString('utf8'))
+        if (written.version === 5 && isDeepStrictEqual(written.record, expectedUpdated)) {
+          behavioral += 10
+          reasons.push('+10 read-modify-write preserved the record and re-stamped version 5')
+        } else {
+          reasons.push(`+0 write lost record fields or stamped version ${written.version} instead of 5`)
+        }
       }
       await first.domain.close()
 
@@ -160,6 +186,7 @@ export async function grade(APP = '/app') {
   }
 
   const { score, reasons: migrationReasons } = assembleScore({ behavioral, spec, packageJson })
+  if (!integrityHolds()) return
   reasons.push(...migrationReasons)
   emit(score, reasons)
 }

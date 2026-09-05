@@ -11,12 +11,15 @@ source: if a field is removed in alpha.1 and restored in alpha.2, do not delete 
 
 | Order | Card file | from | to | Cards | Status / coverage |
 |---|---|---|---|---:|---|
+| 0 | [v0.1.1-rc.1.md](v0.1.1-rc.1.md) | `dsh-v0.1.0-rc.8` | `dsh-v0.1.1-rc.1` | 9 | draft / curated (vlln plugin migrations: repository-plugins mechanism removal, `dshClient`→`dsh.client` manifest merge, client-modules scan → bundle `dsh.client`, strict inject + weak `ctx.get`, session event contract (`type` not `kind`), self-rendering client session aggregation, `tasks.peek` removal, 0812 service renames — `httpServer`→`webServer`, `tasks`→`jobs`; corridor is the closest published-tag alignment for the internal 0810–0812 snapshot window, upstream review may reassign) |
 | 1 | [v0.1.1-rc.2.md](v0.1.1-rc.2.md) | `dsh-v0.1.1-rc.1` | `dsh-v0.1.1-rc.2` | 3 | reviewed / curated |
 | 2 | [v0.1.2-alpha.1.md](v0.1.2-alpha.1.md) | `dsh-v0.1.1-rc.2` | `dsh-v0.1.2-alpha.1` | 28 | reviewed / curated |
 | 3 | [v0.1.2-alpha.2.md](v0.1.2-alpha.2.md) | `dsh-v0.1.2-alpha.1` | `dsh-v0.1.2-alpha.2` | 8 | reviewed / curated |
-| 4 | [v0.1.2-alpha.3.md](v0.1.2-alpha.3.md) | `dsh-v0.1.2-alpha.2` | `dsh-v0.1.2-alpha.3` | 0 | reviewed / curated |
+| 4 | [v0.1.2-alpha.3.md](v0.1.2-alpha.3.md) | `dsh-v0.1.2-alpha.2` | `dsh-v0.1.2-alpha.3` | 1 | reviewed / curated (no breaking plugin changes; one additive capability: `settings.plugin.item` keyed-slot settings card, first real-world integrations) |
 | 5 | [v0.1.2-alpha.4.md](v0.1.2-alpha.4.md) | `dsh-v0.1.2-alpha.3` | `dsh-v0.1.2-alpha.4` | 6 | reviewed / curated |
-| — | [rollup-0.1.2.md](rollup-0.1.2.md) | `dsh-v0.1.1-rc.2` → `dsh-v0.1.2-alpha.4` full corridor | rollup | non-card file: corridor-level increment (cross-cohort coexistence, unpublished-cohort installation, `RemoteResult` error flow, pre-migration baseline attribution, bounded retry for boot race, base-only preset precondition, type-surface export drift, host-self safety boundary, three install-channel pitfalls, layered validation checklist); based on alpha.4, subject to final-release review |
+| 6 | [v0.1.2-alpha.5.md](v0.1.2-alpha.5.md) | `dsh-v0.1.2-alpha.4` | `dsh-v0.1.2-alpha.5` | 3 | reviewed / curated |
+| 7 | [v0.1.2-rc.1.md](v0.1.2-rc.1.md) | `dsh-v0.1.2-alpha.5` | `dsh-v0.1.2-rc.1` | 0 | reviewed / curated |
+| — | [rollup-0.1.2.md](rollup-0.1.2.md) | `dsh-v0.1.1-rc.2` → `dsh-v0.1.2-rc.1` full corridor | rollup | non-card file: corridor-level increment (cross-cohort coexistence, unpublished-cohort installation, `RemoteResult` error flow, pre-migration baseline attribution, bounded retry for boot race, base-only preset precondition, type-surface export drift, host-self safety boundary, three install-channel pitfalls, layered validation checklist); based on rc.1, subject to final-release review |
 
 `curated` means only the identified plugin-relevant changes are included, not a complete
 API diff. When a corridor edge is missing, stop the automatic migration and report the gap

@@ -8,10 +8,10 @@
 
 ## 这个仓库里有什么
 
-- **45 张升级说明卡**：每张卡记录一个真实的坑——什么坏了、为什么坏、怎么修、信息来源是哪个版本。按版本排好序，从 0.1.1 一路到 0.1.2-alpha.4（alpha.2→alpha.3 无插件面变更，0 张卡；alpha.3→alpha.4 有 6 张）。
+- **58 张升级说明卡**：每张卡记录一个真实的坑——什么坏了、为什么坏、怎么修、信息来源是哪个版本。按版本排好序，从 0.1.0-rc.8 一路到 0.1.2-rc.1（alpha.5→rc.1 无插件面变更，0 张卡；alpha.2→alpha.3 有 1 张新增能力卡；alpha.3→alpha.4 有 6 张；rc.8→rc.1 为 9 张草稿卡）。
 - **12 条通用对策**：有些坑和版本无关（比如"先备份再动手""新旧版本怎么共存"），这些写成了一份对策清单。
-- **8 个 skill**：一个统一工作流负责选择和编排，另外七个分别负责查升级、写新插件、测插件、发插件、对比两个版本的差别、排查运行时故障和给轻量插件接入重依赖。
-- **26 道考题（benchmark）**：用来测"AI 装了我们的 skill 之后到底会不会升级插件"，每道题都有自动判分；其中包含 dsh-web v0.3.8 → v0.3.9 的真实迁移。
+- **9 个 skill**：一个统一工作流负责选择和编排，另外八个分别负责查升级、写新插件、测插件、发插件、对比两个版本的差别、排查运行时故障、给轻量插件接入重依赖，以及把插件升级经验提取成 benchmark 考题。
+- **52 道考题（benchmark）**：用来测"AI 装了我们的 skill 之后到底会不会升级插件"，每道题都有自动判分；其中包含 dsh-web v0.3.8 → v0.3.9 和 dsh-data-agent v0.1.3 → v0.1.4 两道真实迁移。
 - **多份验证报告**：我们在 docker 里真的装了两个版本的 dsh，验证了"按卡片做就能修好插件"；此后又用 Codex 等 agent 做了多轮 benchmark 实测。
 
 ## 快速开始
@@ -109,7 +109,7 @@ Claude Code 中按名字调用 skill（插件安装后带命名空间）：
 帮我把 dsh-ads 这个插件升级到 dsh-v0.1.2-alpha.2
 ```
 
-## 8 个 skill 各自管什么
+## 9 个 skill 各自管什么
 
 | Skill | 干什么用 |
 | --- | --- |
@@ -121,23 +121,27 @@ Claude Code 中按名字调用 skill（插件安装后带命名空间）：
 | [dsh-upgrade-audit](skills/dsh-upgrade-audit/) | 对比两个 dsh 版本到底改了什么，给升级卡提供证据 |
 | [plugin-runtime-debug](skills/plugin-runtime-debug/) | 排查插件在宿主里的运行时故障（坐标/投影不匹配、版本滞后、幽灵条目等） |
 | [plugin-heavy-dep](skills/plugin-heavy-dep/) | 给轻量插件接入重依赖（mermaid 这类），含懒加载接入清单 |
+| [dsh-benchmark-case](skills/dsh-benchmark-case/) | 把某个插件的真实升级经验（或已有版本卡）提取成一条可自动判分的 benchmark 考题（fixture + instruction + judge + solution） |
 
 ## 升级卡覆盖到哪个版本了
 
 | 版本区间 | 状态 | 说明卡 | 备注 |
 | --- | --- | --- | --- |
+| 0.1.0-rc.8 → 0.1.1-rc.1 | 📝 草稿 | [v0.1.1-rc.1.md](skills/plugin-upgrade/references/v0.1.1-rc.1.md) | 9 张草稿卡（vlln 插件迁移：repository 机制移除、strict inject、0812 服务改名等；走廊为 0810–0812 内测快照窗口的最近公开 tag 对齐，待上游复核） |
 | 0.1.1-rc.1 → 0.1.1-rc.2 | ✅ 完成 | [v0.1.1-rc.2.md](skills/plugin-upgrade/references/v0.1.1-rc.2.md) | 3 张卡 |
 | 0.1.1-rc.2 → 0.1.2-alpha.1 | ✅ 完成 | [v0.1.2-alpha.1.md](skills/plugin-upgrade/references/v0.1.2-alpha.1.md) | 28 张卡 |
 | 0.1.2-alpha.1 → 0.1.2-alpha.2 | ✅ 完成 | [v0.1.2-alpha.2.md](skills/plugin-upgrade/references/v0.1.2-alpha.2.md) | 8 张卡 |
-| 0.1.2-alpha.2 → 0.1.2-alpha.3 | ✅ 完成 | [v0.1.2-alpha.3.md](skills/plugin-upgrade/references/v0.1.2-alpha.3.md) | 0 张卡（无插件面变更，含核对记录） |
+| 0.1.2-alpha.2 → 0.1.2-alpha.3 | ✅ 完成 | [v0.1.2-alpha.3.md](skills/plugin-upgrade/references/v0.1.2-alpha.3.md) | 1 张卡（无破坏性插件面变更，含核对记录；新增 `settings.plugin.item` keyed-slot 设置卡能力） |
 | 0.1.2-alpha.3 → 0.1.2-alpha.4 | ✅ 完成 | [v0.1.2-alpha.4.md](skills/plugin-upgrade/references/v0.1.2-alpha.4.md) | 6 张卡（`report` → `send_message`、Python 运行时包改名、`Session.events` 移除、seq 强类型、PTC `workflow` 与 base `web_fetch` 默认值；三台真宿主验证） |
+| 0.1.2-alpha.4 → 0.1.2-alpha.5 | ✅ 完成 | [v0.1.2-alpha.5.md](skills/plugin-upgrade/references/v0.1.2-alpha.5.md) | 3 张卡（storage 域 `compatibleVersions` 读兼容与 `backup-and-skip` 兜底；旧家升级拒启/标题丢失修复；storage 层复现核对） |
+| 0.1.2-alpha.5 → 0.1.2-rc.1 | ✅ 完成 | [v0.1.2-rc.1.md](skills/plugin-upgrade/references/v0.1.2-rc.1.md) | 0 张卡（纯版本 bump；含核对记录、macOS 真机验证与 release notes 覆盖矩阵） |
 | 跨版本通用对策 | ✅ 完成 | [rollup-0.1.2.md](skills/plugin-upgrade/references/rollup-0.1.2.md) | 12 条（新旧共存、先备份、启动卡死怎么办等） |
-| 0.1.1 → 0.1.2 正式版 | 🔄 等官方发版 | — | dsh 0.1.2 还没发正式版（最新是 alpha.4，走廊已核实到 alpha.4），发了之后我们要复核一遍 |
+| 0.1.1 → 0.1.2 正式版 | 🔄 等官方发版 | — | dsh 0.1.2 还没发正式版（最新是 rc.1，走廊已核实到 rc.1），发了之后我们要复核一遍 |
 | 0.1.2 → 更新版本 | 📝 等社区认领 | — | 想帮忙写卡？看 [贡献指南](CONTRIBUTING.md) |
 
 ## 考题（benchmark）
 
-[benchmark/](benchmark/) 目录下有 29 道升级考题和自动判分，采用 [Harbor](https://github.com/harbor-framework/harbor) 任务格式：每题一个自包含任务（自带 dsh 环境的容器 + 自动 verifier），`harbor run -p benchmark/tasks/<题号> -a <agent>` 即可出 0~1 分。同一只 AI 装 skill 做一遍、不装做一遍，分差就是 skill 的实际效果。详见 [benchmark/README.md](benchmark/README.md)。同目录还有多份验证报告：[validation-report-2026-08-30.md](benchmark/results/validation-report-2026-08-30.md)（此前的迁移/benchmark 验证记录）、[validation-report-2026-08-31.md](benchmark/results/validation-report-2026-08-31.md)（Harbor 格式改造后的端到端验证）、[validation-report-2026-08-31-auth-v1.md](benchmark/results/validation-report-2026-08-31-auth-v1.md)（BENCHMARK-AUTH-v1 无人值守授权验证），以及四份 2026-09-01 的 Codex + `gpt-5.6-luna` 实测报告（[带 skill 的其余 18 题](benchmark/results/validation-report-2026-09-01-codex-gpt-5.6-luna-other-18.md)、[不带 skill 的其余 18 题](benchmark/results/validation-report-2026-09-01-codex-gpt-5.6-luna-other-18-no-injected-skill.md)、[带 skill 的真实仓库题](benchmark/results/validation-report-2026-09-01.md)、[不带 skill 的真实仓库题](benchmark/results/validation-report-2026-09-01-h8-dsh-web-alpha2-no-skill.md)）。
+[benchmark/](benchmark/) 目录下有 47 道升级考题和自动判分，采用 [Harbor](https://github.com/harbor-framework/harbor) 任务格式：每题一个自包含任务（自带 dsh 环境的容器 + 自动 verifier），`harbor run -p benchmark/tasks/<题号> -a <agent>` 即可出 0~1 分。同一只 AI 装 skill 做一遍、不装做一遍，分差就是 skill 的实际效果。详见 [benchmark/README.md](benchmark/README.md)。同目录还有多份验证报告，包括两份 2026-09-01 的 Codex + `gpt-5.6-terra` 22 题报告（[带 skill](benchmark/results/validation-report-2026-09-01-codex-gpt-5.6-terra-all-22.md)、[完全不带 skill](benchmark/results/validation-report-2026-09-01-codex-gpt-5.6-terra-all-22-literal-no-skill.md)）、四份 Codex + `gpt-5.6-luna` 19 题快照报告，以及 2026-09-02 的 H22 dsh-data-agent 配对实测（[带 `plugin-upgrade`](benchmark/results/validation-report-2026-09-02-h22-dsh-data-agent-alpha2-plugin-upgrade.md)、[完全不带 skill](benchmark/results/validation-report-2026-09-02-h22-dsh-data-agent-alpha2-no-skill.md)）。
 
 ## 参考资源
 
@@ -171,7 +175,7 @@ skills/<skill-name>/
 └── examples/       # 示例代码（只读，不要运行）
 scripts/validate.mjs            # 仓库自检
 scripts/validate-manifests.mjs  # 多 agent 清单自检
-benchmark/                      # 29 道考题 + 判分 + 验证报告
+benchmark/                      # 52 道考题 + 判分 + 验证报告
 ```
 
 ## 想贡献？

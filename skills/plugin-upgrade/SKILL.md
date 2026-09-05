@@ -21,6 +21,28 @@ Note: the version cards and reference docs under `references/` are in English; c
 
 This skill does not handle "upgrade DSH core only and leave the plugins alone," and it must not modify DSH core to conceal plugin incompatibility.
 
+## Global DSH host upgrades (agent discipline)
+
+Upgrading the dsh host itself (`npm install -g @deepseek-ai/dsh@…`) is not Mode B/C plugin
+work — and when the requesting agent runs INSIDE a dsh session it is structurally fatal:
+the session IS the host process, npm removes/replaces the very package tree it executes
+from, the host dies mid-install (the tool call never returns), and the interrupted install
+leaves package content present WITHOUT regenerated shims — the `dsh` command itself is
+gone until an external pinned re-install repairs it. Never execute the global host
+upgrade from inside a session on that host; hand the user the external procedure:
+
+1. fully stop every dsh process (a running host holds native-module file locks → EBUSY;
+   a browser refresh is not a host stop);
+2. from an EXTERNAL terminal, run the pinned install
+   `npm install -g @deepseek-ai/dsh@<exact-version>` (a bare package name resolves to the
+   `latest` dist-tag and can silently downgrade to an older line);
+3. restart `dsh web`, hard-refresh the browser, verify version markers and plugins.
+
+Because the host is fully stopped before npm runs, nothing crashes mid-install — a crash
+during the upgrade is a signature of doing it wrong, not a risk to tolerate. If an install
+was already interrupted: repair from an external shell by re-running the pinned formal
+install (never hand-copy package directories or hand-write shims).
+
 ## Shared read-only preparation
 
 1. Read the target repository's rules such as `AGENTS.md` / `CLAUDE.md`; check branch, HEAD, working tree, and submodules. Stop and report unfamiliar changes or untracked files; never auto-stash, reset, clean, or checkout.
@@ -92,12 +114,16 @@ Structure the report as:
 | [references/README.md](references/README.md) | Version corridors, card schema, and maintenance rules |
 | [references/pre-flight.md](references/pre-flight.md) | Seven-class touchpoint self-check and summary template |
 | [references/troubleshooting.md](references/troubleshooting.md) | Post-migration symptom → root cause → card lookup |
+| [references/v0.1.1-rc.1.md](references/v0.1.1-rc.1.md) | rc.8→rc.1 draft cards: repository-plugins mechanism removal, `dshClient`→`dsh.client` manifest merge, client-modules scan → bundle `dsh.client`, strict injection + weak `ctx.get`, session event contract, self-rendering client session aggregation, `tasks.peek` removal, 0812 service renames (vlln plugin migrations; corridor is the closest published-tag alignment for the internal 0810–0812 snapshot window) |
 | [references/v0.1.2-alpha.1.md](references/v0.1.2-alpha.1.md) | rc.2→alpha.1 curated cards |
 | [references/v0.1.2-alpha.2.md](references/v0.1.2-alpha.2.md) | alpha.1→alpha.2 curated cards |
-| [references/v0.1.2-alpha.3.md](references/v0.1.2-alpha.3.md) | alpha.2→alpha.3 curated cards (zero cards: no plugin-facing changes; carries the verification record) |
+| [references/v0.1.2-alpha.3.md](references/v0.1.2-alpha.3.md) | alpha.2→alpha.3 curated cards (1): no breaking plugin changes; additive `settings.plugin.item` keyed-slot settings card capability; carries the verification record |
 | [references/v0.1.2-alpha.4.md](references/v0.1.2-alpha.4.md) | alpha.3→alpha.4 curated cards (6): `report` tool package removed in favour of `send_message`, Python code-runtime package renamed, `Session.events` replaced by `seq`/`eventAt`/`snapshotEvents`, branded `SessionSeq`/`SessionLogOffset` + `seedLength`→`isSeeded`, PTC preset drops `workflow`, base bundle enables `web_fetch`; carries a three-host verification record |
+| [references/v0.1.2-alpha.5.md](references/v0.1.2-alpha.5.md) | alpha.4→alpha.5 curated cards (3): storage domains gain optional `compatibleVersions` read tolerance and `invalidRecords: 'backup-and-skip'` salvage; host fix for rc.2/alpha.3-era homes that refused to boot or dropped session titles on alpha.4; carries a storage-layer reproduction record |
+| [references/v0.1.2-rc.1.md](references/v0.1.2-rc.1.md) | alpha.5→rc.1, the first release candidate of the 0.1.2 series (zero cards: pure version bump, no plugin-facing changes; verification record plus a release-notes coverage matrix mapping the rc.1 summary onto the corridor cards, with backfill candidates) |
 | [references/api-migration-0.1.2-alpha.2.md](references/api-migration-0.1.2-alpha.2.md) | Exact rc.2→alpha.2 interface ledger; read when API, Remote, Settings, events, Headless, packaging, or composition surfaces are hit; includes the removed client runtime and keyed chat snapshots (API-10) |
-| [references/rollup-0.1.2.md](references/rollup-0.1.2.md) | 0.1.1 → 0.1.2 corridor (rollup): cross-cohort coexistence, unpublished-cohort installation, `RemoteResult` error flow, pre-migration baseline attribution, bounded retry for boot race, base-only preset precondition, type-surface export drift, host-self safety boundary, install-channel pitfalls (mirror lag, pnpm 11 supply-chain rules, peer-floor prerelease semantics), and the layered validation checklist; based on alpha.4 and subject to final-release review |
+| [references/rollup-0.1.2.md](references/rollup-0.1.2.md) | 0.1.1 → 0.1.2 corridor (rollup): cross-cohort coexistence, unpublished-cohort installation, `RemoteResult` error flow, pre-migration baseline attribution, bounded retry for boot race, base-only preset precondition, type-surface export drift, host-self safety boundary, install-channel pitfalls (mirror lag, pnpm 11 supply-chain rules, peer-floor prerelease semantics), and the layered validation checklist; based on rc.1 and subject to final-release review |
+
 | [scripts/README.md](scripts/README.md) | Executable helper scripts: `plan-migration` (read-only migration planner), `verify-runtime` (offline runtime contract checker), and `ghost-host-check` (ghost-host classifier for pre-flight step 1.5) |
 | [examples/legacy-plugin/](examples/legacy-plugin/) | Static fixture for the seven touchpoint classes (never execute) |
 | [examples/08-real-web-client-alpha2-migration.md](examples/08-real-web-client-alpha2-migration.md) | Real Host + Web Client source migration from an older unsupported corridor segment |

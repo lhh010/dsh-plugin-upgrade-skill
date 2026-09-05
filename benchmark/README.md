@@ -1,8 +1,8 @@
 # dsh plugin upgrade tasks (benchmark v2.4 · Harbor format)
 
-The 42 plugin-upgrade tasks measure one thing: **once an AI has our upgrade skill
-installed, will it actually upgrade the plugin**. The first 14 are written exams (read
-the code, produce the answer); the last 28 are hands-on (actually install dsh and run
+The 52 plugin-upgrade tasks measure one thing: **once an AI has our upgrade skill
+installed, will it actually upgrade the plugin**. The first 19 are written exams (read
+the code, produce the answer); the last 33 are hands-on (actually install dsh and run
 the plugin — whether it is alive is obvious at a glance). Every task ships with
 auto-grading, so no human marking is involved.
 
@@ -44,6 +44,11 @@ honestly instead of quietly fixing it and pretending nothing happened).
 | S9-composer-coordinate-trap | Static | A community attachment plugin works on the first paste then fails every later one, and the dock × leaves an `unavailable` chip — can it tie both symptoms to one coordinate-projection misread and derive the conversion from host source |
 | S10-paste-rename-and-version-chip | Static | Post-release follow-ups: pasted files need unified `paste_image(N)` renaming driven by the authoritative live-chip set (drops/picker untouched), and the version chip reported a CDN-stale fetched tag as latest — can it design both correctly |
 | S11-mermaid-lazyload-trap | Static | A lazy-loaded mermaid chunk rollout fails three ways: split-chunk sibling imports 404, a Windows-only 403 from a case-sensitive containment guard, and a Ctrl+scroll double-fire under the zoom modal — can it derive each mechanism from the evidence |
+| S12-global-upgrade-ebusy-trap | Static | A user upgrades dsh and fails twice: EBUSY on koffi.node (running process holds a native-module lock) then a silent downgrade to rc.2 (unpinned npm install follows the latest dist-tag) — can it diagnose both and give the safe upgrade sequence |
+| S13-peer-range-vs-runtime | Static | A TUI plugin's peerDependencies claim ^0.1.2-alpha.2 (npm installs without warnings) but it crashes on dsh alpha.5 because alpha.4 removed Session.events — can it distinguish peer range satisfaction from runtime API compatibility |
+| S14-link-install-lock-trap | Static | Repo edits to a link-installed plugin never reach the GUI, Copy-Item into the profile hits EBUSY, and a rename-aside recovery leaves both "directories" with no entry files — can it recognize the junction install (repo tree IS the installed copy), attribute the two locks (running host + browser cache), and derive the activation procedure |
+| S15-slot-error-boundary-crash | Static | After a feature release the pending-attachment dock vanishes entirely: a dangling `busy` identifier (another component's state) throws only when a chip renders and the phase guard short-circuits open — can it find the pre-existing line behind the misleading new diff and design a data-present render regression |
+| S16-self-host-upgrade-trap | Static | An agent runs the global dsh upgrade from inside its own session on the running host: npm replaces the live package tree, the GUI dies mid-call, and the interrupted install leaves the package present but the `dsh` command gone — can it diagnose the self-upgrade failure, repair via an external pinned re-install, and state the hand-off protocol (host stopped BEFORE npm so nothing crashes mid-install) |
 | M2-optional-dep-trap | Hands-on | The plugin declares an optional dependency but imports it unconditionally at top level (the comment says optional is harmless): does it fix the dependency contract instead of wrapping the import, and prove it with a cold boot |
 | M3-session-projection | Hands-on | A self-assembled profile mounts dsh-tool-todo without the sessionProjections service: does it fix the composition (never edit shipped packages) so the tree activates while the todo tool survives in the final composition |
 | M4-peer-prerelease-range | Hands-on | A peer lower bound written as ^0.1.0-rc.8 does not match 0.1.2-alpha.2 under npm semver's prerelease rule: does it rewrite the bound to the target cohort instead of widening it into a meaningless range |
@@ -55,12 +60,17 @@ honestly instead of quietly fixing it and pretending nothing happened).
 | M10-tools-tree | Hands-on | The ctx.slots service moved to ui-renderer in the client-runtime split: does it add the type-only renderer/settings merges and rehome the inject list instead of trusting the cosmetic-import memo |
 | M11-sidebar-spur | Hands-on | ClientContext lived in the deleted client-runtime: does it move to the cordis Context + ui-renderer slots merge, rework the inject list, and keep the dock registration |
 | M12-interpreters-card | Hands-on | The store engine moved to dsh-client-store and dsh-settings renamed Settings to SettingsProvider: does it re-home both type surfaces, the client inject list, and the peer cohort |
+| M13-repository-plugins-removal | Hands-on | A 0.1.1-era repository-plugin ships in the removed shape (`.dsh-plugin/` + `dsh.entry` + a self-executing client): does it convert it to the one official npm-package path — bundle `dsh.bundle`/`dsh.client`/`exports` + cordis.patch.yml insert — drop the legacy manifest, and prove the browser half is recognized in the boot manifest |
+| M14-service-renames-0812 | Hands-on | A bundle plugin still names the pre-0812 host services — `inject: ['tasks', 'httpServer']`, `ctx.tasks` reads, `ctx.httpServer.register`, an `onTaskDone` listener — while the alpha.2 host renamed them (`httpServer`→`webServer`, `tasks`→`jobs`, `onTaskDone`→`onJobDone`) and the boot fails at `pending (waiting for services: tasks, httpServer)`: does it recognize the high-frequency low-diff breaking change, rename every identifier (comments included), and prove activation plus a live route with a cold boot |
 | H14-mineru-api | Hands-on | A tool plugin serves its settings page through a dedicated /mineru-api RPC channel: apiproxy is deleted, rpc.handle lost its third authority argument, and the client inject list names the removed runtime - migrate both planes and prove the boot-roster entry |
 | H15-locale-pack | Hands-on | A 19-language override layer built on a LocaleRuntime lookup monkey-patch: does it migrate to the native third-language API (addLanguage + register(ns, locale, dict)) and delete the patch, the settings row, and localStorage - instead of the belt-and-braces bait |
 | H16-history-dock | Hands-on | The composer became a Lexical contenteditable: does it switch to a capture-phase document keydown inside the session-scoped dock, collect history through useChat legacy nodes, and yield to data-trigger-menu - instead of the textarea bait |
 | H17-merge-calls | Hands-on | ui-tool deleted its resultView/callView derivations and ui-chat owns the chat nodes: does it derive cards from block.meta + call args + result text, read through useChat, and relax override dicts to Partial - instead of the renamed-fields bait |
 | H18-blame-bubbles | Hands-on | The suggestion-bubbles plugin rides the deleted apiproxy facade with a three-argument rpc.handle and an undeclared projection cell: does it migrate to ConnectionRpcResult, the two-argument handle, and the SessionProjectionStateMap dual-table declaration |
 | H19-workspace-ya | Hands-on | The workspace browser must take over the disabled official ui-workspace through slots.provideRoot plus a stand-in service (the boot-deadlock fix): does it compose the takeover instead of patching the shipped package in node_modules |
+| H20-session-events-ledger | Hands-on | alpha.4 removes the `Session.events` getter (implicit whole-event-array access): does the agent migrate a plugin-internal event ledger module to the explicit sequence/window surface — visible window keeps fork-inherited history, exact-seq lookup, half-open window bounds, own/inherited cut — instead of a symbol rename, an invented getEvents, or a runtime patch |
+| H21-question-answerer-waterfall | Hands-on | A structured-question answerer still uses the rc.2 single-seat registration: can it migrate to the alpha.2 waterfall while preserving current-owner claim, foreign-owner delegation, rebinding, disposal, and the legacy cohort |
+| H22-dsh-data-agent-alpha2 | Hands-on | Can it migrate the complete real dsh-data-agent v0.1.3 repository to the exact v0.1.4 alpha.2 client behavior, including provider ownership, New Session Hero preservation, revisioned workbench hand-off, Lexical fallback, release artifacts, and browser execution |
 
 ## Benchmark results
 
@@ -73,17 +83,35 @@ supplied by Harbor, although native Codex skills remained available in the
 latter condition. These rows belong to the same benchmark family but are not a
 direct model comparison: `S8-release-routing-trap`, `M5-token-auth-smoke`, and
 `H8-fire-drill` were added after the Luna snapshot, while
-`H10-browser-activation-trap` was added after the Terra runs, and
-`H11-dual-cohort-rpc` is added by this PR.
+`H10-browser-activation-trap`, `H11-dual-cohort-rpc`, and
+`H22-dsh-data-agent-alpha2` were added after the Terra runs.
+
+On 2026-09-02, Luna also ran the new `H22-dsh-data-agent-alpha2` task once with
+`skills/plugin-upgrade` and once with both Harbor-injected and Codex-native
+skills disabled. Both rows below are scored single trials; the literal-zero-skill
+report separately accounts for an excluded preliminary attempt that read a native
+skill and timed out.
+
+On 2026-09-03, `deepseek/deepseek-v4-flash` with terminus-2 also ran the new
+`H21-question-answerer-waterfall` task three times per condition — with the fixed
+pre-answer skill snapshot `5f7234ba…` and with no Harbor-injected skill. Harbor
+0.22.0 on the Windows Docker Desktop host rejected H21's formal `no-network`
+agent policy, so these six trials ran on a public-network calibration copy of
+the task; treat the two H21 rows below as calibration evidence rather than
+formal no-network scores.
 
 | Model | Skill condition | Scope | reward | mean | perfect tasks | Summed job duration | Tokens (input / cache / output) | Cost | Detailed report |
 |---|---|---|---:|---:|---:|---:|---:|---:|---|
 | `openai/gpt-5.6-terra` | With `skills/plugin-upgrade` | 22-task 2026-09-01 snapshot; 21 rewarded + 1 verifier error | 16.75/21 scored; 16.75/22 conservative | 0.7976 scored; 0.7614 conservative | 13 | 2h33m58.860s | 54,094,444 / 51,131,904 / 355,256 | $20.4145 | [22-task report](results/validation-report-2026-09-01-codex-gpt-5.6-terra-all-22.md) |
-| `openai/gpt-5.6-terra` | Literal zero skill | 22-task 2026-09-01 snapshot; 21 rewarded + 1 verifier error | 14.93/21 scored; 14.93/22 conservative | 0.7110 scored; 0.6786 conservative | 10 | 2h51m32s | 46,824,114 / 44,432,640 / 283,652 | $17.0733 | [22-task literal-no-skill report](results/validation-report-2026-09-01-codex-gpt-5.6-terra-all-22-literal-no-skill.md) |
+| `openai/gpt-5.6-terra` | Literal zero skill | 22-task 2026-09-01 snapshot; 21 rewarded + 1 verifier error | 14.93/21 scored; 14.93/22 conservative | 0.7110 scored; 0.6786 conservative | 10 | 2h51m31.853s | 46,824,114 / 44,432,640 / 283,652 | $17.0733 | [22-task literal-no-skill report](results/validation-report-2026-09-01-codex-gpt-5.6-terra-all-22-literal-no-skill.md) |
 | `openai/gpt-5.6-luna` | With `skills/plugin-upgrade` | 19-task 2026-09-01 snapshot | 15.95/19 | 0.8395 | 13 | 1h38m30.556s | 57,118,102 / 54,630,656 / 332,161 | $1.9887 | [18-task batch](results/validation-report-2026-09-01-codex-gpt-5.6-luna-other-18.md) · [real-repository task](results/validation-report-2026-09-01.md) |
 | `openai/gpt-5.6-luna` | No Harbor-injected skill† | 19-task 2026-09-01 snapshot | 13.09/19 | 0.6889 | 10 | 1h49m25.650s | 36,761,760 / 34,515,712 / 244,223 | $1.4326 | [18-task batch](results/validation-report-2026-09-01-codex-gpt-5.6-luna-other-18-no-injected-skill.md) · [real-repository task](results/validation-report-2026-09-01-h8-dsh-web-alpha2-no-skill.md) |
+| `openai/gpt-5.6-luna` | With `skills/plugin-upgrade` | H22 dsh-data-agent; 1 scored trial | 0.08/1 | 0.0800 | 0 | 3h58m55.457s | 143,377,248 / 138,872,576 / 445,689 | $4.2132 | [H22 with-skill report](results/validation-report-2026-09-02-h22-dsh-data-agent-alpha2-plugin-upgrade.md) |
+| `openai/gpt-5.6-luna` | Literal zero skill‡ | H22 dsh-data-agent; 1 accepted scored trial | 0.11/1 | 0.1100 | 0 | 1h34m53.399s | 70,605,981 / 68,899,072 / 227,439 | $1.9923 | [H22 literal-zero-skill report](results/validation-report-2026-09-02-h22-dsh-data-agent-alpha2-no-skill.md) |
 | `deepseek/deepseek-v4-flash` + terminus-2 | With `skills/plugin-upgrade` | 23-task full set (3-run median) | 18.55/23 | 0.8063 | 14 | 2h34m | 58.7M / n/a / 2.5M | $5.28 | [terminus-2 + deepseek-v4-flash report](results/validation-report-2026-09-01-terminus2-deepseek-v4-flash.md) |
 | `deepseek/deepseek-v4-flash` + terminus-2 | No skill | 23-task full set (3-run median) | 16.09/23 | 0.6996 | 11 | 2h24m | 53.9M / n/a / 2.3M | $4.85 | [terminus-2 + deepseek-v4-flash report](results/validation-report-2026-09-01-terminus2-deepseek-v4-flash.md) |
+| `deepseek/deepseek-v4-flash` + terminus-2 | With fixed pre-answer skill snapshot§ | H21 question-answerer-waterfall; 3 scored trials | 1.00/1 median (2.90/3 raw) | 0.9667 | 2/3 trials | 45m33.274s | 8,042,266 / 7,779,840 / 291,429 | $0.6091 | [H21 paired report](results/validation-report-2026-09-03-terminus2-deepseek-v4-flash-h21.md) |
+| `deepseek/deepseek-v4-flash` + terminus-2 | No Harbor-injected skill§ | H21 question-answerer-waterfall; 3 scored trials | 0.90/1 median (2.70/3 raw) | 0.9333 | 1/3 trials | 45m27.972s | 6,270,437 / 6,040,320 / 292,922 | $0.5725 | [H21 paired report](results/validation-report-2026-09-03-terminus2-deepseek-v4-flash-h21.md) |
 
 Duration is the sum of the Harbor job durations represented in each report;
 concurrent jobs therefore remain additive rather than being collapsed into an
@@ -99,31 +127,33 @@ first H8 agent attempt when retrying it.
 Per-task skill comparison (`delta = with-skill - corresponding no-skill
 condition`; `—` means the task was absent or no verifier reward existed):
 
-| Task | Luna with skill | Luna no Harbor skill | Luna delta | Terra with skill | Terra literal zero skill | Terra delta |
-|---|---:|---:|---:|---:|---:|---:|
-| S1-static-scan | 1.00 | 0.67 | +0.33 | 1.00 | 0.83 | +0.17 |
-| S2-negative-scan | 1.00 | 0.60 | +0.40 | 1.00 | 0.60 | +0.40 |
-| S3-snapshot-migration | 1.00 | 0.00 | +1.00 | 1.00 | 0.20 | +0.80 |
-| H4-tsbuildinfo-trap | 1.00 | 0.30 | +0.70 | 1.00 | 0.30 | +0.70 |
-| M1-host-migration | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
-| H1-plane-trap | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
-| H2-baseline-trap | 1.00 | 1.00† | 0.00 | 1.00 | 1.00 | 0.00 |
-| H3-client-plane | 1.00 | 1.00† | 0.00 | 1.00 | 1.00 | 0.00 |
-| H5-runtime-export-drift | 1.00 | 1.00 | 0.00 | 0.20 | 1.00 | -0.80 |
-| M5-token-auth-smoke | — | — | — | 0.60 | 0.60 | 0.00 |
-| H8-fire-drill | — | — | — | error | error | — |
-| H9-dsh-web-alpha2 | 0.80 | 0.67 | +0.13 | 0.80 | 0.50 | +0.30 |
-| H10-browser-activation-trap | — | — | — | — | — | — |
-| S4-legacy-client-imports | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
-| S5-negative-naming | 0.75 | 0.50 | +0.25 | 0.75 | 0.50 | +0.25 |
-| H6-remote-error-trap | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
-| S6-corridor-net-state | 0.25 | 0.25 | 0.00 | 0.25 | 0.25 | 0.00 |
-| S7-unpublished-cohort | 0.25 | 0.10 | +0.15 | 0.25 | 0.25 | 0.00 |
-| S8-release-routing-trap | — | — | — | 1.00 | 1.00 | 0.00 |
-| M2-optional-dep-trap | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
-| M3-session-projection | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
-| M4-peer-prerelease-range | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
-| H7-locale-trap | 0.90 | 1.00 | -0.10 | 0.90 | 0.90 | 0.00 |
+| Task | Luna with skill | Luna no Harbor skill | Luna delta | Terra with skill | Terra literal zero skill | Terra delta | Flash with skill (median) | Flash no skill (median) | Flash delta |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| S1-static-scan | 1.00 | 0.67 | +0.33 | 1.00 | 0.83 | +0.17 | 1.00 | 0.33 | +0.67 |
+| S2-negative-scan | 1.00 | 0.60 | +0.40 | 1.00 | 0.60 | +0.40 | 1.00 | 0.40 | +0.60 |
+| S3-snapshot-migration | 1.00 | 0.00 | +1.00 | 1.00 | 0.20 | +0.80 | 0.80 | 0.60 | +0.20 |
+| H4-tsbuildinfo-trap | 1.00 | 0.30 | +0.70 | 1.00 | 0.30 | +0.70 | 1.00 | 0.30 | +0.70 |
+| M1-host-migration | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
+| H1-plane-trap | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
+| H2-baseline-trap | 1.00 | 1.00† | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
+| H3-client-plane | 1.00 | 1.00† | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
+| H5-runtime-export-drift | 1.00 | 1.00 | 0.00 | 0.20 | 1.00 | -0.80 | 1.00 | 1.00 | 0.00 |
+| M5-token-auth-smoke | — | — | — | 0.60 | 0.60 | 0.00 | 0.60 | 0.60 | 0.00 |
+| H8-fire-drill | — | — | — | error | error | — | 0.70 | 0.20 | +0.50 |
+| H9-dsh-web-alpha2 | 0.80 | 0.67 | +0.13 | 0.80 | 0.50 | +0.30 | 0.05 | 0.26 | -0.21 |
+| H10-browser-activation-trap | — | — | — | — | — | — | 1.00 | 1.00 | 0.00 |
+| H22-dsh-data-agent-alpha2 | 0.08 | 0.11‡ | -0.03 | — | — | — | — | — | — |
+| H21-question-answerer-waterfall | — | — | — | — | — | — | 1.00§ | 0.90§ | +0.10 |
+| S4-legacy-client-imports | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
+| S5-negative-naming | 0.75 | 0.50 | +0.25 | 0.75 | 0.50 | +0.25 | 0.50 | 0.75 | -0.25 |
+| H6-remote-error-trap | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.25 | 0.00 | +0.25 |
+| S6-corridor-net-state | 0.25 | 0.25 | 0.00 | 0.25 | 0.25 | 0.00 | 0.50 | 0.25 | +0.25 |
+| S7-unpublished-cohort | 0.25 | 0.10 | +0.15 | 0.25 | 0.25 | 0.00 | 0.25 | 0.50 | -0.25 |
+| S8-release-routing-trap | — | — | — | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
+| M2-optional-dep-trap | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
+| M3-session-projection | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
+| M4-peer-prerelease-range | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
+| H7-locale-trap | 0.90 | 1.00 | -0.10 | 0.90 | 0.90 | 0.00 | 0.90 | 0.90 | 0.00 |
 
 For Luna, the observed with-skill uplift is **+2.86 reward points across 19
 tasks**, or **+0.1505 mean reward**. Seven tasks improved, eleven tied, and one
@@ -138,9 +168,15 @@ improved, fourteen tied, and one (H5) was 0.80 lower. The largest gains were S3
 (+0.80), H4 (+0.70), S2 (+0.40), and H9 (+0.30). H8 produced no verifier
 reward in either Terra condition and is excluded from this delta.
 
-These numbers are evidence from one selected attempt per task and condition,
-not the three-run median recommended below. They also have these protocol
-limits:
+For the terminus-2 + DeepSeek V4 Flash pairing, the observed with-skill uplift
+is **+2.46 reward points across 23 tasks**, or **+0.1067 mean reward**, using
+three-run medians. Seven tasks improved, thirteen tied, and three regressed
+(S5, S7, and H9). The largest gains were H4 (+0.70), S1 (+0.67), S2 (+0.60),
+and H8 (+0.50).
+
+The Luna and Terra numbers are evidence from one selected attempt per task and
+condition; the Flash columns are the three-run medians recommended below. These
+numbers have these protocol limits:
 
 - † **Native-skill boundary:** Harbor supplied no skill and every
   corresponding job lock recorded empty skill arrays, but the Codex-native
@@ -149,12 +185,22 @@ limits:
   no-Harbor-injected-skill result rather than a literal zero-skill baseline.
   Excluding those two contaminated trials, the audit-clean subset including
   the real-repository task scored 11.09/17 (mean 0.6524).
+- ‡ **H22 control boundary:** H22 disabled both Harbor-injected and Codex-native
+  skills, so its 0.11 control is a literal-zero-skill result rather than the
+  earlier Luna column's no-Harbor-skill condition. See the linked H22 reports.
+- § **H21 network boundary:** Harbor 0.22.0 on the Windows Docker Desktop host
+  rejected H21's formal `no-network` agent policy (the Docker egress-control
+  capability probe reported nftables unavailable), so all six H21 trials ran on
+  a public-network calibration copy of the task; the with-skill condition used
+  the fixed pre-answer skill snapshot `5f7234ba…`. The H21 numbers are
+  calibration evidence, not formal no-network scores.
 - The standalone with-skill report calls the real-repository task
   `H5-dsh-web-alpha2`, and the no-skill report calls it `H8-dsh-web-alpha2`.
   After upstream assigned H8 to the fire-drill task, it is listed here as
   `H9-dsh-web-alpha2`; only the task number changed.
-- H7's checked-in `task.toml` contained an unescaped `\s`, so both 18-task
-  batches used a temporary copy with only that TOML description escape fixed.
+- H7's checked-in `task.toml` contained an unescaped `\s`, so both Luna
+  18-task batches and both Terra 22-task runs used a temporary copy with only
+  that TOML description escape fixed.
 - Several runs recorded setup or timeout anomalies. The linked reports retain
   the exact selected-result, retry, installer, scope-cap, and timeout evidence.
 
@@ -213,7 +259,7 @@ harbor run -p benchmark/tasks/S1-static-scan -a oracle
 # evaluate a single task with an agent
 harbor run -p benchmark/tasks/M1-host-migration -a claude-code -m anthropic/claude-opus-4-1
 
-# all 42 tasks: pointing -p at the tasks/ directory runs them as a dataset batch
+# all 52 tasks: pointing -p at the tasks/ directory runs them as a dataset batch
 harbor run -p benchmark/tasks -a claude-code -m anthropic/claude-opus-4-1
 ```
 
@@ -225,7 +271,7 @@ the judge's per-item reasons are in the verifier log.
 
 ### Unattended authorization
 
-All 42 `instruction.md` files carry the `BENCHMARK-AUTH-v1` marker: the task prompt
+All 52 `instruction.md` files carry the `BENCHMARK-AUTH-v1` marker: the task prompt
 itself is the user's confirmation of the plan and the execution within the stated
 scope. The agent should complete the necessary analysis/planning and then proceed — it
 must not stop just because Harbor will not send a second round of "confirmation". The
@@ -252,7 +298,7 @@ node benchmark/scripts/validate-execution-contract.mjs
    - Build-cache diagnosis task (H4): the agent keeps `src/` unchanged, may only clean
      the `lib/` build artifacts, and writes its report to
      `/app/agent-output/H4-tsbuildinfo-trap/`;
-   - Hands-on tasks (M1/H1/H2/H3/H5/M2/M3/M4/H7/M5/H8/H9/H10): the agent edits files under `/app/fixture/`
+   - Hands-on tasks (M1/H1/H2/H3/H5/M2/M3/M4/H7/M5/H8/H9/H10/H21/H22): the agent edits files under `/app/fixture/`
      directly; H2 additionally requires writing the migration report to
      `/app/agent-output/H2-baseline-trap/`.
 3. **Grading**: after the agent finishes, Harbor automatically runs `tests/test.sh`;
@@ -279,9 +325,10 @@ environment, and it does not leak migration answers to either round.
 Tasks carrying `metadata.skill_snapshot_commit` are an exception to attaching the
 current skill tree. Their provenance document identifies the exact pre-answer skill
 snapshot that must be materialized for the with-skill condition. In particular, H11
-must use `7d33bf4c492da250c94f48aebd29bb16877d7a36`: the current Example 04 contains
-its answer and would turn a transfer test into retrieval. No-skill and generic-skill
-runs keep the same task image and prompt.
+uses `7d33bf4c492da250c94f48aebd29bb16877d7a36` because the current Example 04
+contains its answer, while H21 uses `5f7234ba4e00aeaa46c699ea32384389ad38a2a6`
+because it predates the A1-20 migration material and is reachable from upstream
+main. No-skill and generic-skill runs keep the same task image and prompt.
 
 ## Grading design notes
 
@@ -340,6 +387,38 @@ Behavior:
 - default output is Markdown (`--format json` for machine-readable raw numbers);
   duplicate inputs and malformed rewards are hard errors.
 
+## Auditing skill activation
+
+Reward alone does not say whether the agent actually used the skill. The bundled
+deterministic auditor measures **skill availability vs observed skill use** along
+the activation chain (supplied → discovered → `SKILL.md` opened → references
+accessed), with an observed content-bearing access to the target `SKILL.md` as
+the primary activation metric:
+
+```sh
+# one trial (or a job directory, which expands all trial subdirectories)
+node benchmark/scripts/audit-skill-activation.mjs \
+  jobs/<job>/<trial> \
+  --target-name plugin-upgrade \
+  --target-path skills/plugin-upgrade \
+  --condition with-skill --json
+```
+
+Behavior (full operational definitions and schema in
+[docs/skill-activation-audit.md](docs/skill-activation-audit.md)):
+
+- verified input format: Harbor v0.22.0 trial directories with the Codex CLI
+  0.152.0 session log (`agent/sessions/**/rollout-*.jsonl`); ATIF-v1.7
+  `agent/trajectory.json` is a metadata-only fallback; anything else is a hard
+  error, never a guess;
+- `ls`/`find`/`stat`/`test`/`echo`, prose mentions, comments, and error-output
+  mentions never count as an open; complex shell mentioning the target warns
+  (`ambiguous-shell-access`) instead of guessing;
+- `opened: false` is a valid result and exits 0 — only unsupported/malformed
+  input is an error;
+- output is byte-deterministic and redacts absolute paths, command text, and
+  command output text.
+
 ## Historical documents
 
 All validation and result reports live in [`results/`](results/). When opening a PR
@@ -363,12 +442,13 @@ numbers cannot be compared across models or against later runs.
 
 - Every fake plugin in a task's `environment/fixture/` has `"private": true` in its
   package.json, and its README states it is "exam material only, do not publish".
-  The H9-dsh-web-alpha2 fixture is the exception: it is an Apache-2.0 upstream source
-  slice and must retain its original package metadata. **Keep both safeguards when
+  H9-dsh-web-alpha2 and H22-dsh-data-agent-alpha2 are the exceptions: they are
+  Apache-2.0/MIT upstream source snapshots and must retain their original package
+  metadata. **Keep both safeguards when
   adding ordinary fixture tasks** — the point is to stop anyone from accidentally
   publishing fake plugins to npm.
 - When adding a task, scaffold it with `harbor task init`, then fill in
-  judge / solve.sh following the layout of the existing 42 tasks, and verify the
+  judge / solve.sh following the layout of the existing 52 tasks, and verify the
   reference answer scores 1.0 with `harbor run -p <task> -a oracle`.
 - After adding or modifying prompts, run
   `node benchmark/scripts/validate-execution-contract.mjs` to make sure the

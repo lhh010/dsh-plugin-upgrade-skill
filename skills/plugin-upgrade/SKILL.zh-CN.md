@@ -16,6 +16,16 @@
 本 skill 不负责“只升级 DSH core 且不处理插件”；也不允许修改 DSH core 来掩盖插件兼容
 问题。
 
+## 全局 DSH 宿主升级（代理纪律）
+
+升级 dsh 宿主本身（`npm install -g @deepseek-ai/dsh@…`）不属于模式 B/C 的插件工作——而且当发起请求的代理本身就运行在 dsh 会话**内部**时，这是结构性致命操作：会话就是宿主进程，npm 会拆除它正在执行的包树，宿主在安装中途死亡（工具调用不会有结果返回），中断的安装留下「包内容在、shim 未重新生成」的残缺状态——`dsh` 命令本身失效，只能靠外部钉版本的重新安装修复。绝不要在运行于该宿主上的会话内部执行全局宿主升级；把外部流程交给用户：
+
+1. 完全停止所有 dsh 进程（运行中的宿主持有原生模块文件锁 → EBUSY；刷新浏览器不等于停止宿主）；
+2. 在**外部**终端执行钉版本的安装 `npm install -g @deepseek-ai/dsh@<精确版本>`（裸包名会解析到 `latest` dist-tag，可能静默降级到旧线）；
+3. 重启 `dsh web`、浏览器硬刷新，核验版本标记与插件。
+
+因为 npm 运行前宿主已完全停止，安装中途不会有任何进程崩溃——升级过程中的崩溃是做错了的标志，而不是需要容忍的风险。若安装已被中断：在外部 shell 重跑钉版本的正式安装修复（绝不手动复制包目录或手写 shim）。
+
 ## 通用只读准备
 
 1. 阅读目标仓库的 `AGENTS.md` / `CLAUDE.md` 等规则；检查 branch、HEAD、working tree、
@@ -123,12 +133,16 @@
 | [references/README.md](references/README.md) | 版本走廊、卡片 schema 与维护规则 |
 | [references/pre-flight.md](references/pre-flight.md) | 七类触点自查与汇总模板 |
 | [references/troubleshooting.md](references/troubleshooting.md) | 迁移后症状 → 根因 → 卡片 / 走廊配方速查 |
+| [references/v0.1.1-rc.1.md](references/v0.1.1-rc.1.md) | rc.8→rc.1 草稿卡：repository-plugins 机制移除、`dshClient`→`dsh.client` manifest 合并、client-modules 扫描 → bundle `dsh.client`、严格注入 + 弱 `ctx.get`、session 事件契约、自渲染 client 会话聚合、`tasks.peek` 移除、0812 服务改名（vlln 插件迁移；走廊为 0810–0812 内测快照窗口的最近公开 tag 对齐，待上游复核） |
 | [references/v0.1.2-alpha.1.md](references/v0.1.2-alpha.1.md) | rc.2→alpha.1 curated 卡 |
 | [references/v0.1.2-alpha.2.md](references/v0.1.2-alpha.2.md) | alpha.1→alpha.2 curated 卡 |
 | [references/v0.1.2-alpha.3.md](references/v0.1.2-alpha.3.md) | alpha.2→alpha.3 curated 卡（0 张卡：无插件面变更，含核对记录） |
 | [references/v0.1.2-alpha.4.md](references/v0.1.2-alpha.4.md) | alpha.3→alpha.4 curated 卡（6 张）：`report` 工具包删除改用 `send_message`、Python code-runtime 包改名、`Session.events` 换成 `seq`/`eventAt`/`snapshotEvents`、`SessionSeq`/`SessionLogOffset` 强类型 + `seedLength`→`isSeeded`、PTC 预设不再暴露 `workflow`、base bundle 默认开 `web_fetch`；含三台真宿主核对记录 |
+| [references/v0.1.2-alpha.5.md](references/v0.1.2-alpha.5.md) | alpha.4→alpha.5 curated 卡（3 张）：storage 域新增可选 `compatibleVersions` 读兼容与 `invalidRecords: 'backup-and-skip'` 兜底；修复 rc.2/alpha.3 时代旧家升级 alpha.4 后拒启/会话列表标题丢失；含 storage 层复现核对记录 |
+| [references/v0.1.2-rc.1.md](references/v0.1.2-rc.1.md) | alpha.5→rc.1（0.1.2 系列首个候选版，0 张卡：纯版本号 bump、无插件面变更；含核对记录与 release notes 覆盖矩阵——把 rc.1 汇总 notes 对照到既有卡片并给出回填候选） |
 | [references/api-migration-0.1.2-alpha.2.md](references/api-migration-0.1.2-alpha.2.md) | rc.2→alpha.2 精确接口 ledger；命中 API、Remote、Settings、事件、Headless、打包或 composition 时读取；含 client runtime 移除与 keyed chat snapshot（API-10） |
-| [references/rollup-0.1.2.md](references/rollup-0.1.2.md) | 0.1.1 → 0.1.2 走廊（rollup）：跨 cohort 共存、未发布 cohort 安装、`RemoteResult` 错误流、迁移前 baseline 归因、boot race 有界重试、base-only preset 前置、类型面导出漂移、宿主自身安全边界、安装通道三坑（镜像延迟、pnpm 11 供应链规则、peer 下限 prerelease 语义）、分层验证清单；基于 alpha.4，正式版需复核 |
+| [references/rollup-0.1.2.md](references/rollup-0.1.2.md) | 0.1.1 → 0.1.2 走廊（rollup）：跨 cohort 共存、未发布 cohort 安装、`RemoteResult` 错误流、迁移前 baseline 归因、boot race 有界重试、base-only preset 前置、类型面导出漂移、宿主自身安全边界、安装通道三坑（镜像延迟、pnpm 11 供应链规则、peer 下限 prerelease 语义）、分层验证清单；基于 rc.1，正式版需复核 |
+
 | [scripts/README.md](scripts/README.md) | 只读 migration planner：扫描目标仓库、连接卡片走廊并输出候选迁移计划 |
 | [examples/legacy-plugin/](examples/legacy-plugin/) | 七类触点静态夹具（不得执行） |
 | [examples/08-real-web-client-alpha2-migration.md](examples/08-real-web-client-alpha2-migration.md) | 从更早 unsupported 走廊迁移 Host + Web Client 源码的真实样本 |

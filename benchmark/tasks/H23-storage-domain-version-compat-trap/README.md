@@ -18,18 +18,18 @@ the unlisted ancient stamp must stay foreign.
   a git baseline — the judge seals everything except `fixture/src/**` and
   `fixture/package.json` (dependency edits are scanned, not trusted).
 - **Verifier**: deterministic. 65 behavioral against the real published
-  alpha.5 packages (v4 records visible, v5 record intact, unlisted v3
-  foreign, write re-stamps 5, close+reopen retains) + 25 migration (runtime
-  `compatibleVersions === [4]`, version stays 5, no `z.any()`) + 10 hygiene.
+  alpha.5 packages (v4/v5 records preserved in full, unlisted v3
+  foreign, read-modify-write preserves fields and re-stamps 5, close+reopen retains full records) + 25 migration (runtime
+  `compatibleVersions === [4]`, version stays 5, schema preserves valid records and rejects invalid fields) + 10 hygiene.
   Hard caps: invalid declaration → 30; version downgrade → 20; alpha.4 pin
-  → 20; backup-and-skip instead of compatibility → 50; `z.any()` → 70.
+  → 20; backup-and-skip instead of compatibility → 50; schema bypass → 70.
   Flat 0: fixture untouched, persisted data / tests / node_modules modified,
   or the baseline rewritten.
 - **Oracle**: `harbor run -p benchmark/tasks/H23-storage-domain-version-compat-trap -a oracle`, expected reward 1.0.
 
 ```
 environment/fixture/   # alpha.4 domain spec + reader app + preloaded records + pinned closure (test material only)
-tests/                 # judge.mjs + judge-utils.mjs + judge-utils.test.mjs + test.sh
+tests/                 # judge.mjs + judge-utils.mjs + unit/runtime regression tests + test.sh
 solution/              # alpha.5 migration + solve.sh
 ```
 
@@ -37,3 +37,23 @@ Distinct from H20 (Session.events ledger migration), H5 (runtime export
 drift), and M-tasks: this failure mode — boot-green / open-green with
 historical compatible records silently disappearing at a version-stamp
 boundary — was previously uncovered.
+
+## Grader regression checks
+
+Run `npm run test:h23-judge` from the repository root. It installs the exact
+fixture lockfile (installation scripts disabled), then runs helper and full
+judge tests against the real alpha.5 packages in disposable git baselines.
+The same command runs in `npm test` and the Node 22/24 CI matrix.
+
+Constants, expressions, and spread arrays evaluating to `[4]` earn the same
+100 as the oracle. Schema probes inspect the actual table schema, including
+aliased or imported `any`/`unknown` fields; they must preserve valid records
+and reject missing or wrongly typed fields. Full-record comparisons also
+cover initial reads, read-modify-write, and close/reopen.
+
+Current regression controls: untouched/sealed edits 0; oracle and equivalent
+declarations 100; downgrade/alpha.4 pin 20; invalid declarations 10;
+comment-only and backup-and-skip without compatibility 40; direct, aliased,
+or imported schema bypasses at most 70. A spec that fails to load earns no
+schema-validation points. These local runtime tests do not replace a Harbor
+container run.

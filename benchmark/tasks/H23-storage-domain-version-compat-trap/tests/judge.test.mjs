@@ -1,0 +1,111 @@
+// End-to-end regressions against the pinned alpha.5 packages and real git gates.
+import { after, before, beforeEach, test } from 'node:test'
+import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const task = fileURLToPath(new URL('../', import.meta.url))
+const judgeUrl = new URL('./judge.mjs', import.meta.url).href
+const oracle = readFileSync(join(task, 'solution/src/domain-spec.mjs'), 'utf8')
+const fixture = readFileSync(join(task, 'environment/fixture/src/domain-spec.mjs'), 'utf8')
+let app
+const git = (...args) => execFileSync('git', ['-C', app, ...args], { encoding: 'utf8' })
+
+before(() => {
+  app = mkdtempSync(join(tmpdir(), 'h23-judge-'))
+  cpSync(join(task, 'environment/fixture'), join(app, 'fixture'), { recursive: true })
+  git('init', '-q')
+  git('add', '-f', 'fixture')
+  git('-c', 'user.name=benchmark', '-c', 'user.email=benchmark@local', '-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', 'commit', '-qm', 'baseline')
+  writeFileSync(join(app, 'baseline.sha'), git('rev-parse', 'HEAD'))
+})
+
+beforeEach(() => {
+  git('reset', '--hard', '-q', 'HEAD')
+  git('clean', '-fdq', '-e', 'baseline.sha')
+})
+after(() => { if (app) rmSync(app, { recursive: true, force: true }) })
+
+function grade(source, prepare = () => {}) {
+  if (source !== null) writeFileSync(join(app, 'fixture/src/domain-spec.mjs'), source)
+  prepare()
+  const output = execFileSync(process.execPath, ['--input-type=module', '-e',
+    `import { grade } from ${JSON.stringify(judgeUrl)}; await grade(${JSON.stringify(app)});`,
+  ], { encoding: 'utf8', timeout: 30000 })
+  return JSON.parse(output.trim().split('\n').at(-1))
+}
+
+for (const [name, source] of [
+  ['oracle', oracle],
+  ['constant compatibility version', 'const PREVIOUS_VERSION = 4;\n' + oracle.replace('[4]', '[PREVIOUS_VERSION]')],
+  ['computed compatibility version', oracle.replace('[4]', '[2 + 2]')],
+  ['spread compatibility version', oracle.replace('[4]', '[...[4]]')],
+]) {
+  test(`${name} earns 100 against the real runtime`, () => {
+    assert.equal(grade(source).score, 100)
+  })
+}
+
+for (const field of ['id', 'title', 'pinned']) {
+  test(`removing ${field} loses record-preservation points`, () => {
+    const source = oracle.replace(new RegExp(`^  ${field}:.*\\n`, 'm'), '')
+    const result = grade(source)
+    assert.ok(result.score < 100)
+    assert.ok(result.reasons.some((reason) => reason.startsWith('+0 v5 record')))
+    assert.ok(result.reasons.some((reason) => reason.startsWith('+0 reopen')))
+    if (field !== 'pinned') {
+      assert.ok(result.reasons.some((reason) => reason.startsWith('+0 v4 record')))
+      if (field === 'id') assert.ok(result.reasons.some((reason) => reason.startsWith('+0 write')))
+    }
+  })
+}
+
+for (const name of ['direct any', 'aliased any', 'imported any', 'aliased unknown']) {
+  test(`${name} cannot earn more than 70`, () => {
+    const schema = name.includes('unknown') ? 'unknown' : 'any'
+    let source = oracle.replace('id: z.string()', `id: z.${schema}()`)
+      .replace('title: z.string()', `title: z.${schema}()`)
+    if (name.startsWith('aliased')) source = source.replace('import { z }', 'import { z as schema }').replaceAll('z.', 'schema.')
+    const prepare = () => {
+      if (name !== 'imported any') return
+      writeFileSync(join(app, 'fixture/src/shared-schema.mjs'), "import { z } from 'zod'; export const field = z.any();\n")
+    }
+    if (name === 'imported any') source = "import { field } from './shared-schema.mjs';\n" + source.replaceAll('z.any()', 'field')
+    const result = grade(source, prepare)
+    assert.equal(result.score, 70)
+    assert.ok(result.reasons.some((reason) => reason.includes('schema fails')))
+  })
+}
+
+for (const [name, source, expected] of [
+  ['untouched', null, 0],
+  ['comment-only migration', fixture + '\n// compatibleVersions: [4]\n', 40],
+  ['version downgrade', oracle.replace('version: 5,', 'version: 4,').replace('  compatibleVersions: [4],\n', ''), 20],
+  ['backup-and-skip without compatibility', oracle.replace('compatibleVersions: [4]', "invalidRecords: 'backup-and-skip'"), 40],
+  ['invalid current-version compatibility', oracle.replace('[4]', '[5]'), 10],
+  ['invalid negative compatibility', oracle.replace('[4]', '[-1]'), 10],
+]) {
+  test(`${name} retains its negative control`, () => { assert.equal(grade(source).score, expected) })
+}
+
+test('alpha.4 dependency pin remains capped at 20', () => {
+  assert.equal(grade(oracle, () => {
+    const file = join(app, 'fixture/package.json')
+    writeFileSync(file, readFileSync(file, 'utf8').replaceAll('0.1.2-alpha.5', '0.1.2-alpha.4'))
+  }).score, 20)
+})
+
+for (const target of ['data/migration_summaries/summaries/A.json', 'node_modules/zod/index.js']) {
+  test(`editing sealed ${target} remains a flat zero`, () => {
+    const result = grade(oracle, () => writeFileSync(join(app, 'fixture', target), '{}\n'))
+    assert.equal(result.score, 0)
+    assert.ok(result.reasons.some((reason) => reason.includes('sealed files modified')))
+  })
+}
+
+test('deleting a persisted record remains a flat zero', () => {
+  assert.equal(grade(oracle, () => rmSync(join(app, 'fixture/data/migration_summaries/summaries/B.json'))).score, 0)
+})

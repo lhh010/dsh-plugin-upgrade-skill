@@ -10,39 +10,41 @@
 //        optional field (10), unlisted v3 record D still foreign (10), a
 //        write after reading a v4 record re-stamps the file to version 5
 //        (10), close+reopen retains the expected state (10);
-//   25 — migration correctness from the IMPORTED runtime spec + source scan:
+//   25 — migration correctness from the IMPORTED runtime spec + schema probes:
 //        compatibleVersions === [4] (15), version stays 5 (5), honest schema
-//        with no z.any() (5);
+//        preserving valid records and rejecting invalid field types (5);
 //   10 — hygiene: no alpha.4 dependency pin;
 //   caps — invalid compatibleVersions declaration → 30; version downgrade
 //        → 20; alpha.4 pin → 20; backup-and-skip instead of compatibility
-//        → 50; z.any() bypass → 70;
+//        → 50; schema contract bypass (including any/unknown) → 70;
 //    0 — fixture untouched, persisted data / tests / node_modules modified,
 //        or the git baseline rewritten (all git-gated).
 // The judge always exits 0; the last stdout line is the {score, max, reasons} JSON.
-import { execSync } from 'node:child_process'
+import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { isDeepStrictEqual } from 'node:util'
 import { assembleScore } from './judge-utils.mjs'
-
-const APP = '/app'
-const SPEC_FILE = join(APP, 'fixture', 'src', 'domain-spec.mjs')
-const PACKAGE_FILE = join(APP, 'fixture', 'package.json')
-const DATA_ROOT = join(APP, 'fixture', 'data')
-const A_FILE = join(DATA_ROOT, 'migration_summaries', 'summaries', 'A.json')
-const CORDIS = join(APP, 'fixture', 'node_modules', '@deepseek-ai', 'cordis', 'lib', 'index.js')
-const STORAGE = join(APP, 'fixture', 'node_modules', '@deepseek-ai', 'dsh-storage', 'lib', 'index.js')
-const STORAGE_JSON = join(APP, 'fixture', 'node_modules', '@deepseek-ai', 'dsh-storage-json', 'lib', 'index.js')
-const STORAGE_DOMAIN = join(APP, 'fixture', 'node_modules', '@deepseek-ai', 'dsh-storage-domain', 'lib', 'index.js')
 
 function emit(score, reasons) {
   console.log(JSON.stringify({ score, max: 100, reasons }))
 }
 
-main().catch((error) => emit(0, [`judge error: ${error.message}`]))
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  grade().catch((error) => emit(0, [`judge error: ${error.message}`]))
+}
 
-async function main() {
+// An explicit root lets regression tests use disposable fixtures; the verifier defaults to /app.
+export async function grade(APP = '/app') {
+  const SPEC_FILE = join(APP, 'fixture', 'src', 'domain-spec.mjs')
+  const PACKAGE_FILE = join(APP, 'fixture', 'package.json')
+  const DATA_ROOT = join(APP, 'fixture', 'data')
+  const A_FILE = join(DATA_ROOT, 'migration_summaries', 'summaries', 'A.json')
+  const CORDIS = join(APP, 'fixture', 'node_modules', '@deepseek-ai', 'cordis', 'lib', 'index.js')
+  const STORAGE = join(APP, 'fixture', 'node_modules', '@deepseek-ai', 'dsh-storage', 'lib', 'index.js')
+  const STORAGE_JSON = join(APP, 'fixture', 'node_modules', '@deepseek-ai', 'dsh-storage-json', 'lib', 'index.js')
+  const STORAGE_DOMAIN = join(APP, 'fixture', 'node_modules', '@deepseek-ai', 'dsh-storage-domain', 'lib', 'index.js')
   const reasons = []
   if (!existsSync(SPEC_FILE)) { emit(0, ['fixture domain spec missing']); return }
 
@@ -50,14 +52,14 @@ async function main() {
   // Preloaded data, tests, node_modules, and the baseline commit are sealed.
   let status = ''
   try {
-    status = execSync('git -C /app status --porcelain', { encoding: 'utf8' })
+    status = execFileSync('git', ['-C', APP, 'status', '--porcelain'], { encoding: 'utf8' })
   } catch (error) { emit(0, [`git baseline check failed to run: ${error.message}`]); return }
   const lines = status.split('\n').filter((l) => l.trim() !== '')
   const modified = lines.filter((l) => !l.startsWith('??')).map((l) => l.slice(3))
   const allowed = (p) => p.startsWith('fixture/src/') || p === 'fixture/package.json'
   const tampered = modified.filter((p) => !allowed(p))
   let head = ''
-  try { head = execSync('git -C /app rev-parse HEAD', { encoding: 'utf8' }).trim() } catch { head = '' }
+  try { head = execFileSync('git', ['-C', APP, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim() } catch { head = '' }
   let baseline = ''
   try { baseline = readFileSync(join(APP, 'baseline.sha'), 'utf8').trim() } catch { baseline = '' }
   if (tampered.length > 0 || (baseline !== '' && head !== baseline)) {
@@ -71,10 +73,13 @@ async function main() {
 
   // Import the agent's spec module (an invalid declaration throws at load).
   let spec = null
-  let specSource = ''
+  let expected
   let packageJson = ''
   try {
-    specSource = readFileSync(SPEC_FILE, 'utf8')
+    // Snapshot sealed input records before loading candidate code.
+    expected = Object.fromEntries(['A', 'B', 'C'].map((key) => [key,
+      JSON.parse(readFileSync(join(DATA_ROOT, 'migration_summaries', 'summaries', `${key}.json`), 'utf8')).record,
+    ]))
     packageJson = readFileSync(PACKAGE_FILE, 'utf8')
   } catch (error) { emit(0, [`fixture files unreadable: ${error.message}`]); return }
   try {
@@ -106,14 +111,14 @@ async function main() {
       const visible = () => [...first.table.keys()].sort()
 
       const keys1 = visible()
-      if (keys1.includes('A') && keys1.includes('B')) {
+      if (isDeepStrictEqual(first.table.get('A'), expected.A) && isDeepStrictEqual(first.table.get('B'), expected.B)) {
         behavioral += 25
-        reasons.push('+25 v4 records A and B visible again')
+        reasons.push('+25 v4 records A and B preserved unchanged')
       } else {
-        reasons.push(`+0 v4 records not both visible (got ${keys1.join(',') || 'none'})`)
+        reasons.push(`+0 v4 record contents missing or changed (got ${keys1.join(',') || 'none'})`)
       }
       const c = first.table.get('C')
-      if (c !== undefined && c.pinned === true) {
+      if (isDeepStrictEqual(c, expected.C)) {
         behavioral += 10
         reasons.push('+10 v5 record C intact with its optional field')
       } else {
@@ -125,13 +130,14 @@ async function main() {
       } else {
         reasons.push('+0 unlisted v3 record D became visible')
       }
-      await first.table.put('A', { id: 'A', title: 'judge-updated' })
-      const stamped = JSON.parse(readFileSync(A_FILE, 'utf8')).version
-      if (stamped === 5) {
+      const expectedUpdated = { ...expected.A, title: 'judge-updated' }
+      await first.table.put('A', { ...first.table.get('A'), title: 'judge-updated' })
+      const written = JSON.parse(readFileSync(A_FILE, 'utf8'))
+      if (written.version === 5 && isDeepStrictEqual(written.record, expectedUpdated)) {
         behavioral += 10
-        reasons.push('+10 write after v4 read re-stamped the file to version 5')
+        reasons.push('+10 read-modify-write preserved the record and re-stamped version 5')
       } else {
-        reasons.push(`+0 write stamped the file with version ${stamped} instead of 5`)
+        reasons.push(`+0 write lost record fields or stamped version ${written.version} instead of 5`)
       }
       await first.domain.close()
 
@@ -139,7 +145,9 @@ async function main() {
       const keys2 = [...second.table.keys()].sort()
       const aUpdated = second.table.get('A')
       if (keys2.includes('A') && keys2.includes('B') && keys2.includes('C') && !keys2.includes('D')
-        && aUpdated?.title === 'judge-updated') {
+        && isDeepStrictEqual(aUpdated, expectedUpdated)
+        && isDeepStrictEqual(second.table.get('B'), expected.B)
+        && isDeepStrictEqual(second.table.get('C'), expected.C)) {
         behavioral += 10
         reasons.push('+10 close+reopen retains the expected state')
       } else {
@@ -151,7 +159,7 @@ async function main() {
     }
   }
 
-  const { score, reasons: sourceReasons } = assembleScore({ behavioral, spec, specSource, packageJson })
-  reasons.push(...sourceReasons)
+  const { score, reasons: migrationReasons } = assembleScore({ behavioral, spec, packageJson })
+  reasons.push(...migrationReasons)
   emit(score, reasons)
 }

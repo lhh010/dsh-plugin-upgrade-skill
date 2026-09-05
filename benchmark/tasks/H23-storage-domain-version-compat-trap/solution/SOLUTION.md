@@ -63,10 +63,11 @@ packages before the task shipped (see the judge's behavioral checks).
 
 ## Scoring
 
-65 behavioral (real alpha.5 runtime: v4 records visible 25 / v5 record
-intact 10 / unlisted v3 foreign 10 / re-stamp on write 10 / reopen retains
-10) + 25 migration (declaration [4] 15, version stays 5 5, honest schema 5)
+65 behavioral (real alpha.5 runtime: complete v4 records preserved 25 / v5
+record intact 10 / unlisted v3 foreign 10 / read-modify-write preserves
+fields and re-stamps 5 10 / reopen retains complete records 10) + 25 migration
+(evaluated declaration [4] 15, version stays 5 5, schema behavior probes 5)
 + 10 hygiene. Hard caps: invalid declaration → 30; version downgrade → 20;
-alpha.4 pin → 20; backup-and-skip instead of compatibility → 50; `z.any()`
-→ 70. Flat 0: untouched fixture, sealed files modified, or baseline
+alpha.4 pin → 20; backup-and-skip instead of compatibility → 50; schema
+bypass (including aliased/imported `any` or `unknown`) → 70. Flat 0: untouched fixture, sealed files modified, or baseline
 rewritten. Full model in [tests/judge.mjs](../tests/judge.mjs).

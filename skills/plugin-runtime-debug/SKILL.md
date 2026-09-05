@@ -105,6 +105,10 @@ cover most incidents:
   factory via `require("react")`, and export `inject`/`apply`.
 
 
+- **Phantom pixels at the right edges of a terminal sprite (outline, Z symbols, hearts), and ghost pixels surviving frame switches** — two half-block ANSI rendering defects, both invisible in the frame data: (a) a half-filled cell (upper-half block with only one half colored) sets the foreground but leaves the SGR background from the PREVIOUS cell set — SGR persists across cells, so the stale background paints a phantom pixel into the empty half; reset it explicitly (ESC[49m on every half-filled cell). (b) rows trimmed at their trailing transparent cells let a NARROWER frame leave the previous frame's pixels to the right of the trim — paint every row across the full sprite width (transparent cells as plain spaces) and close with an erase-to-EOL (ESC[K). And pin the frame data itself: hand-ported sprite frames drift from the source art a few cells at a time (a regression over an excerpt misses it) — digest every frame against the source and assert the digests.
+- **A head/UI process hangs for minutes (or until the CI timeout) after its work is done** — a rescheduling timer chain (an animation planner that re-arms setTimeout forever while mounted) keeps the event loop alive on hosts that mount the component without ever unmounting it (probe and test hosts; a GitHub job defaults to a 6h timeout). The interactive TUI stays alive on its TTY/stdin handles regardless — so unref the chain (timer.unref()): the probes drain and exit, real sessions lose nothing. Suspect this whenever enabling a feature flips previously-finishing jobs into timeouts.
+
+
 ## Workflow
 
 1. Reproduce once and capture the exact user-visible strings (toast text,

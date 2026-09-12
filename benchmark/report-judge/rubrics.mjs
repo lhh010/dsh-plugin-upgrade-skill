@@ -1,5 +1,5 @@
 // Default semantic criteria. Historical score packets are archived separately.
-export const PROTOCOL = 'report-judge-v1'
+export const PROTOCOL = 'report-judge-v2'
 const criterion = (id, points, requirement, sourceRequired = true) => ({ id, points, requirement, sourceRequired })
 const alpha1 = 'skills/plugin-upgrade/references/v0.1.2-alpha.1.md'
 const alpha2 = 'skills/plugin-upgrade/references/v0.1.2-alpha.2.md'
@@ -8,6 +8,44 @@ const cards = (...ids) => ids.map(id => ({ path: id.includes('-A2-') ? alpha2 : 
 const closedBookReplacement = 'Respect the closed-book task: exact successor package names, symbols or signatures absent from the fixture are not mandatory for full credit. Accept a correct located diagnosis, card and defensible migration direction with unavailable details marked unconfirmed or deferred to the actual target owners/exports. Use the sealed references to check asserted details, not to require unseen names. Uncertainty alone without the diagnosis and migration direction earns no credit; positively invented replacements still lose credit.'
 
 export const RUBRICS = {
+  'H4-tsbuildinfo-trap': {
+    references: cards('DSH-0.1.2-A1-21'),
+    allowDeletedPrefixes: ['lib/'],
+    criteria: [
+      criterion('artifact-attribution', 30, 'Locate the obsolete resolveSessionPreset import in lib/index.js and the old dependency graph in lib/tsconfig.tsbuildinfo. Explain why stale emitted output/incremental state can produce the build error despite a passing source typecheck. Naming cache or quoting the error alone is insufficient.'),
+      criterion('clean-rebuild-plan', 30, 'Use package.json clean (or equivalent removal of lib and its incremental state), then rebuild from current source and recheck typecheck/build/tests. Explain what each step verifies. This is a proposed procedure: executing it is not required, the static fixture lacks scripts/build.mjs and a complete runnable toolchain, and success must not be fabricated. Partial credit for a sound clean/rebuild plan without verification detail.'),
+      criterion('no-source-migration', 40, 'Ground the no-source-change conclusion in src/index.ts having no resolveSessionPreset reference and contrast it with the stale lib artifacts. Explain that the A1-21 deletion applies to real callers, so the colleague suggestion does not justify changing already migrated source. A bare no-change assertion earns no credit.'),
+    ],
+    caps: [{ id: 'unnecessary-source-migration', total: 30, requirement: 'Trigger only if the final recommendation affirmatively rewrites the source to replace resolveSessionPreset despite its absence there. Quoting or rejecting the colleague suggestion or migration recipe is not a violation.' }],
+  },
+  'H6-remote-error-trap': {
+    references: [...cards('DSH-0.1.2-A2-02', 'DSH-0.1.2-A1-30'), { path: api, heading: 'API-02' }],
+    criteria: [
+      criterion('namespaced-codes', 25, 'Locate the bare cancelled/internal comparisons and misleading comment in src/remote-usage.ts. Explain migration to namespaced error codes and reject the comment using the contract. Correct gateway/cancelled and gateway/internal earn full credit; a located diagnosis with the namespace migration direction but exact unavailable spelling explicitly unconfirmed earns partial credit. Do not demand any additional unseen enum names or exact import paths in this closed-book task.'),
+      criterion('cancel-policy', 25, 'Relate the current cancelled branch to the target cancellation behavior: terminate the operation or propagate cancellation deliberately, without retry or converting cancellation into a generic error. Include cancellation in the proposed verification matrix. Mere mentions of cancellation or retry earn nothing.'),
+      criterion('internal-unknown-policy', 25, 'Locate the silent internal return and the unhandled unknown-code fallthrough. Preserve the original code/details and surface internal and unknown failures explicitly, without blind retries because internal does not prove the operation never ran. Include internal and an unknown code in proposed checks.'),
+      criterion('exception-boundary', 25, 'Locate the blanket catch return and instanceof RemoteError test. Remove silent swallowing, expose/propagate genuine local assembly/programming faults, and use structural discrimination instead of cross-realm instanceof. Keep ordinary result.ok failure handling separate from real throw/catch boundaries; if a guard such as isRemoteFailure is named, use it at an actual thrown boundary. Propose success and unexpected-exception checks; no reproduction, installation or execution is required.'),
+    ],
+    caps: [
+      { id: 'retain-old-codes', total: 25, requirement: 'The report affirmatively recommends keeping the bare old cancelled/internal strings as the correct target contract. Explicitly rejected bad examples do not trigger this cap.' },
+      { id: 'cross-realm-instanceof', total: 50, requirement: 'The report affirmatively recommends instanceof RemoteError as the reliable cross-realm failure discriminator. Rejecting that advice is correct and must not trigger the cap.' },
+    ],
+  },
+  'H12-remote-result-boundary-trap': {
+    references: [...cards('DSH-0.1.2-A2-02'), { path: api, heading: 'API-02' }],
+    criteria: [
+      criterion('root-cause', 20, 'Locate src/index.ts renameSession and explain that ordinary unary failures resolve with ok:false/error rather than entering catch; the current code incorrectly assumes resolved means success. Do not falsely date the RemoteResult discriminated shape to alpha.2; it already exists in rc.2.'),
+      criterion('current-problems', 10, 'Locate and explain at least two distinct actual defects in src/index.ts: unchecked result.value, catch used as the ordinary business-failure path, cross-realm instanceof, or retry of genuine assembly/programming rejects. Partial credit for one supported defect; a list of symbols alone earns zero.'),
+      criterion('corrected-implementation', 25, 'Evaluate the proposed fenced ts/js code semantically: await the remote call, discriminate success/failure, handle the failure error and exit that path before reading success value. Accept equivalent variable names, destructuring, success-first branches and explicit propagation. A comment or string containing API tokens is not executable handling. No code block means missing for this criterion. Do not require running the static fixture.', false),
+      criterion('resolved-control-flow', 20, 'Explain success ok:true/value and ordinary failure ok:false/error on the resolved result, with catch outside the ordinary failure route. The error-code vocabulary is already migrated; merely proposing renamed codes does not answer this task.', false),
+      criterion('reject-boundary', 15, 'Identify genuine assembly/programming rejects, give a concrete supported example such as an unmounted method or missing Context adapter, and require propagating/exposing it rather than swallowing or blindly retrying it. Do not mistake ordinary remote business/carrier/cancellation failures for these faults.', false),
+      criterion('error-discrimination', 10, 'Reject instanceof RemoteError across bundles/workers/realms; discriminate ordinary failures structurally/by code on the failed result. Place isRemoteFailure or an equivalent structural guard only at a genuine thrown boundary (for example explicitly throwing result.error), not as a replacement for checking the resolved result discriminant. Equivalent explanation without the exact helper spelling is valid.', false),
+    ],
+    caps: [
+      { id: 'ordinary-failures-reject', total: 30, requirement: 'Trigger only on an affirmative final claim that ordinary unary remote failures primarily reject and should be handled in catch. Explicitly throwing an already discriminated failure is a valid separate boundary, not this misconception.' },
+      { id: 'unsafe-corrected-code', total: 60, requirement: 'Trigger when the proposed corrected code actually reads the success value without discriminating success, uses cross-realm instanceof as its failure discriminator, or swallows/blindly retries genuine local rejects. Inspect executable behavior, not tokens in comments, quoted old code, or rejected examples.' },
+    ],
+  },
   'S1-static-scan': {
     references: cards('DSH-0.1.2-A1-01', 'DSH-0.1.2-A1-02', 'DSH-0.1.2-A1-03', 'DSH-0.1.2-A1-04', 'DSH-0.1.2-A1-05', 'DSH-0.1.2-A1-08', 'DSH-0.1.2-A2-01'),
     criteria: [

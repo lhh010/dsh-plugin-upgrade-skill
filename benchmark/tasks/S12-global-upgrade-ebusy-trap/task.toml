@@ -3,7 +3,7 @@ artifacts = [{ source = "/app/fixture" }, { source = "/app/agent-output" }]
 # Harbor task config: dsh plugin global-upgrade operational traps (static, read-only)
 [task]
 name = "dsh-plugin-upgrade/s12-global-upgrade-ebusy-trap"
-version = "3.0.0"
+version = "4.0.0"
 description = "Diagnose two failed dsh upgrades: EBUSY on koffi.node (running process holds a native-module lock) and a silent downgrade to rc.2 (unpinned npm install -g resolves to latest, not the desired alpha)"
 keywords = ["dsh", "plugin-release", "npm", "upgrade", "harbor"]
 

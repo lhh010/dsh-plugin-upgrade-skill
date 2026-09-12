@@ -9,9 +9,9 @@ production-freeze constraint, and the maintainer-side fix. 题面见
 [instruction.md](instruction.md)，判分逻辑见 [tests/judge.mjs](tests/judge.mjs)。
 
 - **Environment**: `node:24-bookworm` + git (fixture baseline-committed for the read-only gate); no dsh (static task).
-- **Verifier**: [LLM-as-judge by default](../../docs/report-judge-pilot.md), task version `3.0.0`.
+- **Verifier**: [LLM-as-judge by default](../../docs/report-judge-pilot.md), task version `4.0.0`.
   A sealed fixture hash enforces read-only work. The separate verifier reads the report,
-  judges each criterion with quoted evidence, and deterministically aggregates the score.
+  judges each criterion with a verdict and short reason, and deterministically aggregates the score.
   Configure `REPORT_JUDGE_BASE_URL`, `REPORT_JUDGE_MODEL` and `REPORT_JUDGE_API_KEY`
   only for the verifier. Missing reports score 0; evaluator failures leave no reward.
 - **Oracle**: `harbor run -p benchmark/tasks/S8-release-routing-trap -a oracle`; inspect the semantic decisions (a reference answer has no assumed model score).

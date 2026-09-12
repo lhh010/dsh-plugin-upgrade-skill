@@ -31,6 +31,7 @@ export function makePacket(task, root = REPO) {
   return { protocol: PROTOCOL, task, source_commit: commit,
     instruction: readFileSync(join(taskRoot, 'instruction.md'), 'utf8'),
     rubric: { criteria: rubric.criteria, caps: rubric.caps ?? [] }, references,
+    ...(rubric.allowDeletedPrefixes ? { allowedDeletions: Object.keys(collectFiles(join(taskRoot, 'environment/fixture'))).filter(path => rubric.allowDeletedPrefixes.some(prefix => path.startsWith(prefix))) } : {}),
     fixture: collectFiles(join(taskRoot, 'environment/fixture')) }
 }
 
@@ -41,7 +42,7 @@ export function semanticToml(original) {
     ? original.replace(/^artifacts = .*$/m, artifacts)
     : original.replace('schema_version = "1.4"', `schema_version = "1.4"\n${artifacts}`)
   return withArtifacts
-    .replace(/^version = "[^"]+"$/m, 'version = "3.0.0"')
+    .replace(/^version = "[^"]+"$/m, 'version = "4.0.0"')
     .replace(/\[verifier\][\s\S]*?(?=\n\[environment\])/, `[verifier]
 timeout_sec = 240.0
 environment_mode = "separate"

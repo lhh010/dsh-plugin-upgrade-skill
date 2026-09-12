@@ -3,7 +3,7 @@ artifacts = [{ source = "/app/fixture" }, { source = "/app/agent-output" }]
 # Harbor task config: dsh plugin migration task S1 (static touchpoint scan, read-only)
 [task]
 name = "dsh-plugin-upgrade/s1-static-scan"
-version = "3.0.0"
+version = "4.0.0"
 description = "Read-only compatibility scan of a legacy dsh 0.1.1 plugin: map all seven touchpoint categories to upgrade cards without modifying the fixture"
 keywords = ["dsh", "plugin-migration", "static-analysis", "compat-scan", "harbor"]
 

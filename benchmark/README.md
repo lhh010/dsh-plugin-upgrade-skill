@@ -10,11 +10,11 @@ auto-grading, so no human marking is involved.
 task format** — each question is a standard Harbor task (directory layout below) that
 can be run directly with `harbor run` on any agent / provider Harbor supports.
 
-**S1–S12, S14–S19 and S21–S22 use [LLM-as-judge by default](docs/report-judge-pilot.md).**
+**H4, H6, H12, S1–S12, S14–S19 and S21–S22 use [LLM-as-judge by default](docs/report-judge-pilot.md).**
 Run their registered `benchmark/tasks/<task>` directories directly. Configure
 `REPORT_JUDGE_BASE_URL`, `REPORT_JUDGE_MODEL` and `REPORT_JUDGE_API_KEY` for the
 separate verifier; a missing/broken judge is an evaluator failure, never a
-keyword-score fallback. The version-3 semantic scores are not interchangeable
+keyword-score fallback. The version-4 semantic scores are not interchangeable
 with archived keyword scores.
 
 Every task tests a real trap: some fixtures hide a misleading comment like "try

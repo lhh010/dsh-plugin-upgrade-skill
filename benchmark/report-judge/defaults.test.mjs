@@ -15,7 +15,7 @@ function sandbox(t) {
 }
 
 test('registered default tasks are self-contained semantic verifiers with separate secrets and artifacts', () => {
-  assert.equal(Object.keys(RUBRICS).length, 19)
+  assert.equal(Object.keys(RUBRICS).length, 22)
   assert.deepEqual(syncDefaults({ check: true }).changed, [])
   for (const task of Object.keys(RUBRICS)) {
     const files = defaultFiles(task)
@@ -74,12 +74,9 @@ globalThis.fetch = async (url, options) => {
   assert.equal(input.candidate_reports['report.md'], 'independent diagnosis');
   assert.equal(request.tools, undefined);
   if (process.env.PROTOCOL_FAILURE) return new Response('secret must not leak', { status: 503 });
-  const [path, quote] = Object.entries(input.fixture)[0];
   const response = { decisions: input.rubric.criteria.map(c => ({ id: c.id, verdict: 'partial',
-    reason: 'Transport test only; this is not a semantic score.',
-    evidence: [{ report: 'report.md', quote: 'independent diagnosis' }],
-    sources: c.sourceRequired ? [{ path, quote }] : [], references: [] })),
-    caps: input.rubric.caps.map(c => ({ id: c.id, triggered: false, reason: 'No cap', evidence: [] })) };
+    reason: 'Transport test only; this is not a semantic score.' })),
+    caps: input.rubric.caps.map(c => ({ id: c.id, triggered: false, reason: 'No cap' })) };
   return new Response(JSON.stringify({ choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(response) } }] }));
 };\n`)
     const env = { PATH: process.env.PATH, NODE_OPTIONS: `--import=${stub}`, REPORT_JUDGE_BASE_URL: 'https://judge.invalid/v1',

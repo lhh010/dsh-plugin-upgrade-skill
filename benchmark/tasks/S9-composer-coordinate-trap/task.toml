@@ -3,7 +3,7 @@ artifacts = [{ source = "/app/fixture" }, { source = "/app/agent-output" }]
 # Harbor task config: dsh plugin runtime-contract diagnosis task S9 (static, read-only)
 [task]
 name = "dsh-plugin-upgrade/s9-composer-coordinate-trap"
-version = "3.0.0"
+version = "4.0.0"
 description = "Diagnose a community Web plugin whose composer attachments work once then fail: clipboard-projection offsets fed into detect-projection span guards in insertReference and consumeToken"
 keywords = ["dsh", "plugin-runtime", "input-machine", "coordinates", "harbor"]
 

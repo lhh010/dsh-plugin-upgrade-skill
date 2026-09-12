@@ -15,7 +15,7 @@ AttachmentChips; surfaced by the hover-preview rollout).
 - **Oracle**: run `harbor run -p benchmark/tasks/S15-slot-error-boundary-crash -a oracle` with judge configuration. This grades the reference report through the same LLM; a perfect score is not hardcoded.
 - See `instruction.md` for the brief, `solution/SOLUTION.md` for the reference answer
 
-Default task version: **3.0.0**, protocol `report-judge-v1`. Set
+Default task version: **4.0.0**, protocol `report-judge-v2`. Set
 `REPORT_JUDGE_BASE_URL`, `REPORT_JUDGE_MODEL` and `REPORT_JUDGE_API_KEY` for the
 verifier. See [semantic-judge setup](../../docs/report-judge-pilot.md).
 The agent receives neither judge credentials nor sealed reference excerpts.

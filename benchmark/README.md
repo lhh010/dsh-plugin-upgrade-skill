@@ -1,8 +1,8 @@
 # dsh plugin upgrade tasks (benchmark v2.4 · Harbor format)
 
-The 62 plugin-upgrade tasks measure one thing: **once an AI has our upgrade skill
+The 63 plugin-upgrade tasks measure one thing: **once an AI has our upgrade skill
 installed, will it actually upgrade the plugin**. The first 25 are written exams (read
-the code, produce the answer); the last 37 are hands-on (actually install dsh and run
+the code, produce the answer); the last 38 are hands-on (actually install dsh and run
 the plugin — whether it is alive is obvious at a glance). Every task ships with
 auto-grading, so no human marking is involved.
 
@@ -88,6 +88,7 @@ honestly instead of quietly fixing it and pretending nothing happened).
 | H24-invalid-record-salvage-trap | Hands-on | alpha.4 → alpha.5: one current-version schema-invalid record in a disposable derived-index domain rejects the entire domain open — can the agent salvage it through the backup-and-skip contract (corrupted bytes preserved on disk, healthy records kept, damaged key rebuildable) instead of deleting evidence, swallowing the error, or loosening the schema |
 | H25-session-seed-boundary-trap | Hands-on | alpha.3 → alpha.4: a fork-aware session state helper migrates from header.seedLength to isSeeded + inheritedEventCount and from plain numbers to branded SessionSeq / SessionLogOffset — does the agent keep the ORIGINAL inherited cut on a RESUMED fork (where the stored log has grown) instead of silently reclassifying own events as inherited |
 | H26-notlisted-trap | Hands-on | A package that installs cleanly but never registers (`dsh plugin add` succeeds, the entry never appears in the list; distilled from a 22k★ real failure): does it separate dependency installation from plugin registration, attribute the gap to the missing manifest self-description (`main`/`exports`/`dsh`) rather than the host, resist the in-source reinstall memo, and prove the fix live (listed + cold boot reaches the application layer) |
+| H27-undeclared-import-trap | Hands-on | A plugin that installs and lists fine but crashes on load (`ERR_MODULE_NOT_FOUND` — an import with no declared dependency; the old host provided packages implicitly): does it pin the failing import, attribute the crash to the undeclared dependency rather than the code, resist the try/catch-and-degrade memo, declare the package, and prove a cold boot that reaches the application layer |
 
 ## Benchmark results
 
@@ -284,7 +285,7 @@ harbor run -p benchmark/tasks/S1-static-scan -a oracle
 # evaluate a single task with an agent
 harbor run -p benchmark/tasks/M1-host-migration -a claude-code -m anthropic/claude-opus-4-1
 
-# all 62 tasks: pointing -p at the tasks/ directory runs them as a dataset batch
+# all 63 tasks: pointing -p at the tasks/ directory runs them as a dataset batch
 harbor run -p benchmark/tasks -a claude-code -m anthropic/claude-opus-4-1
 ```
 
@@ -296,7 +297,7 @@ the judge's per-item reasons are in the verifier log.
 
 ### Unattended authorization
 
-All 62 `instruction.md` files carry the `BENCHMARK-AUTH-v1` marker: the task prompt
+All 63 `instruction.md` files carry the `BENCHMARK-AUTH-v1` marker: the task prompt
 itself is the user's confirmation of the plan and the execution within the stated
 scope. The agent should complete the necessary analysis/planning and then proceed — it
 must not stop just because Harbor will not send a second round of "confirmation". The
@@ -473,7 +474,7 @@ numbers cannot be compared across models or against later runs.
   adding ordinary fixture tasks** — the point is to stop anyone from accidentally
   publishing fake plugins to npm.
 - When adding a task, scaffold it with `harbor task init`, then fill in
-  judge / solve.sh following the layout of the existing 62 tasks, and verify the
+  judge / solve.sh following the layout of the existing 63 tasks, and verify the
   reference answer scores 1.0 with `harbor run -p <task> -a oracle`.
 - After adding or modifying prompts, run
   `node benchmark/scripts/validate-execution-contract.mjs` to make sure the

@@ -75,6 +75,8 @@ const expectedModes = new Map([
   ['H20-session-events-ledger', 'mutable'],
   ['H21-question-answerer-waterfall', 'mutable'],
   ['H26-notlisted-trap', 'mutable'],
+  ['H27-undeclared-import-trap', 'mutable'],
+
 ])
 
 const compact = (text) => text.replaceAll('\r\n', '\n').replace(/\s+/g, ' ')

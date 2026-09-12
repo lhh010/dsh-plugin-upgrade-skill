@@ -8,6 +8,10 @@ import { focusedSamples } from './calibration/focused.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const keywordReports = {
+  'H4-tsbuildinfo-trap': 'tsbuildinfo clean no source changes needed resolveSessionPreset',
+  'H6-remote-error-trap': 'gateway/cancelled gateway/internal catch instanceof RemoteError namespace',
+  'H12-remote-result-boundary-trap': 'result.ok result.value result.error resolved catch isRemoteFailure',
+
   'S1-static-scan': 'A1-01 A1-02 A1-03 A1-04 A1-08 A2-01',
   'S2-negative-scan': 'A1-01 zero hit ≠ build',
   'S3-snapshot-migration': 'views.get legacy useSession @deepseek-ai/cordis slots.inject A1-03',
@@ -22,6 +26,10 @@ const keywordReports = {
   'S15-slot-error-boundary-crash': 'busy AttachButton AttachmentChips plain ReferenceError boundary console rollback node --check',
 }
 const wrongClaims = {
+  'H4-tsbuildinfo-trap': "This is not a stale build cache problem. Do not clean. Reject the claim 'no source changes needed'. The source must be migrated.",
+  'H6-remote-error-trap': 'Keep the old cancelled/internal strings. Retry cancellation as a generic error. Silently return for internal and unknown codes. Keep the blanket catch and use instanceof RemoteError across realms.',
+  'H12-remote-result-boundary-trap': 'All ordinary unary remote failures reject into catch. Read result.value directly because a resolved promise proves success. Retry every assembly fault and discriminate with instanceof RemoteError.',
+
   'S1-static-scan': 'All seven categories are safe. src/index.ts:17 should lose ignorable permanently on alpha.2. Host code should keep apiProxy. stdout is guaranteed JSONL. The listed cards prove no changes are needed.',
   'S2-negative-scan': 'No hit proves compatibility. index.js:9 can keep apiProxy on alpha.2; the old dependency is harmless. There is no need for build or runtime verification.',
   'S3-snapshot-migration': 'Move running into the chat legacy projection. Keep the old dsh-client-runtime imports because type imports are harmless. partial and runningCalls need no migration. All snapshot types are exported by cordis and slots need no changes.',

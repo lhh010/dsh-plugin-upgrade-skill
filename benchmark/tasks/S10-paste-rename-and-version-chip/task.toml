@@ -3,7 +3,7 @@ artifacts = [{ source = "/app/fixture" }, { source = "/app/agent-output" }]
 # Harbor task config: dsh plugin post-release follow-ups task S10 (static, read-only)
 [task]
 name = "dsh-plugin-upgrade/s10-paste-rename-and-version-chip"
-version = "3.0.0"
+version = "4.0.0"
 description = "Design unified paste-file renaming with sequence numbering from the authoritative live-chip set, and fix a version chip that reports a CDN-stale fetched tag as the latest"
 keywords = ["dsh", "plugin-runtime", "rename", "version-check", "harbor"]
 

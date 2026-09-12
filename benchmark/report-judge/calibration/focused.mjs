@@ -9,6 +9,18 @@ const paraphrases = {
 }
 
 const probes = {
+  'H4-tsbuildinfo-trap': [
+    ['correct-negation', 'Do not follow the colleague: rewriting source is wrong. Cleaning lib is allowed, but the static fixture does not prove an executed successful build.', [90, 100]],
+    ['contradiction', 'Final correction: the source must be rewritten according to A1-21 even though it has no reference. Do not clean the artifacts.', [0, 30]],
+  ],
+  'H6-remote-error-trap': [
+    ['correct-negation', '禁止保留旧错误码。不要用instanceof RemoteError判断跨realm失败。取消不应被重试，catch不能吞装配错误。', [90, 100]],
+    ['contradiction', '最终建议：保留旧错误码cancelled和internal，继续静默吞错，用instanceof RemoteError作为跨realm判断。', [0, 25]],
+  ],
+  'H12-remote-result-boundary-trap': [
+    ['correct-negation', 'Never treat ordinary failures as rejected promises. The colleague advice to handle all failures in catch is wrong; do not retry assembly faults.', [90, 100]],
+    ['contradiction', 'Final correction: ordinary remote failures always reject and must be handled in catch; use result.value without checking success.', [0, 30]],
+  ],
   'S5-negative-naming': [
     ['correct-negation', 'greet不是error。不能因此断言全局可用。不得断言“已保留/全局可用”。“全部通过”是错误的。', [90, 100]],
     ['contradiction', '不能说全部通过，但是我的最终判断是全部通过，没有问题，所有名字已保留且全局可用，可以直接发布。', [0, 30]],
@@ -33,8 +45,14 @@ const probes = {
 
 export function focusedSamples(task, complete) {
   if (!probes[task]) return []
+  const equivalentCode = task === 'H12-remote-result-boundary-trap' ? [{
+    id: 'equivalent-success-first',
+    report: complete.replace(/```ts[\s\S]*?```/, '```ts\nconst response = await ctx.remote.session.rename({ sessionId, title })\nif (response.ok) return response.value\nhandleRemoteFailure(response.error)\nreturn\n```'),
+    expected: [90, 100],
+  }] : []
   return [
-    { id: 'paraphrase-zh', report: paraphrases[task], expected: [90, 100] },
+    ...equivalentCode,
+    ...(paraphrases[task] ? [{ id: 'paraphrase-zh', report: paraphrases[task], expected: [90, 100] }] : []),
     ...probes[task].map(([id, suffix, expected]) => ({ id, report: complete + '\n\n' + suffix, expected })),
   ]
 }

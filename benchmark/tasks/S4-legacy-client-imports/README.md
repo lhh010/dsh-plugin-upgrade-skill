@@ -4,7 +4,7 @@ The agent read-only-scans the legacy dsh 0.1.1-rc.2 Web Client plugin in `/app/f
 
 - **2026-08-31 calibration note**: in closed-book runs, agents fabricate "upgrade cards" (e.g. an apply-lifecycle replacement or inject-moved-to-manifest that never happened) — the semantic judge caps positive unsupported assertions at 70; a rejected bad example does not trigger the cap.
 - **Environment**: `node:24-bookworm` + git (fixture baseline retained; read-only verification uses sealed hashes); dsh is not installed (static task).
-- **Verifier**: LLM: runtime removal, registration identity, session content and connection face: 25 each. Positive unsupported lifecycle/inject claims cap at 70; rejecting bad advice does not. Full/partial/fail/missing earn 100%/50%/0%/0% of each weight. The verifier runs separately, validates frozen fixture hashes and report/source quotations, and writes scalar `reward.txt` plus `details.json`. Judge service failures exit nonzero without a reward.
+- **Verifier**: LLM: runtime removal, registration identity, session content and connection face: 25 each. Positive unsupported lifecycle/inject claims cap at 70; rejecting bad advice does not. Full/partial/fail/missing earn 100%/50%/0%/0% of each weight. The verifier runs separately, validates frozen fixture hashes and structured decisions and reasons, and writes scalar `reward.txt` plus `details.json`. Judge service failures exit nonzero without a reward.
 - **Oracle**: run `harbor run -p benchmark/tasks/S4-legacy-client-imports -a oracle` with judge configuration. This grades the reference report through the same LLM; a perfect score is not hardcoded.
 
 ```
@@ -13,7 +13,7 @@ tests/                 # judge.mjs + packet.json + test.sh + Dockerfile
 solution/              # reference report + solve.sh
 ```
 
-Default task version: **3.0.0**, protocol `report-judge-v1`. Set
+Default task version: **4.0.0**, protocol `report-judge-v2`. Set
 `REPORT_JUDGE_BASE_URL`, `REPORT_JUDGE_MODEL` and `REPORT_JUDGE_API_KEY` for the
 verifier. See [semantic-judge setup](../../docs/report-judge-pilot.md).
 The agent receives neither judge credentials nor sealed reference excerpts.

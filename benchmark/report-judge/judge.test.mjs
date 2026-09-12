@@ -15,12 +15,8 @@ function sandbox(t) {
   return root
 }
 function responseFor(packet, verdict = 'pass') {
-  const source = Object.entries(packet.fixture)[0]
-  return { decisions: packet.rubric.criteria.map(c => ({ id: c.id, verdict, reason: 'Protocol test only, not semantic calibration.',
-    evidence: verdict === 'missing' ? [] : [{ report: 'report.md', quote: 'candidate evidence' }],
-    sources: c.sourceRequired ? [{ path: source[0], quote: source[1].text.split('\n').find(x => x.trim()) }] : [],
-    references: packet.references.slice(0, 1).map(r => r.id) })),
-  caps: packet.rubric.caps.map(c => ({ id: c.id, triggered: false, reason: 'No assertion.', evidence: [] })) }
+  return { decisions: packet.rubric.criteria.map(c => ({ id: c.id, verdict, reason: 'Protocol test only, not semantic calibration.' })),
+    caps: packet.rubric.caps.map(c => ({ id: c.id, triggered: false, reason: 'No assertion.' })) }
 }
 const report = { 'report.md': 'candidate evidence' }
 const config = { url: 'https://judge.example/v1/chat/completions', key: 'private-test-key', model: 'test-model' }
@@ -51,14 +47,12 @@ test('aggregation is deterministic: full, half and missing; model totals ignored
   }
 })
 
-test('declared caps require quoted claims and apply after aggregation', () => {
+test('declared caps use decisions and reasons and apply after aggregation', () => {
   for (const [task, rubric] of Object.entries(RUBRICS)) {
     for (const [index, cap] of (rubric.caps ?? []).entries()) {
       const packet = makePacket(task)
       const response = responseFor(packet)
       response.caps[index].triggered = true
-      assert.throws(() => scoreDecisions(packet, report, response), /missing report evidence/)
-      response.caps[index].evidence = [{ report: 'report.md', quote: 'candidate evidence' }]
       assert.equal(scoreDecisions(packet, report, response).score, cap.total)
     }
   }
@@ -75,17 +69,19 @@ test('unknown, duplicate and omitted criteria/caps cannot produce a reward', () 
   }
 })
 
-test('judge cannot invent report quotes, fixture evidence or reference IDs', () => {
-  const packet = makePacket('S1-static-scan')
+test('grading accepts explanations without quotations but still requires bounded reasons', () => {
+  const packet = makePacket('H4-tsbuildinfo-trap')
+  const response = responseFor(packet)
+  response.decisions[0].reason = 'The answer locates the old emitted import and distinguishes it from the current source.'
+  assert.equal(scoreDecisions(packet, { 'report.md': 'A differently formatted report.\n\n| A | B |' }, response).score, 100)
+  assert.deepEqual(Object.keys(scoreDecisions(packet, report, response).decisions[0]), ['id', 'verdict', 'reason', 'points', 'awarded'])
   for (const mutate of [
-    r => { r.decisions[0].evidence[0].quote = 'not in report' },
-    r => { r.decisions[0].sources[0].path = 'nonexistent.ts' },
-    r => { r.decisions[0].sources[0].quote = 'invented code' },
-    r => { r.decisions[0].sources = [] },
-    r => { r.decisions[0].references = ['imaginary-card'] },
+    r => { r.decisions[0].reason = '' }, r => { r.decisions[0].reason = ' '.repeat(3) },
+    r => { r.decisions[0].reason = 'x'.repeat(4001) }, r => { delete r.caps[0].reason },
+    r => { r.caps[0].reason = 'x'.repeat(4001) }, r => { r.caps[0].triggered = 'yes' },
   ]) {
-    const response = responseFor(packet); mutate(response)
-    assert.throws(() => scoreDecisions(packet, report, response), JudgeError)
+    const invalid = responseFor(packet); mutate(invalid)
+    assert.throws(() => scoreDecisions(packet, report, invalid), JudgeError)
   }
 })
 
@@ -131,7 +127,7 @@ test('symlinks, special paths and oversized reports cannot escape or get silentl
   await assert.rejects(grade({ packet: makePacket(task), appRoot: root }), SubmissionError)
 })
 
-test('transport sends a text-only blinded request and validates returned evidence', async () => {
+test('transport sends complete reports and validates returned decisions', async () => {
   const packet = makePacket('S2-negative-scan')
   const result = await callJudge(packet, report, config, { fetchImpl: async (url, init) => {
     assert.equal(url, config.url); assert.equal(init.redirect, 'error')
@@ -198,13 +194,13 @@ test('CLI failure produces details and nonzero exit, never a default-zero reward
 test('preparation keeps agent prompts/fixtures exact and puts references/keys only in verifier', t => {
   const dir = sandbox(t); const out = join(dir, 'pilot')
   const manifest = prepare(out)
-  assert.equal(manifest.tasks.length, 12)
+  assert.equal(manifest.tasks.length, 15)
   for (const { task } of manifest.tasks) {
     assert.equal(readFileSync(join(out, task, 'instruction.md'), 'utf8'), readFileSync(join(REPO, 'benchmark/tasks', task, 'instruction.md'), 'utf8'))
     assert.deepEqual(collectFiles(join(out, task, 'environment/fixture')), makePacket(task).fixture)
     const toml = readFileSync(join(out, task, 'task.toml'), 'utf8')
     assert.match(toml, /environment_mode = "separate"/)
-    assert.match(toml, /version = "3.0.0"/)
+    assert.match(toml, /version = "4.0.0"/)
     assert.match(toml, /\[verifier.env\]/)
     assert.doesNotMatch(toml, /source = "\/app\/\.git"/)
     assert.doesNotMatch(readFileSync(join(out, task, 'environment/Dockerfile'), 'utf8'), /REPORT_JUDGE|packet.json|COPY .*tests/)
@@ -243,4 +239,69 @@ test('S5-S9 retain bilingual, negated and contradictory reports as live calibrat
     assert.deepEqual(cases.find(c => c.id === 'correct-negation').expected, [90, 100])
     assert.ok(cases.find(c => c.id === 'contradiction').expected[1] < 100)
   }
+})
+
+
+test('H4 allows only original lib artifact deletion and keeps sealed evidence after clean', async t => {
+  const task = 'H4-tsbuildinfo-trap'; const packet = makePacket(task)
+  assert.deepEqual(packet.allowedDeletions.sort(), ['lib/index.js', 'lib/tsconfig.tsbuildinfo'])
+  for (const mutate of [
+    dir => rmSync(join(dir, 'lib'), { recursive: true }),
+    dir => rmSync(join(dir, 'lib/tsconfig.tsbuildinfo')),
+  ]) {
+    const root = sandbox(t)
+    cpSync(join(REPO, 'benchmark/tasks', task, 'environment/fixture'), join(root, 'fixture'), { recursive: true })
+    const out = join(root, 'agent-output', task); mkdirSync(out, { recursive: true })
+    writeFileSync(join(out, 'report.md'), 'Original stale import in lib/index.js:1; clean lib then rebuild, no source migration.')
+    mutate(join(root, 'fixture'))
+    let called = false
+    const result = await grade({ packet, appRoot: root, evaluate: async sealed => {
+      called = true
+      assert.match(sealed.fixture['lib/index.js'].text, /resolveSessionPreset/)
+      return { score: 30 }
+    } })
+    assert.ok(called); assert.equal(result.status, 'scored')
+    assert.equal(result.citation_audit.find(c => c.path === 'lib/index.js')?.valid, true)
+  }
+  for (const mutate of [
+    dir => rmSync(join(dir, 'src/index.ts')),
+    dir => writeFileSync(join(dir, 'src/index.ts'), 'changed'),
+    dir => writeFileSync(join(dir, 'package.json'), '{}'),
+    dir => writeFileSync(join(dir, 'lib/index.js'), 'rewritten artifact'),
+    dir => writeFileSync(join(dir, 'lib/new.js'), 'new artifact'),
+    dir => writeFileSync(join(dir, 'allowedDeletions.json'), '["src/index.ts"]'),
+  ]) {
+    const root = sandbox(t)
+    cpSync(join(REPO, 'benchmark/tasks', task, 'environment/fixture'), join(root, 'fixture'), { recursive: true })
+    mutate(join(root, 'fixture'))
+    const result = await grade({ packet, appRoot: root, evaluate: () => assert.fail('invalid submission must not call model') })
+    assert.equal(result.status, 'invalid_submission'); assert.equal(result.score, 0)
+  }
+})
+
+for (const task of ['H6-remote-error-trap', 'H12-remote-result-boundary-trap']) {
+  test(`${task}: fixture mutations fail before model evaluation`, async t => {
+    const packet = makePacket(task); assert.equal(packet.allowedDeletions, undefined)
+    for (const mutation of ['delete', 'rewrite', 'add']) {
+      const root = sandbox(t)
+      cpSync(join(REPO, 'benchmark/tasks', task, 'environment/fixture'), join(root, 'fixture'), { recursive: true })
+      const file = join(root, 'fixture', mutation === 'add' ? 'extra.txt' : 'package.json')
+      if (mutation === 'delete') rmSync(file)
+      else writeFileSync(file, 'modified')
+      const result = await grade({ packet, appRoot: root, evaluate: () => assert.fail('network') })
+      assert.equal(result.status, 'invalid_submission')
+    }
+  })
+}
+
+
+test('H diagnosis calibration covers contradictions and equivalent code without fake semantic assertions', () => {
+  for (const task of ['H4-tsbuildinfo-trap', 'H6-remote-error-trap', 'H12-remote-result-boundary-trap']) {
+    const cases = samples(task)
+    assert.ok(cases.every(c => typeof c.report === 'string' && c.report.trim()))
+    assert.ok(cases.find(c => c.id === 'correct-negation'))
+    assert.ok(cases.find(c => c.id === 'contradiction'))
+  }
+  const sample = samples('H12-remote-result-boundary-trap').find(c => c.id === 'equivalent-success-first')
+  assert.match(sample.report, /if \(response.ok\) return response.value/)
 })

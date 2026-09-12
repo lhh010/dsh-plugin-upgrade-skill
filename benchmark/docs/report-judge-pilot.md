@@ -1,7 +1,7 @@
-# Semantic report judging: default for S1–S10, S12 and S15
+# Semantic report judging: default for H4, H6, H12, S1–S10, S12 and S15
 
-The registered `benchmark/tasks/` entries for these twelve tasks now use
-**LLM-as-judge by default**, at task version `3.0.0`, protocol `report-judge-v1`.
+The registered `benchmark/tasks/` entries for these fifteen tasks now use
+**LLM-as-judge by default**, at task version `4.0.0`, protocol `report-judge-v2`.
 No generated pilot directory or extra enable flag is needed. This document keeps
 its original filename so existing links remain valid.
 
@@ -55,7 +55,7 @@ not guarantee complete blinding.
 The model-free `skill-evaluation` CI controls run the four deterministic tasks in
 that suite. S1, S5 and S9 remain in the seven-task model suite; the control manifest
 lists them separately under `semanticProtocolTasks`. The same CI job runs
-`test:report-judge` for all twelve semantic verifiers, with mocked responses and no
+`test:report-judge` for all fifteen semantic verifiers, with mocked responses and no
 model credentials. This validates their protocol, not reference-answer quality.
 The manual Actions model job has not been wired to a report-judge credential;
 without explicit verifier configuration Harbor rejects it before any trial.
@@ -65,6 +65,9 @@ Use a separately authorized local API or Codex run for actual report grading.
 
 | Task | Criteria / points |
 |---|---|
+| H4 | Located cache attribution 30; clean/rebuild plan 30; evidence-backed no-source-migration conclusion 40 |
+| H6 | Namespaced codes, cancellation, internal/unknown failures, genuine exception boundary: 25 each |
+| H12 | Root cause 20; current defects 10; fenced fix 25; resolved flow 20; reject boundary 15; structural discrimination 10 |
 | S1 | Seven located touchpoints 10 each; justified card mapping 20; scope/verification limits 10 |
 | S2 | Located Host break 40; six negative categories 20; inference limits 20; proposed verification 20 |
 | S3 | Chat projection, Session lifecycle, type/inject ownership, slot registration, justified mapping/plan: 20 each |
@@ -100,13 +103,14 @@ states. S15's rubric acknowledges contradictions in the supplied diff and accept
 grounded discussion of additional scope errors; it does not force a claim that
 every hover addition is harmless.
 
-Credit requires verbatim candidate evidence. Source-dependent criteria also need
-an existing fixture path and verbatim source evidence. These checks prove quotation
-existence, not semantic entailment; relevance remains the LLM's judgment. Reports
-must identify the file or unambiguous function, expression, log entry or process
-record. Candidate `path:line` citations are audited against sealed files; nearby
-line drift alone does not invalidate a uniquely located diagnosis. No report code,
-command or URL is executed.
+The model reads the complete reports, sealed fixture and references directly. It
+returns only criterion ID, verdict and short reason, plus cap ID, boolean and
+short reason. It does not transcribe quotations or return evidence/source/reference
+arrays. Code validates IDs, completeness, verdicts and bounded reasons, then
+computes points and caps. Whether the report actually supports each criterion is
+a semantic judgment, not an exact-string quotation check. Source-required criteria
+still require the candidate to locate the relevant source. Full inputs, model
+responses and hashes remain available for human review.
 
 ## Submissions and evaluator failures
 
@@ -116,7 +120,7 @@ command or URL is executed.
   untrusted text by the LLM.
 - Complete fixture inventory and SHA-256, including hidden/new files, are checked
   against the verifier-owned packet. Candidate Git history is not trusted.
-- Configuration/API/network errors, refusals, truncation and invalid evidence
+- Configuration/API/network errors, refusals, truncation and malformed decisions
   produce `details.json`, exit nonzero and leave **no reward file**. They are
   evaluator failures, not candidate zeros. Previous rewards are cleared before
   evaluation, including before a possible outer timeout.
@@ -133,7 +137,7 @@ npm run sync:report-judge
 npm run test:report-judge
 ```
 
-Synchronization materializes twelve standalone judges, sealed packets, shell
+Synchronization materializes fifteen standalone judges, sealed packets, shell
 entries, verifier Dockerfiles and task configurations. It removes superseded
 keyword helpers. CI runs `--check` and rejects drift in the implementation,
 fixture, instruction or referenced source bytes. Checked-in packets omit HEAD,
@@ -157,8 +161,8 @@ node benchmark/report-judge/calibrate.mjs --live --repeats 1 --out /tmp/report-j
 
 The first command only prepares samples and inputs; it does not call a model or
 simulate semantic scores. The live command uses explicit API configuration and
-makes 111 calls (twelve tasks × eight base samples, plus three focused samples
-for each of S5–S9) at one repeat; three repeats make up to 333 calls. It stops at the first infrastructure/protocol failure, saving
+makes 142 calls (fifteen tasks × eight base samples, three focused samples
+for each of S5–S9, two for each of H4/H6/H12, and an equivalent H12 code sample) at one repeat; three repeats make up to 426 calls. It stops at the first infrastructure/protocol failure, saving
 completed evidence incrementally.
 
 Samples cover complete/reordered answers, bare keywords, wrong claims, injection,
@@ -174,7 +178,7 @@ The [S5–S9 default-verifier validation](../results/validation-report-2026-09-1
 ## Regrade using a Codex login
 
 The alternative host-side `codex-judge.mjs` transport uses the same packets,
-rubrics and evidence checks, for an existing Codex login without an API key:
+rubrics and decision validation, for an existing Codex login without an API key:
 
 ```sh
 node benchmark/report-judge/codex-judge.mjs \
@@ -201,3 +205,38 @@ interchangeable without a paired check.
 For solver authentication use `CODEX_AUTH_JSON_PATH`, not
 `CODEX_FORCE_AUTH_JSON=true`: Harbor 0.22.0 can redact literal `true` values in
 exported artifacts. Damaged exports are infrastructure failures, not valid zeros.
+
+## H4 / H6 / H12 migration
+
+These remain static diagnosis tasks. Their version-3 semantic scores must not be
+pooled with historical regex scores. H4 allows deletion of the original sealed
+`lib/` artifacts only; source, manifests and all other files stay unchanged.
+Original artifacts remain in the verifier packet for evidence and citation checks
+after cleanup. H6/H12 require the entire fixture to remain unchanged.
+
+H6 remains closed-book: a located namespace-migration diagnosis with unavailable
+exact spelling marked unconfirmed earns partial credit (12.5 of 25), rather than
+the old integer 12. H12 retains the requested report sections and fenced proposed
+fix; the model judges its control flow rather than spelling or variable names.
+The code is not executed. Missing substantive evidence earns no credit; rejected
+bad examples must not trigger recommendation caps.
+
+The three rubrics and their caps are defined in `report-judge/rubrics.mjs`.
+Calibration includes the previously full-scoring wrong H4 answer, wrong H6/H12
+policies, keyword dumps, prompt copies, injection, and correct/contradictory
+negations. Prepared expected bands are hypotheses, not measured model results.
+
+## Decision-only output (protocol v2)
+
+Task version 4.0.0 removes required evaluator quotation/source/reference arrays
+and exact quotation matching. It retains the same rubric weights, fixture gates
+and point/cap aggregation. It supersedes protocol-v1 version-3 output; archived
+results remain unchanged. Regrade retained answers under a single version when
+comparing results, and record the new judge/prompt/packet hashes.
+
+```json
+{"decisions":[{"id":"criterion-id","verdict":"partial","reason":"The diagnosis is correct but the verification plan is incomplete."}],"caps":[{"id":"cap-id","triggered":false,"reason":"The report rejects the incorrect recommendation."}]}
+```
+
+This example illustrates the response shape; a real response must include every
+criterion and every cap declared by its packet exactly once.

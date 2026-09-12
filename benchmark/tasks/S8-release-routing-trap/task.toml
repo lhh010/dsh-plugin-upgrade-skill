@@ -3,7 +3,7 @@ artifacts = [{ source = "/app/fixture" }, { source = "/app/agent-output" }]
 # Harbor task config: dsh plugin release-engineering diagnosis task S8 (static, read-only)
 [task]
 name = "dsh-plugin-upgrade/s8-release-routing-trap"
-version = "3.0.0"
+version = "4.0.0"
 description = "Diagnose a two-stage community install failure: a README-pinned tag missing from the public mirror, then a forward-incompatible plugin version crashing on the consumer's DSH"
 keywords = ["dsh", "plugin-release", "tag-sync", "version-routing", "harbor"]
 

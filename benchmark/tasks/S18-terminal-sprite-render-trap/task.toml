@@ -1,9 +1,10 @@
 schema_version = "1.4"
+artifacts = [{ source = "/app/fixture" }, { source = "/app/agent-output" }]
 # Harbor task config: terminal half-block sprite rendering defects and the
 # dev-loop hang they rode in on (task S18, static, read-only)
 [task]
 name = "dsh-plugin-upgrade/s18-terminal-sprite-render-trap"
-version = "1.1.0"
+version = "4.0.0"
 description = "A terminal pixel sprite (whale) shows phantom pixels at its right edges and ghost pixels surviving frame switches; flipping the animation feature default-on then hangs a CI job for its whole timeout - diagnose the half-block SGR background leak, the trailing-trim ghosting, the frame-data drift, the timer pinning, and write the prevention checklist"
 keywords = ["dsh", "tui", "ansi", "half-block", "sprite", "harbor"]
 
@@ -17,7 +18,14 @@ execution_contract = "BENCHMARK-AUTH-v1"
 timeout_sec = 300.0
 
 [verifier]
-timeout_sec = 120.0
+timeout_sec = 240.0
+environment_mode = "separate"
+network_mode = "public"
+
+[verifier.env]
+REPORT_JUDGE_BASE_URL = "${REPORT_JUDGE_BASE_URL}"
+REPORT_JUDGE_MODEL = "${REPORT_JUDGE_MODEL}"
+REPORT_JUDGE_API_KEY = "${REPORT_JUDGE_API_KEY}"
 
 [environment]
 network_mode = "public"

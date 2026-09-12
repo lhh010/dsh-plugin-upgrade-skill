@@ -27,10 +27,13 @@ v0.3.7/v0.3.8 on Windows (bump-after-build phantom badge → amended re-release;
 session's concatenated-zstd generation file).
 
 - Type: static / read-only report
-- Score: 5 aspects × 20 points; every listed condition within an aspect is required.
-  Explicitly wrong operational advice or a failed fixture-integrity check → 0.
-  The deterministic prose rubric reports missing conditions; it is not a general semantic evaluator.
-- **Oracle**: `harbor run -p benchmark/tasks/S19-phantom-update-stale-host -a oracle`, expected 1.0.
+- Score: 5 criteria × 20 points each, sealed fixture hash, separate semantic verifier
+- **Verifier**: [LLM-as-judge by default](../../docs/report-judge-pilot.md), task version `3.0.0`.
+  A sealed fixture hash enforces read-only work. The separate verifier reads the report,
+  judges each criterion with quoted evidence, and deterministically aggregates the score.
+  Configure `REPORT_JUDGE_BASE_URL`, `REPORT_JUDGE_MODEL` and `REPORT_JUDGE_API_KEY`
+  only for the verifier. Missing reports score 0; evaluator failures leave no reward.
+- **Oracle**: `harbor run -p benchmark/tasks/S19-phantom-update-stale-host -a oracle`; inspect the semantic decisions (a reference answer has no assumed model score).
 - See `instruction.md` for the brief, `solution/SOLUTION.md` for the reference answer.
 
 Run `npm run test:s19-judge` for the isolated judge and verifier regressions. The

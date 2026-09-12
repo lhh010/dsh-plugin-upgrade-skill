@@ -20,7 +20,13 @@ Derived from a real 2026-09-09/10 session on this deployment. The trap has three
    unavailable service — the decision order is restart → rollback → report upstream.
 
 - Type: static / read-only report
-- Score: 5 aspects × 20 points. The deterministic prose rubric reports missing
-  conditions; attributing the failure to the plugin's own code or proposing plugin-side
-  workarolds caps the score.
+- **Score**: 5 criteria × 20 points each (100 total). Blaming the plugin's own code for
+  the host-side failure, citing the invalid all-in-one combo join as missing modules, or
+  proposing plugin-side workarounds zeroes the affected criteria.
+- **Verifier**: [LLM-as-judge by default](../../docs/report-judge-pilot.md), task version `3.0.0`.
+  A sealed fixture hash enforces read-only work. The separate verifier reads the report,
+  judges each criterion with quoted evidence, and deterministically aggregates the score.
+  Configure `REPORT_JUDGE_BASE_URL`, `REPORT_JUDGE_MODEL` and `REPORT_JUDGE_API_KEY`
+  only for the verifier. Missing reports score 0; evaluator failures leave no reward.
+- **Oracle**: `harbor run -p benchmark/tasks/S21-resource-service-unavailable-trap -a oracle`; inspect the semantic decisions (a reference answer has no assumed model score).
 - See `instruction.md` for the brief, `solution/report.md` for the reference answer.

@@ -38,8 +38,8 @@ test('controls never invoke a model or inject Skills; invalid inputs fail before
 })
 
 test('control manifests disclose semantic coverage and preserve the complete model suite', () => {
-  assert.deepEqual(SEMANTIC_TASKS, ['S1-static-scan', 'S5-negative-naming', 'S9-composer-coordinate-trap'])
-  assert.equal(CONTROL_TASKS.length, 4)
+  assert.deepEqual(SEMANTIC_TASKS, ['S1-static-scan', 'S5-negative-naming', 'S9-composer-coordinate-trap', 'S11-mermaid-lazyload-trap'])
+  assert.equal(CONTROL_TASKS.length, 3)
   assert.deepEqual([...CONTROL_TASKS, ...SEMANTIC_TASKS].sort(), [...TASKS].sort())
   const model = evaluationConfig({ condition: 'no-injected-skill', model: 'openai/test-model', output: '.artifacts/eval-test' })
   assert.deepEqual(model.tasks.map(task => basename(task.path)), TASKS)

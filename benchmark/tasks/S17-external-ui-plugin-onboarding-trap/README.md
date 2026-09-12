@@ -13,12 +13,14 @@ source-launched dsh 0.1.3-alpha.1 web profile on Windows (misattributed combo fa
 ModuleLoader repackaging → cross-entry slot declaration → tree-kill restart discipline).
 
 - Type: static / read-only report
-- Score: 5 aspects × 20 points; every listed condition within an aspect is required.
-  Explicitly wrong operational advice or a failed fixture-integrity check → 0.
-  The deterministic prose rubric reports missing conditions; it is not a general semantic evaluator.
+- Score: 5 criteria × 20 points, sealed fixture hash, separate semantic verifier
+- **Verifier**: [LLM-as-judge by default](../../docs/report-judge-pilot.md), task version `3.0.0`.
+  A sealed fixture hash enforces read-only work. The separate verifier reads the report,
+  judges each criterion with quoted evidence, and deterministically aggregates the score.
+  Configure `REPORT_JUDGE_BASE_URL`, `REPORT_JUDGE_MODEL` and `REPORT_JUDGE_API_KEY`
+  only for the verifier. Missing reports score 0; evaluator failures leave no reward.
 - **Oracle**: `harbor run -p benchmark/tasks/S17-external-ui-plugin-onboarding-trap -a oracle`, expected 1.0.
 - See `instruction.md` for the brief, `solution/SOLUTION.md` for the reference answer.
 
-Run `npm run test:s17-judge` for the isolated judge and verifier regressions (also included
 in `npm test`). The verifier only reads agent artifacts; it never installs counter-example
 or oracle reports into the answer directory and does not require `/solution/`.

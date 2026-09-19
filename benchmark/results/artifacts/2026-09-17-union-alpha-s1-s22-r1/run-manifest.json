@@ -2501,5 +2501,6 @@
     "scored": false
   },
   "solver_completed": true,
-  "judge_model": "zai/glm-5.3-flash"
+  "judge_model": "zai/glm-5.3-flash",
+  "identity_disclosed": "2026-09-18: stealth/union-alpha claimed by Unbiased (unbiased.ai) as Pareto (composite model; paid openrouter/unbiased/pareto). All run data was collected 2026-09-17 under the anonymous free stealth window; scores and judging are unchanged, provenance description only."
 }

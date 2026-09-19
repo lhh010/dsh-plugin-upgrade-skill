@@ -9,6 +9,8 @@
 - **Judges**: 44 `zai/glm-5.3-flash` subagents against the sealed `packet.json` rubrics with the official SYSTEM contract and deterministic aggregation — the same canonical judge as every other GLM-family row.
 - **Execution**: frequent API reconnects and several subagent failures; all retries, recoveries, and re-dispatches (with agent ids) are recorded in `run-manifest.json` (`execution_events`, `retry_summary`, `final_integrity_audit`). Final integrity audit: all 44 reports re-read and SHA-256 fingerprinted, unchanged, >20 lines, endings intact, no relative .md links.
 
+- **Identity disclosed after the run (2026-09-18)**: `stealth/union-alpha` was claimed by Unbiased (unbiased.ai) — the model is **Pareto** (Pareto 26.9 / Pareto 262K, a composite model routing several frontier and open models per request; now paid as `openrouter/unbiased/pareto`). All data in this run was collected during the anonymous free stealth window on 2026-09-17; scores and judging are unchanged — this note corrects provenance only. Two interpretive consequences: (1) the high baseline reads as "that service on that day", not a single underlying model's capability; (2) composite-routing policy and capacity may differ from the paid release, so non-reproducibility is stronger than for a typical row.
+
 ## Results
 
 | Arm | Total | Mean |

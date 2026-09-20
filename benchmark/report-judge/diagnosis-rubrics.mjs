@@ -151,4 +151,16 @@ export const DIAGNOSIS_RUBRICS = {
     ],
     caps: [cap('slot-reregistration-misdiagnosis', 40, 'The final remedy is only re-registering slots, re-declaring inject, or reinstalling the plugin — the colleague red herring — without the current-session code fix.')],
   },
+  'S24-dock-cotenant-crash-trap': {
+    taskVersion: '4.1.0',
+    references: [{ path: 'skills/plugin-upgrade/references/v0.1.6-alpha.2.md', heading: 'DSH-0.1.6-A2-02' }],
+    criteria: [
+      criterion('culprit-attribution', 20, 'Use console-excerpt.txt plus the two slots-contract excerpts: plugin A (the progress strip) is the only crash; its unconditional useSessionPendingInteraction(...) call throws TypeError at render because alpha.2 SessionStandardProps dropped useSessions and useSessionPendingInteraction (alpha.1 carried both). Plugin B renders no standard-kit hooks and throws nothing. Do not credit answers blaming plugin B or treating the two symptoms as independent breakages.'),
+      criterion('cotenant-mechanism', 20, 'Explain the co-tenant damage via dock-render-tree.md: the input dock is one list slot whose entries mount under ONE shared DrawerErrorBoundary; a child render throw unmounts the whole boundary subtree, so B chips vanish with A strip. The attach button survives because conversation.input.left is a different slot under a different boundary. Cite the console follow-up or render-tree note; a generic error-boundary mention without the shared-subtree linkage earns partial.'),
+      criterion('experiment-reading', 20, 'Interpret tried-notes.txt: disabling A restoring B chips proves A caused the unmount (render-crash coupling) and B can render once freed; it does NOT prove B is fully alpha.2-compatible elsewhere, nor that A crash is the only dock defect. Reinstalling B could never help because B was never broken. The colleague theory that both plugins use a removed prop is false — B uses no standard-kit hooks.'),
+      criterion('degradation-fix', 20, 'Propose corrected component code: optional-chained seat calls with stable empty fallbacks (useSessionPendingInteraction?.(...) ?? EMPTY_MAP, useSessions?.(...) ?? EMPTY_BY_ID), hiding only subagent pending/running indicators while running/todos/token/ETA keep working. Explain why degradation must be silent: a throwing dock tenant unmounts co-tenants, so a missing indicator is cosmetic while a throw is a multi-plugin outage. Full detection later integrates the uiSession status domain direction.'),
+      criterion('verification-and-hygiene', 20, 'Verify without host restart (plugin client bundles re-fetch on refresh): both entries render together; B regression covers paste/remove/re-paste with A enabled. Hygiene: tenants destructure defensively and may wrap their own entry in a local boundary; host could mount per-entry boundaries trading nesting/layout complexity for blast-radius isolation. Do not require executing this static fixture.', false),
+    ],
+    caps: [cap('innocent-plugin-fix', 40, 'The final remedy fixes, rewrites, or reinstalls only plugin B (the attachment plugin), or asserts the two breakages are independent plugin-level bugs requiring two parallel fixes.')],
+  },
 };

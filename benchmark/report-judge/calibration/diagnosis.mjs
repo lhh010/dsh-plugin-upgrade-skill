@@ -1,7 +1,15 @@
 // Independent bilingual answers and adversarial hypotheses for live calibration.
 // Expected bands are not semantic unit-test results or human gold labels.
 export const DIAGNOSIS_PROBES = {
-    'S23-passing-compat-guard-trap': {
+      'S24-dock-cotenant-crash-trap': {
+    keywords: 'standard kit useSessions useSessionPendingInteraction removed dock shared DrawerErrorBoundary co-tenant unmount optional chaining empty fallback degradation attribution disable experiment',
+    wrong: 'Both plugins were broken by the refactor, so both need parallel fixes and a reinstall. The attachment plugin lost its registration. Reinstalling plugin B and fixing its slot registration will restore the chips.',
+    reject: 'Do not blame or fix plugin B for the dock vanish: B uses no standard-kit hooks. The single crash is plugin A calling removed seats; the shared boundary unmounted the whole dock subtree, and disabling A restored B instantly.',
+    contradiction: 'Final correction: both plugins need independent fixes, and plugin B must re-declare its dock registration after the reinstall.',
+    cap: 40,
+    zh: 'console-excerpt.txt指向plugin A的SessionProgressBar调用已移除的useSessionPendingInteraction；dock所有条目挂在同一个DrawerErrorBoundary下，A抛错即卸载整个子树，B的chips随之消失。tried-notes里禁用A后B恢复，证明B无辜。修复：A的两个seats改可选调用+空表降级，绝不抛错。',
+  },
+'S23-passing-compat-guard-trap': {
     keywords: 'sessions.list current field removed uiSession adapter.current key ctx binding value compat guard presence probe silent no-op dual-host fallback scope',
     wrong: 'The sessions service was removed in alpha.2 and the plugin must migrate to the Remote API. The compat guard is broken and should be deleted. Reinstalling the plugin or re-registering its slots will restore the chords.',
     reject: 'Do not claim the sessions service, its list observable, or the guard itself was removed or renamed. The services all exist; only the current field inside the published snapshot is gone. Slot re-registration and reinstall are red herrings that cannot fix a field-level read.',

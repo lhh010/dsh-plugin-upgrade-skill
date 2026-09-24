@@ -9,20 +9,15 @@
 //   d1 = delta(glm-5.3-flash) - delta(glm-5.2)
 //   d2 = delta(glm-5.3-flash) - delta(glm-5.3 standard, flash-rejudged round 3)
 // Usage: node analyze-glm-common-subset.mjs [--check]
-// Inputs: the three aggregate.json files listed in INPUTS (read-only).
-// Outputs (written next to this script's repo root): benchmark/results/glm-trio-common-subset.json
-// and a markdown table printed to stdout.
+// Inputs: the per-round aggregate files listed in ROUND_INPUTS (read-only).
+// Output: benchmark/results/glm-trio-common-subset.json plus a markdown table on stdout.
+// --check recomputes in memory and fails if the committed JSON differs; it never writes.
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '../..')
-const INPUTS = {
-  'glm-5.3-flash': join(ROOT, 'benchmark/results/artifacts/2026-09-11-glm-5.3-flash-s1-s22-round2/aggregate.json'),
-  'glm-5.2': join(ROOT, 'benchmark/results/artifacts/2026-09-13-glm-5.2-s1-s22-round2/aggregate.json'),
-  'glm-5.3': join(ROOT, 'benchmark/results/artifacts/2026-09-17-glm-5.3-s1-s22-r3/aggregate-flash-rejudge.json'),
-}
 // Round provenance per configuration (per-task median across rounds).
 const ROUND_INPUTS = {
   'glm-5.3-flash': [
@@ -110,7 +105,7 @@ export function analyze() {
 }
 export function renderMarkdown(result) {
   const lines = [
-    '| Configuration | median no-skill | median with-skill | mean paired Δ | headroom share |',
+    '| Configuration | mean of per-task median no-skill | mean of per-task median with-skill | mean paired Δ | headroom share |',
     '|---|---:|---:|---:|---:|',
   ]
   for (const [name, s] of Object.entries(result.configs)) {
@@ -124,17 +119,18 @@ export function renderMarkdown(result) {
   lines.push(`Event-family limitation: ${result.eventFamilyDisclosure}.`)
   return lines.join('\n')
 }
-export function isMain(url) {
-  try { return Boolean(process.argv[1]) && fileURLToPath(url) === process.argv[1].replace(/\\/g, '/') } catch { return false }
-}
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const result = analyze()
   const outPath = join(ROOT, 'benchmark/results/glm-trio-common-subset.json')
-  writeFileSync(outPath, JSON.stringify(result, null, 2) + '\n')
-  console.log(renderMarkdown(result))
-  console.log('written: ' + outPath)
+  const serialized = JSON.stringify(result, null, 2) + '\n'
   if (process.argv.includes('--check')) {
-    const prev = JSON.parse(readFileSync(outPath, 'utf8'))
-    if (JSON.stringify(prev) !== JSON.stringify(result)) { console.error('check failed: results drifted'); process.exit(1) }
+    let committed = ''
+    try { committed = readFileSync(outPath, 'utf8') } catch {}
+    if (committed !== serialized) { console.error(`check failed: ${outPath} differs from recomputed analysis`); process.exit(1) }
+    console.log('glm-trio-common-subset.json matches recomputed analysis')
+  } else {
+    writeFileSync(outPath, serialized)
+    console.log(renderMarkdown(result))
+    console.log('written: ' + outPath)
   }
 }

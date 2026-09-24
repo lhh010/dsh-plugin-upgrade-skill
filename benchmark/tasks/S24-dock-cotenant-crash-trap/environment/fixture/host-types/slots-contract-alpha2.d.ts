@@ -6,13 +6,14 @@
 interface SessionStandardProps {
     /** Selector hook over target-neutral Conversation assembly. */
     useConversation: UseConversation;
+    /** Selector hook over this Session's named projections (todos, usage, ...). */
+    useProjection: UseProjection;
     /** Selector hook over the Session input machine. */
     useInput: SnapshotSelectorHook<InputState>;
     /** Stable public input actions for this Session. */
     inputActions: InputActions;
 }
 
-// NOTE: useSessions and useSessionPendingInteraction are gone from the
-// standard kit. Session-list and pending-interaction state now live behind
-// the uiSession service (sourceFor(owner) / provide(descriptor)); slot
-// entries that need them must integrate with that service or degrade.
+// NOTE: useSessions and useSessionPendingInteraction are no longer part of
+// the standard kit. Session-list and pending-interaction state now live behind
+// the uiSession service (sourceFor(owner) / provide(descriptor)).

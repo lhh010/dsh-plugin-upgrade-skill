@@ -26,7 +26,7 @@ Derived from a real 2026-09-17/18 session on this deployment. The trap has three
 
 ## Semantic verifier
 
-- **Scoring**: culprit attribution, experiment interpretation, degradation fix, multi-tenant hygiene, and verification: 20 each; a final recommendation to fix/rewrite only the innocent plugin (or to treat the two breakages as independent) caps at 40.
+- **Scoring**: `culprit-attribution`, `cotenant-mechanism`, `experiment-reading`, `degradation-fix`, and `verification-and-hygiene`: 20 each; a final recommendation to fix/rewrite only the innocent plugin (or to treat the two breakages as independent) caps at 40.
 - **Boundary**: the separate verifier checks the complete fixture against sealed
   hashes; any edit, addition or deletion scores zero. Judge configuration, API, and
   the frozen statistics file live under `benchmark/report-judge/`; the packet seals

@@ -70,6 +70,8 @@
     "test:s18-judge": "node --test --test-name-pattern=S18- benchmark/report-judge/defaults.test.mjs benchmark/report-judge/diagnosis.test.mjs",
     "test:s19-judge": "node --test --test-name-pattern=S19- benchmark/report-judge/defaults.test.mjs benchmark/report-judge/diagnosis.test.mjs",
     "test:s21-judge": "node --test --test-name-pattern=S21- benchmark/report-judge/defaults.test.mjs benchmark/report-judge/diagnosis.test.mjs",
-    "test:s22-judge": "node --test --test-name-pattern=S22- benchmark/report-judge/defaults.test.mjs benchmark/report-judge/diagnosis.test.mjs"
+    "test:s22-judge": "node --test --test-name-pattern=S22- benchmark/report-judge/defaults.test.mjs benchmark/report-judge/diagnosis.test.mjs",
+    "test:s23-judge": "node --test --test-name-pattern=S23- benchmark/report-judge/defaults.test.mjs benchmark/report-judge/diagnosis.test.mjs",
+    "test:s24-judge": "node --test --test-name-pattern=S24- benchmark/report-judge/defaults.test.mjs benchmark/report-judge/diagnosis.test.mjs"
   }
 }

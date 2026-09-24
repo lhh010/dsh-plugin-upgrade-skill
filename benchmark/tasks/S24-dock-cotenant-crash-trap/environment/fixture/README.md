@@ -20,8 +20,8 @@ Files:
 - `host-types/slots-contract-alpha1.d.ts` — the input-dock slot's standard props
   at 0.1.6-alpha.1.
 - `host-types/slots-contract-alpha2.d.ts` — the same contract at 0.1.6-alpha.2.
-- `host-types/dock-render-tree.md` — how the shell renders the dock list and what
-  happens when one entry throws.
+- `host-types/dock-render-tree.md` — the shell's mount tree for the composer
+  slots (dock list and neighbouring composer controls).
 
 Both plugins' full repositories are NOT available; this pack is what the maintainer
 attached to the bug report.

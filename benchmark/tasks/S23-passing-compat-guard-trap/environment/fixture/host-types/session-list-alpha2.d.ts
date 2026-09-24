@@ -21,7 +21,7 @@ export interface ISessions {
      */
     retain(target: SessionTarget, options: SessionRetainOptions): SessionReference;
     // ... using, retainInfo omitted for brevity
-    // NOTE: no scope(id) in this excerpt — per-session scopes are now owned by
-    // the binding sources materialized by the ui-session service (see
-    // ui-session-service-alpha2.d.ts).
+    // NOTE: scope(id) still exists on ISessions at alpha.2 but is omitted from
+    // this excerpt; the ui-session service's binding value also carries the
+    // session-scoped ctx (see ui-session-service-alpha2.d.ts).
 }

@@ -163,4 +163,4 @@ export const DIAGNOSIS_RUBRICS = {
     ],
     caps: [cap('innocent-plugin-fix', 40, 'The final remedy fixes, rewrites, or reinstalls only plugin B (the attachment plugin), or asserts the two breakages are independent plugin-level bugs requiring two parallel fixes.')],
   },
-};
+}

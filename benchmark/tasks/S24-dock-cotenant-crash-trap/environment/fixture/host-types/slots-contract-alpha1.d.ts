@@ -8,6 +8,8 @@ interface SessionStandardProps {
     useSessions: SnapshotSelectorHook<SessionListState>;
     /** Pending human interactions by session id. */
     useSessionPendingInteraction: SnapshotSelectorHook<ReadonlyMap<SessionId, SessionPendingInteraction>>;
+    /** Selector hook over this Session's named projections (todos, usage, ...). */
+    useProjection: UseProjection;
     /** Selector hook over the Session input machine. */
     useInput: SnapshotSelectorHook<InputState>;
     /** Stable public input actions for this Session. */

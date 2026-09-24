@@ -1,21 +1,27 @@
-# How the shell renders the input dock (alpha.2 conversation package)
+# How the shell renders the composer slots (alpha.2 conversation package)
 
-The 'conversation.input.dock' slot is a list slot (scope: session). The shell
-mounts every registered entry as children of ONE shared error boundary:
+The 'conversation.input.dock' slot is a list slot (scope: session). Simplified
+mount tree of the composer area as rendered by the alpha.2 conversation package
+(React DevTools component view, both plugins enabled):
 
 ```
-<DrawerErrorBoundary>          <- nearest boundary for EVERY dock entry
-  <DockEntry id="dsh-paste-input-dock" />   (plugin B, order 5)
-  <DockEntry id="progress" />               (plugin A, order 20)
-  ...
-</DrawerErrorBoundary>
+<Composer>
+  <InputLeft>
+    <DrawerErrorBoundary name="input.left">
+      <SlotEntry id="dsh-paste-input-button" />   (plugin B, order -100)
+    </DrawerErrorBoundary>
+  </InputLeft>
+  <InputDock>
+    <DrawerErrorBoundary name="input.dock">
+      <DockEntry id="dsh-paste-input-dock" />     (plugin B, order 5)
+      <DockEntry id="progress" />                 (plugin A, order 20)
+      ...
+    </DrawerErrorBoundary>
+  </InputDock>
+  <Textarea />
+</Composer>
 ```
 
-React error-boundary semantics: a render throw from ANY child unmounts the
-entire subtree under the nearest boundary. The boundary here wraps the whole
-entry list, so one crashing entry removes every co-tenant entry from the
-screen until the boundary resets. There is no per-entry boundary in alpha.2.
-
-Slots other than the dock (e.g. 'conversation.input.left', where plugin B's
-attach button lives) are mounted under DIFFERENT boundaries - a dock crash
-cannot touch them.
+`DrawerErrorBoundary` is a standard React class boundary
+(`getDerivedStateFromError` → renders `null` as its fallback, resets on the next
+session switch). `DockEntry` itself adds no boundary of its own.

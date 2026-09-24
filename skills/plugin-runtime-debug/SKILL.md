@@ -15,7 +15,7 @@ diagnosis must come from the host source, never from the API's name.
 Before changing any call into a host API, open the implementing package in
 the DSH source checkout (`~/.dsh/source/current`, or the vendored copy) and
 read the actual method — its doc comment, its guards, and the types it
-compares against. Repeat for every value the plugin passes. Three questions
+compares against. Repeat for every value the plugin passes. Four questions
 cover most incidents:
 
 1. **Which text does an offset count into?** When a verb takes a span or an
@@ -35,11 +35,15 @@ cover most incidents:
    own bookkeeping anyway, and the UI renders a "missing/unavailable"
    placeholder next to an object that never went away. Audit every call site
    for the "fire, ignore the result, clean up state anyway" shape.
-4. **Which engine evaluates this line?** Web-platform behaviors that tests
-   run under Node never exercise can be implementation-defined in the
-   browser. The known family: URL parsing of non-special schemes —
-   `new URL('dsh-resource://file/…').hostname` is `"file"` in Node and
-   current Chromium but `""` on some Edge builds, silently. Any host or
+4. **Which engine evaluates this line?** Web-platform behavior that tests
+   run under Node never exercise can differ in the user's browser, because
+   older engines predate the current standard. The known family: URL
+   parsing of non-special schemes — the WHATWG URL Standard requires
+   `new URL('dsh-resource://file/…').hostname` to be `"file"`, which Node
+   and current Chromium return, but Chromium before its standards-compliant
+   non-special URL parsing change returned `""`, so an older Chromium-based
+   Edge build returns `""`, silently. Record the exact browser version when
+   you see this. Any host or
    plugin code that routes by `URL.hostname`/`.pathname` on a custom scheme
    works in every Node-based test and fails only in affected real browsers.
    Before trusting a URL property on a custom scheme, assert it in the
@@ -144,7 +148,7 @@ cover most incidents:
    chip labels, console output) — they are the contract of the bug report.
 2. Map each string to the code path that emitted it; identify the host verb
    at the boundary.
-3. Open the host source for that verb; answer the three standing questions.
+3. Open the host source for that verb; answer the four standing questions.
 4. State the mismatch precisely (which representation, which guard, which
    call sites) before writing any fix; if you cannot state it, you have not
    read enough source.

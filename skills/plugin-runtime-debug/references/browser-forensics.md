@@ -41,8 +41,17 @@ session:
   32-byte secret**, not the base64url string.
 
 Read `BrowserAuth` in `@deepseek-ai/dsh-client-connection` once and mirror
-it; treat the minted cookie as a local diagnostic credential (revoke by
-deleting the record) and never paste it into anything.
+it.
+
+> **Warning — the minted cookie and the signing secret are live
+> credentials.** Anyone holding the cookie has a full authenticated session
+> on that `dsh web` instance until it expires, and anyone holding the
+> secret can mint more. Never paste the cookie, the secret, or the
+> `.credentials.yaml` record into a chat, issue, PR, log excerpt, screenshot
+> or bug report; redact them from CDP traces before sharing. Keep the
+> minting script local and read the secret at run time instead of
+> hard-coding it. To revoke, delete the `client-connection/browser-session`
+> record.
 
 ## Driving the page (Node + CDP, no extra dependencies)
 
@@ -83,7 +92,8 @@ changes served bytes on the next page load without any host restart.
 
 Discipline that keeps this reversible:
 
-1. `Copy-Item <file> <file>.bak` before every patch round; one patch round
+1. Back up before every patch round — `cp <file> <file>.bak` (POSIX
+   shells) or `Copy-Item <file> <file>.bak` (PowerShell); one patch round
    adds exactly one decisive log line (e.g. the inputs AND the branch
    result of the suspect function), not a scatter of traces.
 2. Reload the driven browser, read the line, restore from `.bak`
@@ -123,15 +133,27 @@ providers=["subagentchat","plan","file"]
 ```
 
 Root cause: `protocolOf()` in `dsh-client-resources` read the protocol from
-`new URL(address).hostname`. `dsh-resource:` is a non-special scheme, and
-host parsing for non-special schemes is implementation-defined: Node 24 and
-Chrome 153 return `"file"`; the maintainer's Edge build returns `""`. The
+`new URL(address).hostname`. `dsh-resource:` is a non-special scheme. The
+WHATWG URL Standard is not ambiguous here: a non-special URL written with
+`//` has an (opaque) host, so `new URL('dsh-resource://file/…').hostname`
+must be `"file"` — which is what Node 24 and Chrome 153 return. Chromium
+before its standards-compliant non-special URL parsing change (the
+`StandardCompliantNonSpecialSchemeURLParsing` work, shipped around
+Chrome 130) treated everything after the scheme as an opaque path and
+returned `""`. An Edge that returns `""` therefore implies an older
+Chromium-based Edge build (or one where that change is not yet enabled),
+not a legitimate spec variant. Record the exact Edge version
+(`edge://version`, or `navigator.userAgent` / `Browser.getVersion` over CDP)
+in the report so the divergence can be matched to the Chromium base. The
 router then asked for a provider by `undefined` forever; the store stayed
 at `status:'none'`, which is exactly what the fallback string renders.
 
 Cross-engine confirmation (same address, driven headless browsers): Node
 `hostname="file"`, Chrome 153 `hostname="file"`, Edge `hostname=""`. That
-table — not the symptom — is what made the diagnosis defensible.
+table — not the symptom — is what made the diagnosis defensible; add the
+Edge version string to it when you reproduce this, because it is what ties
+the `""` to an older Chromium base. Hand parsing (below) is still the right
+fix: the plugin cannot choose which Edge build its users run.
 
 Fix (hot-patched into the install tree, reported upstream): parse the
 protocol by hand —

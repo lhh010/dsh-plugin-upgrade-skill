@@ -4,7 +4,7 @@
   "model": "openrouter/stealth/union-alpha",
   "model_notes": "anonymous internal-beta via OpenRouter; 256K context; pricing 0 at run time; knowledge cutoff undisclosed; snapshot date 2026-09-17",
   "base_commit": "f8ab0145f97b8de1b4abea88fa0c1090e66b4e00",
-  "notes": "pilot S1-S5 first, then full S1-S22 x2 single-shot; concurrency 1 (user override); judge planned glm-5.3-flash (separate pass); judged 2026-09-17 by 44 glm-5.3-flash judge subagents (44/44 verdicts, canonical口径); aggregate: noskill 2158 / skill 2190 / lift +32 (+1.5pp)",
+  "notes": "pilot S1-S5 first, then full S1-S22 x2 single-shot; concurrency 1 (serial) for the pilot and start of the full run, raised to a cap of 2 by user directive at 2026-09-17T07:57:55Z (see concurrency_policy_update; the later retry_policy_update text 'strictly single concurrency' predates that raise by ~4 minutes); top-level concurrency=2 is the cap in effect at the end of the run. Judged 2026-09-17 by 44 glm-5.3-flash judge subagents (44/44 verdicts, canonical judge). Aggregate (half-points preserved, recomputed from verdicts): noskill 2157.5 / skill 2190 / lift +32.5 (+1.48 pp). Paired clean subset excluding input-exposed tasks S1, S2, S3, S8, S17, S20 from both arms (16 tasks): noskill 1575/1600 / skill 1590/1600 / lift +15 (+0.94 pp).",
   "concurrency": 2,
   "claim_issue_skipped": true,
   "execution_events": [
@@ -2502,5 +2502,30 @@
   },
   "solver_completed": true,
   "judge_model": "zai/glm-5.3-flash",
-  "identity_disclosed": "2026-09-18: stealth/union-alpha claimed by Unbiased (unbiased.ai) as Pareto (composite model; paid openrouter/unbiased/pareto). All run data was collected 2026-09-17 under the anonymous free stealth window; scores and judging are unchanged, provenance description only."
+  "identity_disclosed": "2026-09-18: stealth/union-alpha claimed by Unbiased (unbiased.ai) as Pareto (composite model; paid openrouter/unbiased/pareto). All run data was collected 2026-09-17 under the anonymous free stealth window; scores and judging are unchanged, provenance description only.",
+  "arithmetic_correction": "2026-09-24: S20 noskill verdict (5 pass + corridor-mapping partial on 5 points) scores 97.5; aggregate previously rounded it to 98. Totals corrected from 2158/2190/+32 to 2157.5/2190/+32.5. Reports and verdicts unchanged.",
+  "input_exposure_summary": {
+    "noskill_pre_restriction": [
+      "S1-static-scan",
+      "S2-negative-scan",
+      "S3-snapshot-migration"
+    ],
+    "noskill_search_beyond_fixture": [
+      "S17-external-ui-plugin-onboarding-trap",
+      "S20-msvc-flock-trap"
+    ],
+    "skill_benchmark_answer_exposure": [
+      "S8-release-routing-trap"
+    ],
+    "paired_clean_subset_excludes": [
+      "S1-static-scan",
+      "S2-negative-scan",
+      "S3-snapshot-migration",
+      "S8-release-routing-trap",
+      "S17-external-ui-plugin-onboarding-trap",
+      "S20-msvc-flock-trap"
+    ],
+    "sources": "protocol_amendments, methodology_observations, contamination_log, pilot_gate.verdict",
+    "note": "Exposed cells were judged as-run and are not rescored; the clean subset is a sensitivity analysis, not a replacement."
+  }
 }

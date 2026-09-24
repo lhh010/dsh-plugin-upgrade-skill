@@ -1,9 +1,14 @@
 # Task annotation v1 — incident-family annotation pipeline
 
-Outcome-blind, reproducible task annotation for the paper's T5 work item
-(`paper/GAP-ANALYSIS.zh.md` T5: 事件分组与可观察任务标注). Groups the
+Outcome-blind, reproducible task annotation supporting incident grouping in the
+[current work plan](../../INVERTED-U-WORKPLAN.zh.md). Groups the
 56-task target pool by **underlying incident family** and **observable trap
 mechanism** using only task-construction evidence — never model outcomes.
+
+The `inventoryPlanReference` field preserves historical plan filenames verbatim
+as provenance, not live links or current instructions. Those deleted plans can
+be read at Git commit `c03140cafa718e96fd2b78d050922360d2f1db99`; inventory
+membership, hashes, and annotation status were not changed by document cleanup.
 
 ## Status
 

@@ -186,4 +186,6 @@ does not grade solutions, does not run a solver, and does not estimate effect
 sizes. Completing all 16 cells would still be development evidence: the pilot is
 excluded from the formal main table, one model's 16 cells cannot support a D−C
 claim, and the study remains `candidate-not-frozen` with `formalRunAllowed:
-false` until the P0 blockers in `paper/NEXT-STEPS.zh.md` are closed.
+false` until its material/QC, isolation, model configuration, and protocol
+freeze requirements are satisfied (see [study status](README.zh.md) and
+[configuration](config.json)). Removing old paper plans does not relax these gates.

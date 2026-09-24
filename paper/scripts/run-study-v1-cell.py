@@ -5,7 +5,8 @@ THIS IS DEVELOPMENT INFRASTRUCTURE. NOT A FORMAL RESULT PIPELINE YET.
 
 Runs (or, by default, only plans) ONE study-v1 cell: a single
 (task, condition) pair of the ``budgeted-small-model-migration-v1`` study.
-It exists to fill the P0-1 gap in ``paper/NEXT-STEPS.zh.md``: the existing
+This optional source-matched runner is separate from the inverted-U work plan.
+The existing
 ``pilot-study-v1.py`` only prepares directories and probes Docker; there was
 no reusable four-condition solver runner.
 

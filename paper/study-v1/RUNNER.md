@@ -5,8 +5,9 @@
 `paper/scripts/run-study-v1-cell.py` runs **one cell** of the
 `budgeted-small-model-migration-v1` study: a single
 `(task, condition)` pair, where condition is one of `A|B|C|D`
-(`paper/study-v1/config.json`). It fills the P0-1 gap recorded in
-`paper/NEXT-STEPS.zh.md`: `pilot-study-v1.py` only stages directories and
+(`paper/study-v1/config.json`). This optional source-matched study is separate
+from the current [inverted-U work plan](../INVERTED-U-WORKPLAN.zh.md).
+`pilot-study-v1.py` only stages directories and
 probes Docker, and `benchmark/report-judge/codex-judge.mjs` is a judge
 transport, not a four-condition solver.
 

@@ -1,16 +1,25 @@
 // benchmark/scripts/measure-paired-effect.mjs
 //
-// Deterministic paired-effect statistics for the three completed
-// skill-vs-noskill experiments. Task-level pairing follows the preregistered
+// Deterministic paired-effect statistics for the completed skill-vs-noskill
+// experiments: five main groups along the capability axis plus one
+// sensitivity group. Task-level pairing follows the preregistered
 // analysisPolicy in benchmark/holdouts/temporal-holdout-execution-v1.json:
 //
 //   - glm-5.3-flash and glm-5.2 (S1–S22, 3 rounds per arm): per-task median of
 //     the 3 rounds per condition, delta = skillMedian − noskillMedian.
 //   - qwen3.8-27b (56 tasks, 3 attempts per arm): per-task mean of the scored
-//     rewards per condition, delta = withSkillMean − noSkillMean, rescaled by
-//     100 so it is comparable to the 0–100 rubric points of the glm groups.
-//     NO-REWARD trials (null rewards) are anomalies, never zeros — the same
-//     semantics as summarize-runs.mjs; the count is reported per group.
+//     rewards per condition, rescaled by 100.
+//   - deepseek-v4-flash (23 tasks, 3 runs per arm): per-task median of the raw
+//     run rewards per condition (H8 with-skill has 2 runs), rescaled by 100.
+//   - gpt-5.6-terra (21 of 22 tasks) and gpt-5.6-luna (18 tasks): single-shot
+//     per-task pairing, rescaled by 100; no per-task median exists. luna is a
+//     SENSITIVITY group (contaminated no-skill arm) and never enters the
+//     paper's main table.
+//   NO-REWARD trials (null rewards, verifier-excluded tasks) are anomalies,
+//   never zeros — the same semantics as summarize-runs.mjs; counts and
+//   excluded tasks are reported per group. The 2026-09-01 groups read only
+//   the extracted paired-scores.json files (see their PROVENANCE.md), never
+//   the markdown reports.
 //
 // Inference:
 //   1. Paired bootstrap over task deltas (resampling unit = task), 10000
@@ -21,8 +30,7 @@
 //      zeroHandling ("zeros are retained"): zeros are EXCLUDED here, the
 //      standard textbook convention; the zero count is reported as nZero.
 //      Ties receive midpoint ranks, the tie-corrected normal approximation
-//      with continuity correction is used (n = 22/56), output is z and the
-//      two-sided p.
+//      with continuity correction is used, output is z and the two-sided p.
 //
 // Validation (hard failures, non-zero exit):
 //   - glm groups: 22 records per round file, task sets identical across the 3
@@ -32,6 +40,10 @@
 //     entry null or a number in [0, 1] and at least one scored reward; the
 //     trial-weighted scored means must match 0.4494 (no-skill) / 0.4160
 //     (with-skill) within 1e-3.
+//   - paired-scores groups (deepseek/terra/luna): unique tasks, arms are a
+//     reward in [0, 1], an array of 1-3 run rewards, or null (null requires an
+//     exclusion reason); per-task arm totals must match the source reports
+//     (16.09/18.55 within 0.0051, 14.93/16.75, 12.42/15.15).
 //
 // Usage (from anywhere; paths resolve against the repo root):
 //   node benchmark/scripts/measure-paired-effect.mjs           # write + print summary
@@ -80,6 +92,7 @@ const GLM_GROUPS = [
   {
     label: 'glm-5.3-flash',
     design: 'S1-S22 × 3 rounds per arm, per-task median',
+    protocol: '3-round median',
     dirs: [
       'benchmark/results/artifacts/2026-09-11-glm-5.3-flash-s1-s22',
       'benchmark/results/artifacts/2026-09-11-glm-5.3-flash-s1-s22-round2',
@@ -90,6 +103,7 @@ const GLM_GROUPS = [
   {
     label: 'glm-5.2',
     design: 'S1-S22 × 3 rounds per arm, per-task median',
+    protocol: '3-round median',
     dirs: [
       'benchmark/results/artifacts/2026-09-13-glm-5.2-s1-s22',
       'benchmark/results/artifacts/2026-09-13-glm-5.2-s1-s22-round2',
@@ -102,9 +116,43 @@ const GLM_GROUPS = [
 const QWEN_GROUP = {
   label: 'qwen3.8-27b',
   design: '56 tasks × 3 attempts per arm, per-task mean of scored rewards × 100',
+  protocol: '3 scored, mean',
   file: 'benchmark/results/validation-report-2026-09-11-codex-qwen3.8-27b-medium-paired.json',
   expectedTrialMeans: { 'no-skill': 0.4494, 'with-skill': 0.4160 },
   tolerance: 1e-3,
+}
+
+// Groups whose per-task scores were extracted from report tables into
+// machine-readable paired-scores.json files (see each directory's
+// PROVENANCE.md). The script reads only the extracted JSON, never the report.
+const DEEPSEEK_GROUP = {
+  label: 'deepseek-v4-flash',
+  design: '23 tasks × 3 runs per arm, per-task median (terminus-2 harness, legacy keyword verifiers)',
+  protocol: '3-run median',
+  file: 'benchmark/results/artifacts/2026-09-01-terminus2-deepseek-v4-flash/paired-scores.json',
+  expectedMedianTotals: [16.09, 18.55], // [noskill, skill], report values
+  // H8 with-skill has 2 runs; the report rounds its 0.695 two-run median to 0.70 (see PROVENANCE.md)
+  totalsTolerance: 0.0051,
+}
+
+const TERRA_GROUP = {
+  label: 'gpt-5.6-terra',
+  design: '21 of 22 tasks, single attempt per arm (H8 excluded: verifier timeout on both arms)',
+  protocol: 'single-shot',
+  file: 'benchmark/results/artifacts/2026-09-01-codex-gpt-5.6-terra/paired-scores.json',
+  expectedMedianTotals: [14.93, 16.75],
+  totalsTolerance: 1e-6,
+}
+
+const LUNA_GROUP = {
+  label: 'gpt-5.6-luna',
+  design: '18 tasks, single attempt per arm (H8 not in the 2026-09-01 snapshot)',
+  protocol: 'single-shot',
+  file: 'benchmark/results/artifacts/2026-09-01-codex-gpt-5.6-luna/paired-scores.json',
+  expectedMedianTotals: [12.42, 15.15],
+  totalsTolerance: 1e-6,
+  sensitivity: true,
+  contamination: 'no-skill arm is not a literal zero-skill run: the H2/H3 trajectories read the Codex-native plugin-creator skill; the decontaminated 16-task no-skill subset (10.42/16 = 0.6513) is diagnostic only',
 }
 
 // ── Deterministic PRNG and statistics ─────────────────────────────────────────
@@ -280,7 +328,7 @@ function loadGlmGroup(repoRoot, spec) {
   if (totals[0] !== spec.expectedMedianTotals[0] || totals[1] !== spec.expectedMedianTotals[1]) {
     throw new Error(`${spec.label}: per-task median totals ${totals[0]}/${totals[1]} do not match the expected ${spec.expectedMedianTotals[0]}/${spec.expectedMedianTotals[1]}`)
   }
-  return { label: spec.label, design: spec.design, scale: 'rubric points (0-100)', inputs, perTask, unscoredTrials: 0 }
+  return { label: spec.label, design: spec.design, protocol: spec.protocol, scale: 'rubric points (0-100)', inputs, perTask, unscoredTrials: 0, excludedTasks: [], sensitivity: false, contamination: null }
 }
 
 function loadQwenGroup(repoRoot, spec) {
@@ -342,10 +390,98 @@ function loadQwenGroup(repoRoot, spec) {
   return {
     label: spec.label,
     design: spec.design,
+    protocol: spec.protocol,
     scale: 'percent (reward mean × 100)',
     inputs: [{ path: spec.file, sha256: sha256Of(abs) }],
     perTask,
     unscoredTrials,
+    excludedTasks: [],
+    sensitivity: false,
+    contamination: null,
+  }
+}
+
+// Load a group from an extracted paired-scores.json (deepseek/terra/luna).
+// Arms are either a single reward (single-shot) or an array of 2-3 raw run
+// rewards (per-task median); null arms mark verifier-excluded tasks.
+function loadPairedScoresGroup(repoRoot, spec) {
+  const abs = join(repoRoot, spec.file)
+  const parsed = loadJson(abs)
+  if (parsed === null || typeof parsed !== 'object' || !Array.isArray(parsed.tasks)) {
+    throw new Error(`${spec.file}: expected an object with a "tasks" array`)
+  }
+  const seen = new Set()
+  const perTask = []
+  const excludedTasks = []
+  let unscoredTrials = 0
+  const armValues = { noskill: [], skill: [] }
+  for (const entry of parsed.tasks) {
+    if (entry === null || typeof entry !== 'object' || typeof entry.task !== 'string' || entry.task === '') {
+      throw new Error(`${spec.file}: task entry has no task name`)
+    }
+    if (seen.has(entry.task)) throw new Error(`${spec.file}: duplicate task "${entry.task}"`)
+    seen.add(entry.task)
+    const arms = {}
+    let excluded = false
+    for (const arm of ['noskill', 'skill']) {
+      const value = entry[arm]
+      if (value === null || value === undefined) {
+        excluded = true
+        continue
+      }
+      if (typeof value === 'number') {
+        if (Number.isNaN(value) || value < 0 || value > 1) {
+          throw new Error(`${spec.file}: task "${entry.task}" arm "${arm}" has malformed reward ${JSON.stringify(value)} (must be in [0, 1])`)
+        }
+        arms[arm] = value
+      } else if (Array.isArray(value) && value.length >= 1 && value.length <= 3) {
+        for (const run of value) {
+          if (typeof run !== 'number' || Number.isNaN(run) || run < 0 || run > 1) {
+            throw new Error(`${spec.file}: task "${entry.task}" arm "${arm}" has malformed run reward ${JSON.stringify(run)} (must be in [0, 1])`)
+          }
+        }
+        unscoredTrials += 3 - value.length
+        arms[arm] = median(value)
+      } else {
+        throw new Error(`${spec.file}: task "${entry.task}" arm "${arm}" must be a reward, an array of 1-3 run rewards, or null, got ${JSON.stringify(value)}`)
+      }
+    }
+    if (excluded) {
+      if (typeof entry.excluded !== 'string' || entry.excluded === '') {
+        throw new Error(`${spec.file}: task "${entry.task}" has a null arm but no "excluded" reason`)
+      }
+      excludedTasks.push({ task: entry.task, reason: entry.excluded })
+      continue
+    }
+    armValues.noskill.push(arms.noskill)
+    armValues.skill.push(arms.skill)
+    perTask.push({
+      task: entry.task,
+      noskill: round4(arms.noskill * 100),
+      skill: round4(arms.skill * 100),
+      delta: round4((arms.skill - arms.noskill) * 100),
+    })
+  }
+  const totals = [
+    armValues.noskill.reduce((sum, value) => sum + value, 0),
+    armValues.skill.reduce((sum, value) => sum + value, 0),
+  ]
+  for (const [index, arm] of [[0, 'noskill'], [1, 'skill']]) {
+    if (Math.abs(totals[index] - spec.expectedMedianTotals[index]) > spec.totalsTolerance) {
+      throw new Error(`${spec.label}: per-task ${arm} total ${round4(totals[index])} differs from the report value ${spec.expectedMedianTotals[index]} by more than ${spec.totalsTolerance}`)
+    }
+  }
+  return {
+    label: spec.label,
+    design: spec.design,
+    protocol: spec.protocol,
+    scale: 'percent (reward × 100)',
+    inputs: [{ path: spec.file, sha256: sha256Of(abs) }],
+    perTask,
+    unscoredTrials,
+    excludedTasks,
+    sensitivity: spec.sensitivity === true,
+    contamination: spec.contamination ?? null,
   }
 }
 
@@ -358,9 +494,13 @@ function analyzeGroup(loaded) {
   return {
     label: loaded.label,
     design: loaded.design,
+    protocol: loaded.protocol,
     scale: loaded.scale,
+    sensitivity: loaded.sensitivity,
+    contamination: loaded.contamination,
     tasks: loaded.perTask.length,
     unscoredTrials: loaded.unscoredTrials,
+    excludedTasks: loaded.excludedTasks,
     inputs: loaded.inputs,
     perTask: loaded.perTask,
     meanNoskill: round4(mean(loaded.perTask.map((row) => row.noskill))),
@@ -381,9 +521,15 @@ function analyzeGroup(loaded) {
 }
 
 export function measure(repoRoot) {
+  // Main groups ordered along the capability axis (weakest first); the
+  // sensitivity group (luna, contaminated no-skill arm) is appended last and
+  // never enters the paper's main table.
   const groups = [
-    ...GLM_GROUPS.map((spec) => loadGlmGroup(repoRoot, spec)),
     loadQwenGroup(repoRoot, QWEN_GROUP),
+    loadPairedScoresGroup(repoRoot, DEEPSEEK_GROUP),
+    loadPairedScoresGroup(repoRoot, TERRA_GROUP),
+    ...GLM_GROUPS.map((spec) => loadGlmGroup(repoRoot, spec)),
+    loadPairedScoresGroup(repoRoot, LUNA_GROUP),
   ].map(analyzeGroup)
   return {
     schemaVersion: 1,
@@ -414,11 +560,12 @@ export function renderMarkdown(report) {
   lines.push('')
   lines.push(`PRNG ${report.prng} (seed ${report.seed}), ${report.bootstrapReplicates} bootstrap replicates. ${report.method}.`)
   lines.push('')
-  lines.push('| Group | Tasks | Mean noskill | Mean skill | Mean Δ | Median Δ | 95% CI (bootstrap) | Wilcoxon z | p (two-sided) | nZero |')
-  lines.push('| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |')
+  lines.push('| Group | Tasks | Protocol | Mean noskill | Mean skill | Mean Δ | Median Δ | 95% CI (bootstrap) | Wilcoxon z | p (two-sided) | nZero |')
+  lines.push('| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |')
   for (const group of report.groups) {
     const ci = `[${fmt(group.bootstrap.ci95[0])}, ${fmt(group.bootstrap.ci95[1])}]`
-    lines.push(`| ${group.label} | ${group.tasks} | ${fmt(group.meanNoskill)} | ${fmt(group.meanSkill)} | ${fmt(group.meanDelta)} | ${fmt(group.medianDelta)} | ${ci} | ${fmt(group.wilcoxon.z)} | ${fmt(group.wilcoxon.pTwoSided)} | ${group.nZero} |`)
+    const label = group.sensitivity ? `${group.label} (sensitivity)` : group.label
+    lines.push(`| ${label} | ${group.tasks} | ${group.protocol} | ${fmt(group.meanNoskill)} | ${fmt(group.meanSkill)} | ${fmt(group.meanDelta)} | ${fmt(group.medianDelta)} | ${ci} | ${fmt(group.wilcoxon.z)} | ${fmt(group.wilcoxon.pTwoSided)} | ${group.nZero} |`)
   }
   lines.push('')
   return lines.join('\n')

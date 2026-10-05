@@ -4,717 +4,17 @@
     "method": "llm-rubric",
     "noskill": 45,
     "noskill_decisions": "pass,partial,partial,partial,partial,partial,partial,fail,partial",
-    "noskill_awarded": [
-      {
-        "id": "source-patch",
-        "verdict": "pass",
-        "points": 10,
-        "awarded": 10
-      },
-      {
-        "id": "events",
-        "verdict": "partial",
-        "points": 10,
-        "awarded": 5
-      },
-      {
-        "id": "host-services",
-        "verdict": "partial",
-        "points": 10,
-        "awarded": 5
-      },
-      {
-        "id": "host-path",
-        "verdict": "partial",
-        "points": 10,
-        "awarded": 5
-      },
-      {
-        "id": "ui",
-        "verdict": "partial",
-        "points": 10,
-        "awarded": 5
-      },
-      {
-        "id": "channel",
-        "verdict": "partial",
-        "points": 10,
-        "awarded": 5
-      },
-      {
-        "id": "subprocess",
-        "verdict": "partial",
-        "points": 10,
-        "awarded": 5
-      },
-      {
-        "id": "mapping",
-        "verdict": "fail",
-        "points": 20,
-        "awarded": 0
-      },
-      {
-        "id": "limits",
-        "verdict": "partial",
-        "points": 10,
-        "awarded": 5
-      }
-    ],
     "skill": 100,
     "skill_decisions": "pass,pass,pass,pass,pass,pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "source-patch",
-        "verdict": "pass",
-        "points": 10,
-        "awarded": 10
-      },
-      {
-        "id": "events",
-        "verdict": "pass",
-        "points": 10,
-        "awarded": 10
-      },
-      {
-        "id": "host-services",
-        "verdict": "pass",
-        "points": 10,
-        "awarded": 10
-      },
-      {
-        "id": "host-path",
-        "verdict": "pass",
-        "points": 10,
-        "awarded": 10
-      },
-      {
-        "id": "ui",
-        "verdict": "pass",
-        "points": 10,
-        "awarded": 10
-      },
-      {
-        "id": "channel",
-        "verdict": "pass",
-        "points": 10,
-        "awarded": 10
-      },
-      {
-        "id": "subprocess",
-        "verdict": "pass",
-        "points": 10,
-        "awarded": 10
-      },
-      {
-        "id": "mapping",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "limits",
-        "verdict": "pass",
-        "points": 10,
-        "awarded": 10
-      }
-    ],
     "delta": 55
-  },
-  {
-    "task": "S2-negative-scan",
-    "method": "llm-rubric",
-    "noskill": 80,
-    "noskill_decisions": "partial,pass,pass,pass",
-    "noskill_awarded": [
-      {
-        "id": "host-break",
-        "verdict": "partial",
-        "points": 40,
-        "awarded": 20
-      },
-      {
-        "id": "negative-coverage",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "inference-boundary",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "verification-plan",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
-    "skill": 100,
-    "skill_decisions": "pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "host-break",
-        "verdict": "pass",
-        "points": 40,
-        "awarded": 40
-      },
-      {
-        "id": "negative-coverage",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "inference-boundary",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "verification-plan",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
-    "delta": 20
-  },
-  {
-    "task": "S3-snapshot-migration",
-    "method": "llm-rubric",
-    "noskill": 30,
-    "noskill_decisions": "partial,partial,fail,fail,partial",
-    "noskill_awarded": [
-      {
-        "id": "chat-projection",
-        "verdict": "partial",
-        "points": 20,
-        "awarded": 10
-      },
-      {
-        "id": "session-lifecycle",
-        "verdict": "partial",
-        "points": 20,
-        "awarded": 10
-      },
-      {
-        "id": "type-and-inject",
-        "verdict": "fail",
-        "points": 20,
-        "awarded": 0
-      },
-      {
-        "id": "slot-registration",
-        "verdict": "fail",
-        "points": 20,
-        "awarded": 0
-      },
-      {
-        "id": "mapping-and-plan",
-        "verdict": "partial",
-        "points": 20,
-        "awarded": 10
-      }
-    ],
-    "skill": 100,
-    "skill_decisions": "pass,pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "chat-projection",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "session-lifecycle",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "type-and-inject",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "slot-registration",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "mapping-and-plan",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
-    "delta": 70
-  },
-  {
-    "task": "S4-legacy-client-imports",
-    "method": "llm-rubric",
-    "noskill": 62.5,
-    "noskill_decisions": "pass,partial,partial,partial",
-    "noskill_awarded": [
-      {
-        "id": "runtime-removal",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "registration-id",
-        "verdict": "partial",
-        "points": 25,
-        "awarded": 12.5
-      },
-      {
-        "id": "session-content",
-        "verdict": "partial",
-        "points": 25,
-        "awarded": 12.5
-      },
-      {
-        "id": "connection-face",
-        "verdict": "partial",
-        "points": 25,
-        "awarded": 12.5
-      }
-    ],
-    "skill": 100,
-    "skill_decisions": "pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "runtime-removal",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "registration-id",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "session-content",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "connection-face",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      }
-    ],
-    "delta": 37.5
-  },
-  {
-    "task": "S5-negative-naming",
-    "method": "llm-rubric",
-    "noskill": 100,
-    "noskill_decisions": "pass,pass,pass,pass",
-    "noskill_awarded": [
-      {
-        "id": "official-short-name",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "service-collision-advice",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "shared-event-context",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "coverage-and-registry-limits",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      }
-    ],
-    "skill": 100,
-    "skill_decisions": "pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "official-short-name",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "service-collision-advice",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "shared-event-context",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "coverage-and-registry-limits",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      }
-    ],
-    "delta": 0
-  },
-  {
-    "task": "S6-corridor-net-state",
-    "method": "llm-rubric",
-    "noskill": 75,
-    "noskill_decisions": "pass,pass,partial,partial",
-    "noskill_awarded": [
-      {
-        "id": "corridor-net-state",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "remove-marker-stripping",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "informational-producer",
-        "verdict": "partial",
-        "points": 25,
-        "awarded": 12.5
-      },
-      {
-        "id": "public-append-gap",
-        "verdict": "partial",
-        "points": 25,
-        "awarded": 12.5
-      }
-    ],
-    "skill": 100,
-    "skill_decisions": "pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "corridor-net-state",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "remove-marker-stripping",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "informational-producer",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "public-append-gap",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      }
-    ],
-    "delta": 25
-  },
-  {
-    "task": "S7-unpublished-cohort",
-    "method": "llm-rubric",
-    "noskill": 100,
-    "noskill_decisions": "pass,pass,pass,pass",
-    "noskill_awarded": [
-      {
-        "id": "published-version-evidence",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "caret-resolution",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "workable-baseline-plan",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "reproducibility-and-exit",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      }
-    ],
-    "skill": 100,
-    "skill_decisions": "pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "published-version-evidence",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "caret-resolution",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "workable-baseline-plan",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      },
-      {
-        "id": "reproducibility-and-exit",
-        "verdict": "pass",
-        "points": 25,
-        "awarded": 25
-      }
-    ],
-    "delta": 0
-  },
-  {
-    "task": "S8-release-routing-trap",
-    "method": "llm-rubric",
-    "noskill": 70,
-    "noskill_decisions": "pass,pass,fail,pass,partial",
-    "noskill_awarded": [
-      {
-        "id": "missing-mirror-tag",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "runtime-compatibility-direction",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "frozen-runtime-remedy",
-        "verdict": "fail",
-        "points": 20,
-        "awarded": 0
-      },
-      {
-        "id": "tag-distribution-repair",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "version-routing-docs",
-        "verdict": "partial",
-        "points": 20,
-        "awarded": 10
-      }
-    ],
-    "skill": 90,
-    "skill_decisions": "pass,pass,partial,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "missing-mirror-tag",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "runtime-compatibility-direction",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "frozen-runtime-remedy",
-        "verdict": "partial",
-        "points": 20,
-        "awarded": 10
-      },
-      {
-        "id": "tag-distribution-repair",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "version-routing-docs",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
-    "delta": 20
-  },
-  {
-    "task": "S9-composer-coordinate-trap",
-    "method": "llm-rubric",
-    "noskill": 100,
-    "noskill_decisions": "pass,pass,pass,pass,pass",
-    "noskill_awarded": [
-      {
-        "id": "projection-contract",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "repeat-paste-failure",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "removal-and-bookkeeping",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "conversion-and-success-gate",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "regression-sequences",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
-    "skill": 100,
-    "skill_decisions": "pass,pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "projection-contract",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "repeat-paste-failure",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "removal-and-bookkeeping",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "conversion-and-success-gate",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "regression-sequences",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
-    "delta": 0
   },
   {
     "task": "S10-paste-rename-and-version-chip",
     "method": "llm-rubric",
     "noskill": 100,
     "noskill_decisions": "pass,pass,pass,pass,pass",
-    "noskill_awarded": [
-      {
-        "id": "paste-names-and-scope",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "live-conflict-state",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "stale-tag-display",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "regressions",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "release-hygiene",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "skill": 100,
     "skill_decisions": "pass,pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "paste-names-and-scope",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "live-conflict-state",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "stale-tag-display",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "regressions",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "release-hygiene",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "delta": 0
   },
   {
@@ -722,72 +22,8 @@
     "method": "llm-rubric",
     "noskill": 100,
     "noskill_decisions": "pass,pass,pass,pass,pass",
-    "noskill_awarded": [
-      {
-        "id": "split-chunk-attribution",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "windows-containment-attribution",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "safe-route-fix",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "modal-event-ownership",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "incident-regressions",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "skill": 100,
     "skill_decisions": "pass,pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "split-chunk-attribution",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "windows-containment-attribution",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "safe-route-fix",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "modal-event-ownership",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "incident-regressions",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "delta": 0
   },
   {
@@ -795,72 +31,8 @@
     "method": "llm-rubric",
     "noskill": 100,
     "noskill_decisions": "pass,pass,pass,pass,pass",
-    "noskill_awarded": [
-      {
-        "id": "native-module-owner",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "browser-versus-host-sequence",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "unpinned-dist-tag-resolution",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "safe-exact-commands",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "readme-prevention",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "skill": 100,
     "skill_decisions": "pass,pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "native-module-owner",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "browser-versus-host-sequence",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "unpinned-dist-tag-resolution",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "safe-exact-commands",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "readme-prevention",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "delta": 0
   },
   {
@@ -868,72 +40,8 @@
     "method": "llm-rubric",
     "noskill": 100,
     "noskill_decisions": "pass,pass,pass,pass,pass",
-    "noskill_awarded": [
-      {
-        "id": "removed-api-and-crash",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "peer-check-boundary",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "distinct-breakage-categories",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "author-prevention",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "user-preinstall-check",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "skill": 100,
     "skill_decisions": "pass,pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "removed-api-and-crash",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "peer-check-boundary",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "distinct-breakage-categories",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "author-prevention",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "user-preinstall-check",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "delta": 0
   },
   {
@@ -941,72 +49,8 @@
     "method": "llm-rubric",
     "noskill": 100,
     "noskill_decisions": "pass,pass,pass,pass,pass",
-    "noskill_awarded": [
-      {
-        "id": "junction-deployment",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "host-lock-and-client-cache",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "rename-recovery",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "ordered-activation",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "install-mode-preflight",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "skill": 100,
     "skill_decisions": "pass,pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "junction-deployment",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "host-lock-and-client-cache",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "rename-recovery",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "ordered-activation",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "install-mode-preflight",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "delta": 0
   },
   {
@@ -1014,72 +58,8 @@
     "method": "llm-rubric",
     "noskill": 100,
     "noskill_decisions": "pass,pass,pass,pass,pass",
-    "noskill_awarded": [
-      {
-        "id": "busy-scope-and-trigger",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "slot-boundary",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "attribution-and-isolation",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "fix-and-hardening",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "data-present-regression",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "skill": 100,
     "skill_decisions": "pass,pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "busy-scope-and-trigger",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "slot-boundary",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "attribution-and-isolation",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "fix-and-hardening",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "data-present-regression",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "delta": 0
   },
   {
@@ -1087,72 +67,8 @@
     "method": "llm-rubric",
     "noskill": 100,
     "noskill_decisions": "pass,pass,pass,pass,pass",
-    "noskill_awarded": [
-      {
-        "id": "self-host-failure",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "interrupted-install-signature",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "external-pinned-repair",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "handoff-protocol",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "guard-and-postupgrade-checks",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "skill": 90,
     "skill_decisions": "pass,pass,pass,partial,pass",
-    "skill_awarded": [
-      {
-        "id": "self-host-failure",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "interrupted-install-signature",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "external-pinned-repair",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "handoff-protocol",
-        "verdict": "partial",
-        "points": 20,
-        "awarded": 10
-      },
-      {
-        "id": "guard-and-postupgrade-checks",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "delta": -10
   },
   {
@@ -1160,72 +76,143 @@
     "method": "llm-rubric",
     "noskill": 90,
     "noskill_decisions": "pass,pass,partial,pass,pass",
-    "noskill_awarded": [
-      {
-        "id": "whole-combo-attribution",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "diagnosis-and-packaging",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "cross-entry-slot-registration",
-        "verdict": "partial",
-        "points": 20,
-        "awarded": 10
-      },
-      {
-        "id": "boot-restart-discipline",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "host-and-author-prevention",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "skill": 100,
     "skill_decisions": "pass,pass,pass,pass,pass",
-    "skill_awarded": [
-      {
-        "id": "whole-combo-attribution",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "diagnosis-and-packaging",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "cross-entry-slot-registration",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "boot-restart-discipline",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      },
-      {
-        "id": "host-and-author-prevention",
-        "verdict": "pass",
-        "points": 20,
-        "awarded": 20
-      }
-    ],
     "delta": 10
+  },
+  {
+    "task": "S18-terminal-sprite-render-trap",
+    "method": "llm-rubric",
+    "noskill": 100,
+    "noskill_decisions": "pass,pass,pass,pass,pass",
+    "skill": 100,
+    "skill_decisions": "pass,pass,pass,pass,pass",
+    "delta": 0
+  },
+  {
+    "task": "S19-phantom-update-stale-host",
+    "method": "llm-rubric",
+    "noskill": 100,
+    "noskill_decisions": "pass,pass,pass,pass,pass",
+    "skill": 100,
+    "skill_decisions": "pass,pass,pass,pass,pass",
+    "delta": 0
+  },
+  {
+    "task": "S2-negative-scan",
+    "method": "llm-rubric",
+    "noskill": 80,
+    "noskill_decisions": "partial,pass,pass,pass",
+    "skill": 100,
+    "skill_decisions": "pass,pass,pass,pass",
+    "delta": 20
+  },
+  {
+    "task": "S20-msvc-flock-trap",
+    "method": "llm-rubric",
+    "noskill": 72.5,
+    "noskill_decisions": "pass,pass,partial,partial,pass,fail",
+    "skill": 100,
+    "skill_decisions": "pass,pass,pass,pass,pass,pass",
+    "delta": 27.5
+  },
+  {
+    "task": "S21-resource-service-unavailable-trap",
+    "method": "llm-rubric",
+    "noskill": 100,
+    "noskill_decisions": "pass,pass,pass,pass,pass",
+    "skill": 100,
+    "skill_decisions": "pass,pass,pass,pass,pass",
+    "delta": 0
+  },
+  {
+    "task": "S22-duplicate-insert-boot-crash-trap",
+    "method": "llm-rubric",
+    "noskill": 100,
+    "noskill_decisions": "pass,pass,pass,pass,pass",
+    "skill": 100,
+    "skill_decisions": "pass,pass,pass,pass,pass",
+    "delta": 0
+  },
+  {
+    "task": "S23-passing-compat-guard-trap",
+    "method": "llm-rubric",
+    "noskill": 100,
+    "noskill_decisions": "pass,pass,pass,pass,pass",
+    "skill": 90,
+    "skill_decisions": "pass,pass,pass,pass,partial",
+    "delta": -10
+  },
+  {
+    "task": "S24-dock-cotenant-crash-trap",
+    "method": "llm-rubric",
+    "noskill": 100,
+    "noskill_decisions": "pass,pass,pass,pass,pass",
+    "skill": 100,
+    "skill_decisions": "pass,pass,pass,pass,pass",
+    "delta": 0
+  },
+  {
+    "task": "S3-snapshot-migration",
+    "method": "llm-rubric",
+    "noskill": 30,
+    "noskill_decisions": "partial,partial,fail,fail,partial",
+    "skill": 100,
+    "skill_decisions": "pass,pass,pass,pass,pass",
+    "delta": 70
+  },
+  {
+    "task": "S4-legacy-client-imports",
+    "method": "llm-rubric",
+    "noskill": 62.5,
+    "noskill_decisions": "pass,partial,partial,partial",
+    "skill": 100,
+    "skill_decisions": "pass,pass,pass,pass",
+    "delta": 37.5
+  },
+  {
+    "task": "S5-negative-naming",
+    "method": "llm-rubric",
+    "noskill": 100,
+    "noskill_decisions": "pass,pass,pass,pass",
+    "skill": 100,
+    "skill_decisions": "pass,pass,pass,pass",
+    "delta": 0
+  },
+  {
+    "task": "S6-corridor-net-state",
+    "method": "llm-rubric",
+    "noskill": 75,
+    "noskill_decisions": "pass,pass,partial,partial",
+    "skill": 100,
+    "skill_decisions": "pass,pass,pass,pass",
+    "delta": 25
+  },
+  {
+    "task": "S7-unpublished-cohort",
+    "method": "llm-rubric",
+    "noskill": 100,
+    "noskill_decisions": "pass,pass,pass,pass",
+    "skill": 100,
+    "skill_decisions": "pass,pass,pass,pass",
+    "delta": 0
+  },
+  {
+    "task": "S8-release-routing-trap",
+    "method": "llm-rubric",
+    "noskill": 70,
+    "noskill_decisions": "pass,pass,fail,pass,partial",
+    "skill": 90,
+    "skill_decisions": "pass,pass,partial,pass,pass",
+    "delta": 20
+  },
+  {
+    "task": "S9-composer-coordinate-trap",
+    "method": "llm-rubric",
+    "noskill": 100,
+    "noskill_decisions": "pass,pass,pass,pass,pass",
+    "skill": 100,
+    "skill_decisions": "pass,pass,pass,pass,pass",
+    "delta": 0
   }
 ]

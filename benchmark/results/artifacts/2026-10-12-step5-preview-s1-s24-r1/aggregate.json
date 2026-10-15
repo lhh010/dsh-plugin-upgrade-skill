@@ -1,6 +1,6 @@
 {
   "run": "2026-10-12-step5-preview-s1-s24-r1",
-  "solver": "Step 5 Preview (OpenCode Zen supply, identity unverified, opencode orchestrator)",
+  "solver": "StepFun Step 5 Preview (OpenCode Zen supply, published Step-5-line preview name; exact checkpoint not independently verified; opencode orchestrator)",
   "tasks": 24,
   "attempts": 1,
   "judges": {

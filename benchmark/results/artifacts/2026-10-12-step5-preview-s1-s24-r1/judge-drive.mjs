@@ -6,8 +6,9 @@ const REPO = 'E:/deepseek-harness/dsh-plugin-upgrade-skill'
 const RUN = join(REPO, 'benchmark/results/artifacts/2026-10-12-step5-preview-s1-s24-r1')
 const { RUBRICS } = await import('file:///' + join(REPO, 'benchmark/report-judge/rubrics.mjs').replace(/\\/g, '/'))
 
-// Judge-side adjudication (judge-side-adjudication.md): kept-invalid cells.
-const INVALID = new Set(['S19-phantom-update-stale-host/noskill', 'S19-phantom-update-stale-host/skill', 'S11-mermaid-lazyload-trap/skill'])
+// Judge-side adjudication (judge-side-adjudication.md + 2026-10-16 follow-up):
+// only S19/noskill stays invalid; rerun-clean S19/skill and S11/skill re-enter scoring.
+const INVALID = new Set(['S19-phantom-update-stale-host/noskill'])
 
 const findReports = (arm, task) => {
   const outRoot = join(RUN, arm, task, 'agent-output')

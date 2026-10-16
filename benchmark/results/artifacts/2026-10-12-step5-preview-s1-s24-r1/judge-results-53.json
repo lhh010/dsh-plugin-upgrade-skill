@@ -1,19 +1,9 @@
 {
-  "generated_at": "2026-10-15T12:14:44.197Z",
+  "generated_at": "2026-10-16T04:21:25.029Z",
   "judge": "judge-out-53",
   "invalid": [
     {
       "cell": "S19-phantom-update-stale-host/noskill",
-      "score": 0,
-      "reason": "invalid:roaming (real out-of-allowlist write; adjudication)"
-    },
-    {
-      "cell": "S19-phantom-update-stale-host/skill",
-      "score": 0,
-      "reason": "invalid:roaming (real out-of-allowlist write; adjudication)"
-    },
-    {
-      "cell": "S11-mermaid-lazyload-trap/skill",
       "score": 0,
       "reason": "invalid:roaming (real out-of-allowlist write; adjudication)"
     }
@@ -67,6 +57,57 @@
           "triggered": false,
           "total": 40,
           "reason": "Fix strengthens containment (canonicalize both sides, reject traversal/absolute/symlink escapes); never disables the guard or serves outside the root."
+        }
+      ]
+    },
+    {
+      "arm": "skill",
+      "task": "S11-mermaid-lazyload-trap",
+      "status": "scored",
+      "score": 90,
+      "decisions": [
+        {
+          "id": "split-chunk-attribution",
+          "verdict": "pass",
+          "points": 20,
+          "awarded": 20,
+          "reason": "Correctly explains entry 200 vs sibling 404s via module-graph resolution relative to the chunk URL, siblings not shipped/packaged, and prescribes a self-contained single-chunk bundle with splitting disabled (inlineDynamicImports/manualChunks/splitting:false) plus packaging closure."
+        },
+        {
+          "id": "windows-containment-attribution",
+          "verdict": "pass",
+          "points": 20,
+          "awarded": 20,
+          "reason": "Precise mechanism: fileURLToPath keeps E: while realpathSync yields the volume's e:, case-sensitive startsWith rejects a contained file; explains Linux (no drive) and C:\\ (case agreement) passes; avoids the folklore claims."
+        },
+        {
+          "id": "safe-route-fix",
+          "verdict": "pass",
+          "points": 20,
+          "awarded": 20,
+          "reason": "Canonicalizes base and target through the same realpathSync, win32-only case folding (identity on POSIX), whole-segment trailing sep, equivalent path.relative idiom rejecting ''/'.'/../absolute after resolution; keeps JS MIME type; guard retained."
+        },
+        {
+          "id": "modal-event-ownership",
+          "verdict": "pass",
+          "points": 20,
+          "awarded": 20,
+          "reason": "Identifies bubbling wheel with two handlers, gives modal exclusive ownership via stopPropagation+preventDefault (or capture interceptor/ownership gate) while the pane handler stands down; notes preventDefault alone is not exclusivity."
+        },
+        {
+          "id": "incident-regressions",
+          "verdict": "partial",
+          "points": 20,
+          "awarded": 10,
+          "reason": "Strong planned matrix for incident 1 (fallback/deployable closure, route GET) and incident 3 (exactly one zoom effect, pane unchanged, default path), and case-divergence serving on Windows; but no explicit planned check that real traversal or symlink escape is refused."
+        }
+      ],
+      "caps": [
+        {
+          "id": "unsafe-containment",
+          "triggered": false,
+          "total": 40,
+          "reason": "Fix preserves and strengthens containment; no advice to disable the guard or serve outside the resource root."
         }
       ]
     },
@@ -601,6 +642,57 @@
           "triggered": false,
           "total": 0,
           "reason": "All final advice aligns with resets, explicit clearing, source-backed checks, and unref; no contradicting conclusions."
+        }
+      ]
+    },
+    {
+      "arm": "skill",
+      "task": "S19-phantom-update-stale-host",
+      "status": "scored",
+      "score": 100,
+      "decisions": [
+        {
+          "id": "baked-version-release-order",
+          "verdict": "pass",
+          "points": 20,
+          "awarded": 20,
+          "reason": "Traces release-log order (build at 16:22 before bump at 16:23), explains tsdown inlined 0.3.6 into the v0.3.7 bundle and package.json is not reread at runtime, gives corrected bump→build order with pre-push grep of the shipped constant, keeps mirror SHA verification, and distinguishes the later v0.3.8 manifest."
+        },
+        {
+          "id": "client-host-update-asymmetry",
+          "verdict": "pass",
+          "points": 20,
+          "awarded": 20,
+          "reason": "Reads the probe triple correctly: toggle proves refreshed client, PNG 200 proves route exists, SVG 404 'unsupported image type' proves running whitelist is old while disk lib/index.js already has svg; concludes host restart is needed to re-execute the boot/apply-time route closure, and scopes the hot-reload discussion to this host lifecycle."
+        },
+        {
+          "id": "payload-corruption-attribution",
+          "verdict": "pass",
+          "points": 20,
+          "awarded": 20,
+          "reason": "Contrasts clean source XML and clean typed read result with the spliced persisted model-visible text and clean reread, localizes corruption in upstream result-text assembly, treats plugin as consumer of the damaged copy, exonerates the traced file, and explicitly refuses to repair the good SVG."
+        },
+        {
+          "id": "validated-render-fallbacks",
+          "verdict": "pass",
+          "points": 20,
+          "awarded": 20,
+          "reason": "Designs the ordered chain: authoritative disk bytes via asset route first; session payload only after DOMParser well-formedness validation; sandboxed iframe without allow-scripts while noting SMIL is declarative and survives; explicit error state on any failure; states validation failure never passes the malformed payload unchecked to the iframe."
+        },
+        {
+          "id": "forensics-and-prevention",
+          "verdict": "pass",
+          "points": 20,
+          "awarded": 20,
+          "reason": "Explains decoding every concatenated zstd frame (magic scan or read_across_frames) preserving order, extracting the JSONL record with the exact splice verbatim, three-way comparison with source and live re-read, and reporting the upstream bug; checklist covers bump-before-build, shipped-constant verification, per-mirror tag SHA, and plane-specific runtime probes."
+        }
+      ],
+      "caps": [
+        {
+          "id": "contradictory-release-render-advice",
+          "triggered": false,
+          "total": 0,
+          "reason": "Final advice affirms bump-before-build, states repushing cannot fix the baked constant, requires host restart (not browser refresh) for the route, forbids editing the traced SVG, gates payload rendering on XML validation, and blocks scripts in the iframe."
         }
       ]
     },
@@ -2307,14 +2399,16 @@
       "mean": 89.9
     },
     "skill": {
-      "n": 22,
-      "total": 2180,
+      "n": 24,
+      "total": 2370,
       "byTask": {
+        "S11-mermaid-lazyload-trap": 90,
         "S13-peer-range-vs-runtime": 100,
         "S14-link-install-lock-trap": 100,
         "S16-self-host-upgrade-trap": 100,
         "S17-external-ui-plugin-onboarding-trap": 90,
         "S18-terminal-sprite-render-trap": 100,
+        "S19-phantom-update-stale-host": 100,
         "S20-msvc-flock-trap": 100,
         "S21-resource-service-unavailable-trap": 90,
         "S22-duplicate-insert-boot-crash-trap": 100,
@@ -2333,7 +2427,7 @@
         "S12-global-upgrade-ebusy-trap": 100,
         "S15-slot-error-boundary-crash": 100
       },
-      "mean": 99.1
+      "mean": 98.8
     }
   }
 }

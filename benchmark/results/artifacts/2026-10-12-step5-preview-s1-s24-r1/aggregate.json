@@ -1,13 +1,14 @@
 {
   "run": "2026-10-12-step5-preview-s1-s24-r1",
   "solver": "StepFun Step 5 Preview (OpenCode Zen supply, published Step-5-line preview name; exact checkpoint not independently verified; opencode orchestrator)",
+  "followup": "2026-10-16 adjudication follow-up: S11/skill and S19/skill re-run clean under the out-of-cell write ban and re-enter scoring; S19/noskill stays invalid (the re-run re-introduced real out-of-cell writes via mistyped directory names; see judge-side-adjudication.md). During archive handling the re-run outputs and first-pass judge verdicts were lost to an operator file-move error and fully restored: solver reports recovered verbatim from the orchestrator session store, briefs regenerated, and both judges re-ran the two cells from scratch (this is the recorded verdict set, not the lost one).",
   "tasks": 24,
-  "attempts": 1,
+  "attempts": "1 per scored cell; 3 cells re-run once under the adjudication follow-up",
   "judges": {
     "canonical": "glm-5.3-flash (in-session subagents, sealed briefs)",
     "panel": "glm-5.3 (same protocol, independent run)"
   },
-  "scoring_note": "invalid cells (real out-of-allowlist writes, judge-side adjudication) count 0; means below are over /24 per arm",
+  "scoring_note": "the single invalid cell (S19/noskill) counts 0; means below are over /24 per arm",
   "byTask": {
     "S1-static-scan": {
       "noskill": {
@@ -35,9 +36,8 @@
         "glm53": 100
       },
       "skill": {
-        "flash": 0,
-        "glm53": 0,
-        "invalid": true
+        "flash": 100,
+        "glm53": 90
       }
     },
     "S12-global-upgrade-ebusy-trap": {
@@ -117,9 +117,8 @@
         "invalid": true
       },
       "skill": {
-        "flash": 0,
-        "glm53": 0,
-        "invalid": true
+        "flash": 100,
+        "glm53": 100
       }
     },
     "S2-negative-scan": {
@@ -259,8 +258,8 @@
       "glm53": 2067.5
     },
     "skill": {
-      "flash": 2200,
-      "glm53": 2180
+      "flash": 2400,
+      "glm53": 2370
     }
   },
   "means_over_24": {
@@ -269,15 +268,15 @@
       "glm53": 86.15
     },
     "skill": {
-      "flash": 91.67,
-      "glm53": 90.83
+      "flash": 100,
+      "glm53": 98.75
     }
   },
   "lift_pp": {
-    "flash": 4.48,
-    "glm53": 4.69
+    "flash": 12.81,
+    "glm53": 12.6
   },
   "inter_judge": {
-    "exact_cell_agreement": "36/45 scored cells identical; all 9 divergences are single-step partial/pass boundary moves; no cap triggered under either judge"
+    "exact_cell_agreement": "37/47 scored cells identical; all divergences are single-step partial/pass boundary moves; no cap triggered under either judge"
   }
 }

@@ -43,7 +43,11 @@
   "2026-10-15T08:59Z : run complete (48/48). Final verification: fixture sha256 48/48 verified against repo sources; 47/48 reports present (S3-snapshot-migration/skill = silent-failure, no report by protocol); git status clean for this run (HEAD drift by external sessions to c95a9424, only docs/skill-references changes, task seals untouched).",
   "2026-10-15T09:19Z : S3-snapshot-migration/skill re-run per user request (third attempt overall after two earlier provider-side failures): report produced by a clean session (ses_ec12ffdd); audit (4 sessions merged) verdict invalid:roaming - 2 path-less globs with absolute fixture/skill patterns and 3 empty-argument writes, all from the two failed attempts (ses_ed18c4ae / ses_ecb83523), none from the report-producing session. Final cell status invalid:roaming; no-report cleared; recorded for judge-side adjudication.",
   "2026-10-15T09:24Z : post-wipe restoration audit: full replay of all 48 cells through the rebuilt audit-cell.py against the opencode DB + fixtures (deterministic - verdicts identical to original per-cell audits) regenerated state/ and manifest exposure_audit/roaming_audit/skill_use maps lost in the 06:36Z overwrite; ledger status-priority fixed (invalid:* now outranks relaunched). Final: ok 25 / relaunched 3 / invalid:roaming 20 / pending 0. S3-snapshot-migration/skill re-run per user request: report produced by clean third attempt; audit merges 4 sessions and retains invalid:roaming from the two failed attempts (glob argument-style + empty-write artifacts); if the judge recomputes with the same rules this is the deterministic result.",
-  "2026-10-15T09:31Z : duration column recomputed (fix-durations.py): long durations caused by merged failed/interrupted attempts (quota cancellations, 504 kills, power loss) mixed multi-hour/multi-day inter-attempt gaps into wall time. New semantics: duration = sum of per-attempt session spans (actual solver work time); start/end keep the true first-creation/last-update timeline of all attempts (interruption window remains visible there). update-ledger.py aligned to preserve this. Examples: S2 skill 1695m->16m09s; S3 skill 4584m->54m36s; S9 pair 1321m/1329m->7m51s/17m23s; S19 pair 1091m/1163m->9m53s/76m48s."
+  "2026-10-15T09:31Z : duration column recomputed (fix-durations.py): long durations caused by merged failed/interrupted attempts (quota cancellations, 504 kills, power loss) mixed multi-hour/multi-day inter-attempt gaps into wall time. New semantics: duration = sum of per-attempt session spans (actual solver work time); start/end keep the true first-creation/last-update timeline of all attempts (interruption window remains visible there). update-ledger.py aligned to preserve this. Examples: S2 skill 1695m->16m09s; S3 skill 4584m->54m36s; S9 pair 1321m/1329m->7m51s/17m23s; S19 pair 1091m/1163m->9m53s/76m48s.",
+  "2026-10-16T02:08Z : rerun wave start (adjudication follow-up, 3 cells). Artifacts dir had been committed to branch benchmark/step5-preview-results and vanished from the paper-branch working tree; restored via targeted git checkout + reset to untracked; verified 48/48 reports + ledger intact. Fixtures re-verified (3 cells: nonempty + sha256 match). Original invalid outputs archived to invalidated-2026-10-15/<arm>.<task>/. S19-phantom-update-stale-host/noskill rerun attempts 1-3 failed provider-side (Endpoint unavailable / [504] / quota-limit cancel); per user instruction subsequent direct-timeout cells will be RESUMED via task_id instead of re-dispatched.",
+  "2026-10-16T02:31Z : rerun cell S19-phantom-update-stale-host/noskill: 2 provider failures then resumed via task_id ses_ebfd99e2 (per user instruction). Result: no out-of-cell/TEMP writes (write ban observed; probes stayed in cell tmp-probe/), report produced (32KB). BUT transcript audit verdict=invalid:roaming in both views: merged-5-sessions view includes the ORIGINAL main-run TEMP write (ses_ec5bacc4) plus rerun-window empty-write artifact and mis-typed-path writes (ses_ebff45dc); resume-single-session view shows the solver itself read/wrote the cell under mistyped names (S19-phantom-upgrade-skill / S19-phantom-upgrade-stale-host, i.e. cell-name typos update->upgrade) - real out-of-allowlist accesses to non-existent/neighboring paths, corrected in-session. Fixture intact; final report restored to standard path S19-phantom-update-stale-host-report.md (recovered from DB write call after an orchestrator cleanup misstep; full text byte-verified, fragments archived to invalidated-2026-10-16-fragments/).",
+  "2026-10-16T02:48Z : rerun cell S19-phantom-update-stale-host/skill (fresh instance, single attempt, write-ban prompt): verdict=clean, 31 toolcalls, 80892 tokens, fixture intact, report 31752 bytes at agent-output/S19-phantom-update-stale-host/S19-phantom-update-stale-host.md. Original invalid output archived at invalidated-2026-10-15/skill.S19-phantom-update-stale-host/. ledger status -> rerun.",
+  "2026-10-16T02:48Z : rerun cell S11-mermaid-lazyload-trap/skill (fresh instance, single attempt, write-ban prompt): verdict=clean, 16 toolcalls, 65979 tokens, fixture intact, report at agent-output/S11-mermaid-lazyload-trap/report.md. Original invalid output archived at invalidated-2026-10-15/skill.S11-mermaid-lazyload-trap/. ledger status -> rerun."
  ],
  "solver_prompt": "instruction.md with /app paths rewritten; WORKSPACE BOUNDARY block; arm-specific clause appended verbatim",
  "exposure_audit": {
@@ -73,8 +77,8 @@
   "S18-terminal-sprite-render-trap": "clean"
  },
  "roaming_audit": {
-  "S19-phantom-update-stale-host/noskill": "invalid:[ses_ec5bacc4] write outside allowlist: C:\\Users\\lhh\\AppData\\Local\\Temp\\opencode\\s19_zstd_forensics_check.py",
-  "S19-phantom-update-stale-host/skill": "invalid:[ses_ec5ba895] bash filesystem command without explicit allowed path (acts on session cwd E:/deepseek-harness/dsh-plugin-upgrade-skill): node -e \"const z=require('zlib'); console.log('node', process.v;[ses_ec5ba895] bash filesystem command without explicit allowed path (acts on session cwd E:/deepseek-harness/dsh-plugin-upgrade-skill): node -e \"const z=require('zlib'); try { const b=z.zstdCompressS;[ses_ec1d9d15] write without filePath;[ses_ec1d9d15] write outside allowlist: C:\\Users\\lhh\\AppData\\Local\\Temp\\opencode\\s19-splice-check.ps1;[ses_ec1d9d15] bash path outside allowlist: C:\\Users\\lhh\\AppData\\Local\\Temp\\opencode\\s19-splice-check.ps1;[ses_ec1d9d15] write without filePath",
+  "S19-phantom-update-stale-host/noskill": "invalid:[ses_ebfd99e2] read outside allowlist: E:\\deepseek-harness\\dsh-plugin-upgrade-skill\\benchmark\\results\\artifacts\\2026-10-12-step5-preview-s1-s24-r1\\noskill\\S19-phantom-upgrade-skill\\fixture\\lib-index-e;[ses_ebfd99e2] read outside allowlist: E:\\deepseek-harness\\dsh-plugin-upgrade-skill\\benchmark\\results\\artifacts\\2026-10-12-step5-preview-s1-s24-r1\\noskill\\S19-phantom-upgrade-skill\\fixture\\lib-index-e;[ses_ebfd99e2] read outside allowlist: E:\\deepseek-harness\\dsh-plugin-upgrade-skill\\benchmark\\results\\artifacts\\2026-10-12-step5-preview-s1-s24-r1\\noskill\\S19-phantom-upgrade-skill\\fixture\\asset-route;[ses_ebfd99e2] read outside allowlist: E:\\deepseek-harness\\dsh-plugin-upgrade-skill\\benchmark\\results\\artifacts\\2026-10-12-step5-preview-s1-s24-r1\\noskill\\S19-phantom-upgrade-skill\\fixture\\package.jso;[ses_ebfd99e2] read outside allowlist: E:\\deepseek-harness\\dsh-plugin-upgrade-skill\\benchmark\\results\\artifacts\\2026-10-12-step5-preview-s1-s24-r1\\noskill\\S19-phantom-upgrade-skill\\fixture\\package.jso;[ses_ebfd99e2] read outside allowlist: E:\\deepseek-harness\\dsh-plugin-upgrade-skill\\benchmark\\results\\artifacts\\2026-10-12-step5-preview-s1-s24-r1\\noskill\\S19-phantom-upgrade-stale-host\\agent-output\\S",
+  "S19-phantom-update-stale-host/skill": "clean",
   "S20-msvc-flock-trap/noskill": "clean",
   "S20-msvc-flock-trap/skill": "clean",
   "S21-resource-service-unavailable-trap/noskill": "clean",
@@ -106,7 +110,7 @@
   "S10-paste-rename-and-version-chip/noskill": "clean",
   "S10-paste-rename-and-version-chip/skill": "clean",
   "S11-mermaid-lazyload-trap/noskill": "invalid:[ses_ec64c989] bash path outside allowlist: E:/dsh/x/lib;[ses_ec64c989] bash path outside allowlist: e:/dsh/x/lib;[ses_ec64c989] bash path outside allowlist: E:\\\\\\\\dsh\\\\\\\\lib;[ses_ec64c989] bash path outside allowlist: E:\\\\\\\\dsh\\\\\\\\lib\\\\\\\\a.js;[ses_ec64c989] bash path outside allowlist: E:\\\\\\\\dsh\\\\\\\\lib;[ses_ec64c989] bash path outside allowlist: e:\\\\\\\\dsh\\\\\\\\lib\\\\\\\\a.js",
-  "S11-mermaid-lazyload-trap/skill": "invalid:[ses_ec64c530] bash filesystem command without explicit allowed path (acts on session cwd E:/deepseek-harness/dsh-plugin-upgrade-skill): node --version; $PSVersionTable.PSVersion.ToString();[ses_ec64c530] write outside allowlist: C:\\Users\\lhh\\AppData\\Local\\Temp\\opencode\\s11-probe.js;[ses_ec64c530] bash path outside allowlist: C:\\Users\\lhh\\AppData\\Local\\Temp\\opencode\\s11-probe.js;[ses_ec64c530] write outside allowlist: C:\\Users\\lhh\\AppData\\Local\\Temp\\opencode\\s11-probe.js;[ses_ec64c530] bash path outside allowlist: C:\\Users\\lhh\\AppData\\Local\\Temp\\opencode\\s11-probe.js;[ses_ec64c530] bash path outside allowlist: C:\\Users\\lhh\\AppData\\Local\\Temp\\opencode\\s11-probe.js",
+  "S11-mermaid-lazyload-trap/skill": "clean",
   "S12-global-upgrade-ebusy-trap/noskill": "clean",
   "S12-global-upgrade-ebusy-trap/skill": "clean",
   "S13-peer-range-vs-runtime/noskill": "invalid:[ses_ec636739] glob without path defaults to session cwd E:/deepseek-harness/dsh-plugin-upgrade-skill (outside allowlist); pattern='E:\\\\deepseek-harness\\\\dsh-plugin-upgrade-skill\\\\benchmark\\\\results\\\\",
@@ -123,7 +127,7 @@
   "S18-terminal-sprite-render-trap/skill": "invalid:[ses_ec5c485a] bash path outside allowlist: E:\\deepseek-harness\\dsh-plugin-upgrade-skill"
  },
  "skill_use": {
-  "S19-phantom-update-stale-host": "A1-01,A1-05,A1-06,A2-01,A2-04",
+  "S19-phantom-update-stale-host": "A2-04",
   "S20-msvc-flock-trap": "A1-03,A1-13",
   "S21-resource-service-unavailable-trap": "A1-11,A1-20,A2-01,A2-02,A2-09,A2-14",
   "S22-duplicate-insert-boot-crash-trap": "A1-16,A1-20",
@@ -139,7 +143,7 @@
   "S8-release-routing-trap": "none",
   "S9-composer-coordinate-trap": "A1-08",
   "S10-paste-rename-and-version-chip": "none",
-  "S11-mermaid-lazyload-trap": "none",
+  "S11-mermaid-lazyload-trap": "A1-19",
   "S12-global-upgrade-ebusy-trap": "none",
   "S13-peer-range-vs-runtime": "A1-03,A4-01,A4-02,A4-03,A4-04,A4-05,A4-06",
   "S14-link-install-lock-trap": "A1-19,A1-26,A2-03,A2-04",
@@ -152,8 +156,9 @@
  "cell_counts": {
   "ok": 25,
   "relaunched": 3,
+  "rerun": 2,
   "silent-failure": 0,
-  "invalid:roaming": 20,
+  "invalid:roaming": 18,
   "invalid:fixture": 0,
   "no-report": 0,
   "pending": 0
@@ -162,5 +167,5 @@
   "subagent cwd inherited from orchestrator session (opencode task tool exposes no cwd parameter); all solver prompts are absolute-path based so the WORKSPACE BOUNDARY allowlist is unaffected; recorded per transparency",
   "concurrency: up to 3 solver subagents in flight per batch"
  ],
- "updated_at": "2026-10-15T09:31:26Z"
+ "updated_at": "2026-10-16T02:48:33Z"
 }

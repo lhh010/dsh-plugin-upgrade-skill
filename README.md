@@ -2,7 +2,8 @@
 
 **简体中文** | [English](README.en.md)
 
-[![arXiv](https://img.shields.io/badge/arXiv-2609.30120-b31b1b.svg)](https://arxiv.org/abs/2609.30120) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Skills](https://img.shields.io/badge/skills-11-blue) ![Upgrade cards](https://img.shields.io/badge/upgrade%20cards-198-blue) ![Benchmark](https://img.shields.io/badge/benchmark-65%20tasks-blue)
+[![arXiv](https://img.shields.io/badge/arXiv-2609.30120-b31b1b.svg)](https://arxiv.org/abs/2609.30120) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Skills](https://img.shields.io/badge/skills-11-blue) ![Upgrade cards](https://img.shields.io/badge/upgrade%20cards-238-blue) ![Benchmark](https://img.shields.io/badge/benchmark-65%20tasks-blue)
+
 **教 AI 帮你升级 DSH 插件的 skill 集合**，社区共建。
 
 [DSH（DeepSeek Harness）](https://github.com/deepseek-ai/deepseek-harness) 是一个"所有功能都以插件形式存在"的 AI 运行框架。麻烦在于：**DSH 每次发新版，老插件就可能启动不了**。本仓库把已知的坑整理成 AI 读得懂的升级手册，让 Claude Code、Codex、Gemini 等 agent 帮你把插件安全迁到新版本，并用一套公开的 benchmark 检验这件事到底有没有做对。
@@ -11,7 +12,7 @@
 
 ## 这个仓库里有什么
 
-- **198 张升级说明卡**：每张卡记录一个真实的坑——什么坏了、为什么坏、怎么修、信息来自哪个版本。按版本走廊排好序，覆盖 0.1.0-rc.8 → 0.2.0-rc.2（其中 0.1.7-rc.1 → 0.1.7-rc.2 一段尚未成卡），每条边的卡数与状态见下方[覆盖表](#升级卡覆盖到哪个版本了)。
+- **238 张升级说明卡**：每张卡记录一个真实的坑——什么坏了、为什么坏、怎么修、信息来自哪个版本。按版本走廊排好序，覆盖 0.1.0-rc.8 → 0.2.1-rc.5，并在 rc.4 处分出 0.2.2-alpha.2 一支（其中 0.1.7-rc.1 → 0.1.7-rc.2 一段尚未成卡），每条边的卡数与状态见下方[覆盖表](#升级卡覆盖到哪个版本了)。
 - **13 条通用对策**：与具体版本无关的坑（先备份、新旧共存、启动卡死怎么办等），集中在一份清单里。
 - **11 个 skill**：统一工作流负责选择与编排，另外九个分别负责查升级、写插件、测插件、发插件、对比两个版本、排查运行时故障、接入重依赖、宿主升级后巡检整批已装插件、把升级经验提取成考题；还有一个不含 DSH 专有知识的通用迁移方法论，用作对照实验的控制组。
 - **65 道自动判分的考题（benchmark）**：27 道笔试（读代码给答案）、38 道实操（真装 dsh 真跑插件），其中包含 dsh-web 与 dsh-data-agent 两次真实迁移。
@@ -162,6 +163,18 @@ Claude Code 中按名字调用 skill（插件安装后带命名空间）：
 | 0.1.7-rc.1 → 0.1.7-rc.2 | 📝 等社区认领 / 尚未成卡 | — | 346 个提交，含真实改动（Schedule 先进默认 Web 组合再被禁用、native-command Windows 适配器、auto-review、user-questions 限时等待、工具描述精简、插件管理器修复）；`plan-migration` 从 ≤0.1.7-rc.1 出发会报走廊缺口。想帮忙写卡？看 [贡献指南](CONTRIBUTING.md) |
 | 0.1.7-rc.2 → 0.2.0-rc.1 | 📝 草稿 | [v0.2.0-rc.1.md](skills/plugin-upgrade/references/v0.2.0-rc.1.md) | 6 张草稿卡（宿主包跨到 0.2.0：所有 `^0.1.x` 下限的 DSH peer 被拒，`^0.2.0` 本身也不接受 rc 宿主——附实测范围表与一手证据；Web 工作详情默认改为 `detailed`、默认值移入客户端代码、`transcriptView` 变为可选；Schedule 行移出默认 web-app bundle，改由 `@deepseek-ai/dsh-experimental-schedule-bundle` 提供；bundle 组合新增遥测行；`fork` 新增 `onCreated`；Explorer 打开路径改为可见窗口，可撤掉本地 reveal 热修。两条 Desktop 0.2.0-rc.2 现场记录已折叠进下一条边卡集） |
 | 0.2.0-rc.1 → 0.2.0-rc.2 | 📝 草稿 | [v0.2.0-rc.2.md](skills/plugin-upgrade/references/v0.2.0-rc.2.md) | 3 张草稿卡（桌面运行时面，实机 Desktop 0.2.0-rc.2 一手验证：Electron 壳经 `dsh-app://app` 转发渲染进程请求前删除 `host`/`origin`/`cookie`/`sec-fetch-site`、WS origin 改写为 Host authority——要求肯定性浏览器标记的插件 fence 全线 403，按平台围栏信任语义修正；原两条现场笔记折叠成卡：Desktop `ctx.sessions` 注册表为空（附上游 discussion 链接）、Windows 子进程 PATH 最小化；未归因现场笔记记录 `readSession` seeded 会话重放校验）。下一条边 0.2.1-alpha.1 另有在途认领 |
+| 0.2.0-rc.2 → 0.2.1-alpha.1 | 📝 草稿 | [v0.2.1-alpha.1.md](skills/plugin-upgrade/references/v0.2.1-alpha.1.md) | 8 张草稿卡（运行时 invariant 插件与 `./invariant` 导出移除、输入区统计拆为 `activity`/`usage`、子路径插件改走子路径导出取展示文本与图标、Schedule 进默认 Web 组合、样式注入 owner 化、安装回报实际版本、依赖映射生命周期、HMR 刷新清单） |
+| 0.2.1-alpha.1 → 0.2.1-alpha.2 | 📝 草稿 | [v0.2.1-alpha.2.md](skills/plugin-upgrade/references/v0.2.1-alpha.2.md) | 11 张草稿卡（工具展示 `both` 模式移除、子代理改为受管 activation、Agent Team 直投 Inbox、`dshHome` 键移除、Python PTC 需 `sandbox`/`sandboxPolicy`、`{{cwd}}` 变量移除、Web profile 去掉 `webRuntime`（改 `webStartup`）等） |
+| 0.2.1-alpha.2 → 0.2.1-alpha.3 | 📝 草稿 | [v0.2.1-alpha.3.md](skills/plugin-upgrade/references/v0.2.1-alpha.3.md) | 5 张草稿卡（Azure 提供方改名 `azure`、API Key 优先级按表面分裂、插件更新热生效、`--from-default-profile` 整体替换已有配置） |
+| 0.2.1-alpha.3 → 0.2.1-alpha.4 | 📝 草稿 | [v0.2.1-alpha.4.md](skills/plugin-upgrade/references/v0.2.1-alpha.4.md) | 3 张草稿卡（兼容判定优先读 `engines.dsh`（`includePrerelease` 语义）、自定义插件索引源） |
+| 0.2.1-alpha.4 → 0.2.1-alpha.5 | 📝 草稿 | [v0.2.1-alpha.5.md](skills/plugin-upgrade/references/v0.2.1-alpha.5.md) | 2 张草稿卡（新增单 owner 的 `conversation.input.model.label` slot、`/` 菜单随插件启停刷新等修复） |
+| 0.2.0-rc.2 ⇒ 0.2.1-alpha.5（jump） | 📝 草稿 | [jump-0.2.0-rc.2-to-0.2.1-alpha.5.md](skills/plugin-upgrade/references/jump-0.2.0-rc.2-to-0.2.1-alpha.5.md) | 20 张 jump 卡（不是走廊边，而是给从 0.2.0-rc.2 直接跳到 0.2.1-alpha.5 的部署看的合并净变更视图，约 1900 个提交：`engines.dsh` 优先与 `requirements` 改名、invariant 体系退役、`webRuntime`→`webStartup`、`{{cwd}}` 移除、子代理委派换代、配置键删除带、client API 删除、协议对端变更、Windows 舰队机制卡等；对应的逐边卡为 A1–A5） |
+| 0.2.1-alpha.5 → 0.2.1-rc.1 | 📝 草稿 | [v0.2.1-rc.1.md](skills/plugin-upgrade/references/v0.2.1-rc.1.md) | 3 张草稿卡（插件全生命周期依赖同步、五个实验性插件席位、杂项能力） |
+| 0.2.1-rc.1 → 0.2.1-rc.3 | 📝 草稿 | [v0.2.1-rc.3.md](skills/plugin-upgrade/references/v0.2.1-rc.3.md) | 3 张草稿卡（rc.2+rc.3 合为一条边：V4.1-Flash-1017 适配器与可选 DeepSeek Search/Fetch、插件发现「更多」菜单、新会话重新复用空白会话（推翻 DSH-0.2.1-A2-07）） |
+| 0.2.1-rc.3 → 0.2.1-rc.4 | 📝 草稿 | [v0.2.1-rc.4.md](skills/plugin-upgrade/references/v0.2.1-rc.4.md) | 1 张草稿卡（版本同步发布：CLI `lib/` 逐字节相同，仅 ACP stdout 诊断泄漏修复） |
+| 0.2.1-rc.4 → 0.2.1-rc.5 | 📝 草稿 | [v0.2.1-rc.5.md](skills/plugin-upgrade/references/v0.2.1-rc.5.md) | 1 张草稿卡（`conversation.chat.reasoning.body` 的 `text` 改为展示文本、原始输出移到新增 `rawText`） |
+| 0.2.1-rc.4 → 0.2.2-alpha.2 | 📝 草稿 | [v0.2.2-alpha.2.md](skills/plugin-upgrade/references/v0.2.2-alpha.2.md) | 3 张草稿卡（0.2.2 线起点（与 rc.5 分叉）：插件管理器第三方包更新、Web 客户端移动端重做、六插件契约巡检；**34 篇上游升级指南尚未成卡**（含 Node.js 24.9 下限等破坏性变更），见文件末尾清单） |
+| 0.2.1-alpha.5 ⇒ 0.2.2-alpha.2（jump） | 📝 草稿 | [jump-0.2.1-alpha.5-to-0.2.2-alpha.2.md](skills/plugin-upgrade/references/jump-0.2.1-alpha.5-to-0.2.2-alpha.2.md) | 6 张 jump 卡（不是走廊边，而是从 0.2.1-alpha.5 直接跳到 0.2.2-alpha.2 的合并视图：兼容清单门槛、依赖感知的插件生命周期、模型与 Web 面、README 详情页、新 Web 客户端、舰队验证记录；与逐边文件共享 34 篇未成卡的上游指南缺口） |
 
 ## 考题（benchmark）
 

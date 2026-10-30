@@ -58,6 +58,13 @@ The runner performs these operations in order:
 5. Cold-starts the configured real DSH entry and waits for the readiness pattern.
 6. Runs the optional functional probe.
 7. Requests graceful shutdown, records the container exit, and removes the container.
+   After the requested `SIGTERM`, the start process must exit with code `0`,
+   terminate with native `SIGTERM`, or return the POSIX wrapper status `143`
+   (`128 + SIGTERM`) within `shutdownGraceSeconds`. Status `143` is accepted only
+   after the runner sends `SIGTERM`; it still fails if observed before teardown.
+   Any other nonzero exit, unexpected signal, or forced shutdown after the grace
+   period fails the teardown check. Wrappers must also stop their child processes;
+   an accepted exit status alone does not prove application-level cleanup.
 
 While the container runs, the host samples `docker stats --no-stream`. Both reports include elapsed time, peak sampled memory, peak sampled CPU, step results, the artifact SHA-256, redacted logs, and explicit unverified boundaries.
 

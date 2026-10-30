@@ -162,8 +162,11 @@ for (const [file, kind] of [
   if (!['draft', 'reviewed'].includes(meta.status)) fail(file, `invalid status: ${meta.status}`)
   if (!['curated', 'complete'].includes(meta.coverage)) fail(file, `invalid coverage: ${meta.coverage}`)
   if (kind === 'dsh-version-card-set') {
-    if (edges.has(meta.from)) fail(file, `duplicate corridor edge from ${meta.from}`)
-    edges.set(meta.from, meta.to)
+    // Release lines can branch (an rc line and the next alpha line from one tag), so
+    // a tag may have several outgoing edges; only an identical from → to pair is a duplicate.
+    const targets = edges.get(meta.from) ?? new Set()
+    if (targets.has(meta.to)) fail(file, `duplicate corridor edge ${meta.from} → ${meta.to}`)
+    edges.set(meta.from, targets.add(meta.to))
   }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(meta.verifiedAt))) fail(file, `verifiedAt must be an ISO date (YYYY-MM-DD), got: ${meta.verifiedAt}`)
 
@@ -210,18 +213,19 @@ for (const [file, kind] of [
 }
 
 // Corridor edges must not cycle.
-for (const start of edges.keys()) {
-  const seen = new Set()
-  let cursor = start
-  while (edges.has(cursor)) {
-    if (seen.has(cursor)) {
-      fail(join(referencesDir, 'README.md'), `version corridor cycle at ${cursor}`)
-      break
+const edgeState = new Map()
+const visitEdges = (node) => {
+  edgeState.set(node, 'open')
+  for (const next of edges.get(node) ?? []) {
+    if (edgeState.get(next) === 'open') {
+      fail(join(referencesDir, 'README.md'), `version corridor cycle at ${next}`)
+    } else if (!edgeState.has(next)) {
+      visitEdges(next)
     }
-    seen.add(cursor)
-    cursor = edges.get(cursor)
   }
+  edgeState.set(node, 'done')
 }
+for (const start of edges.keys()) if (!edgeState.has(start)) visitEdges(start)
 
 // Every full card reference in Markdown must resolve; retired short IDs are forbidden.
 for (const file of markdownFiles) {
